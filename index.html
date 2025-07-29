@@ -17,7 +17,7 @@
     body {
         background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
         color: white;
-        min-height: 80vh;
+        min-height: 90vh;
         display: flex;
         flex-direction: column;
         position: relative;
@@ -94,7 +94,7 @@
         padding: 10px;
         margin: 10px 0;
         text-align: center;
-        min-height: 80px;
+        min-height: 90px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -133,7 +133,7 @@
 
     .username-display {
         text-align: center;
-        font-size: 18px;
+        font-size: 16px;
         margin-top: 15px;
         background: rgba(255,255,255,0.1);
         padding: 8px 15px;
@@ -601,7 +601,7 @@
         </div>
 
         <div class="footer">
-            Minewall Mini App © 2023 | Play and Earn
+            Minewall Mini App © 2025 | Play and Earn
         </div>
     </div>
 
@@ -616,7 +616,7 @@
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="stat-label">COINS</div>
-                <div class="stat-value" id="coinDisplay">300</div>
+                <div class="stat-value" id="coinDisplay">200</div>
             </div>
             <div class="stat-item">
                 <div class="stat-label">USD BALANCE</div>
@@ -744,7 +744,7 @@
         </div>
 
         <div class="footer">
-            Minewall Mini App © 2025 | Version 1.2.0
+            Minewall Mini App © 2025 | Version 1.1.0
         </div>
     </div>
 
@@ -817,7 +817,7 @@
     
     // Game state
     const gameState = {
-        coins: 300,
+        coins: 200,
         usd: 0,
         level: 1,
         diamondsFound: 0,
@@ -867,7 +867,7 @@
 
     // Load game state from localStorage
     function loadGameState() {
-        const savedState = localStorage.getItem('minewallGameState');
+        const savedState = localStorage.getItem('minewallState');
         if (savedState) {
             Object.assign(gameState, JSON.parse(savedState));
         }
@@ -876,7 +876,7 @@
 
     // Save game state to localStorage
     function saveGameState() {
-        localStorage.setItem('minewallGameState', JSON.stringify(gameState));
+        localStorage.setItem('minewallState', JSON.stringify(gameState));
     }
 
     // Setup event listeners
@@ -1083,7 +1083,7 @@
     function calculateMinesCount() {
         let baseMines = 4;
         const difficultyFactor = gameState.difficulty === 'easy' ? 0 : 
-                              gameState.difficulty === 'medium' ? 1 : 2;
+                              gameState.difficulty === 'medium' ? 0 : 1;
         return baseMines + Math.floor(gameState.level / 3) + difficultyFactor;
     }
 
@@ -1172,7 +1172,7 @@
         // Show lose modal after delay
         setTimeout(() => {
             document.getElementById('loseModal').style.display = 'flex';
-        }, 3000); // 3 second delay
+        }, 2000); // 2 second delay
     }
 
     // Level complete function with delay
@@ -1181,7 +1181,7 @@
         clearInterval(gameState.timerInterval);
 
         // Update game state
-        gameState.coins += 10;
+        gameState.coins += 0;
         gameState.usd += 0.05;
         gameState.level++;
 
@@ -1191,7 +1191,7 @@
         // Show win modal after delay
         setTimeout(() => {
             document.getElementById('winModal').style.display = 'flex';
-        }, 3000); // 3 second delay
+        }, 2000); // 2 second delay
 
         showRewardedAd();
     }
@@ -1319,7 +1319,7 @@
             const message = `🚀 New Withdrawal Request 🚀
             
 👤 User: ${gameState.username}
-💰 Amount: $${amount.toFixed(2)}
+💰 Amount: $${amount.toFixed(5)}
 📭 Wallet: ${walletAddress}
             
 #withdrawal #request`;
