@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minezwall - Telegram Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Minewall - Telegram Mini App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -13,72 +13,524 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
             color: white;
-            min-height: 100vh;
+            min-height: 90vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
-        
+
         .container {
             max-width: 480px;
-            width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
-        
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 15px 10px;
             background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
+            position: relative;
         }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
+
+        .menu-button, .back-button {
+            background: #4e54c8;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
-        
-        .logo i {
-            color: #4dffb8;
-        }
-        
-        .restriction-container {
-            background: rgba(0, 0, 0, 0.7);
+
+        .daily-bonus {
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            border: none;
+            color: white;
+            padding: 8px 15px;
             border-radius: 20px;
-            padding: 30px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .game-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+
+        .page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .ad-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-label {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+        }
+
+        .ad-content {
+            padding: 10px;
             text-align: center;
             width: 100%;
-            margin-top: 30px;
         }
-        
-        .channel-icon {
-            font-size: 60px;
-            color: #0088cc;
+
+        .ad-content h3 {
+            margin-bottom: 5px;
+            color: #ff8a00;
+        }
+
+        .ad-content p {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .ad-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+        }
+
+        .ad-banner {
+            background: linear-gradient(135deg, #ff8a00, #da1b60);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .ad-timer {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .start-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            margin: 20px auto;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        .start-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+
+        .username-display {
+            text-align: center;
+            font-size: 16px;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .cell {
+            aspect-ratio: 1/1;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell::before {
+            content: "?";
+            position: absolute;
+            font-size: 24px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .cell.revealed {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .cell.revealed::before {
+            display: none;
+        }
+
+        .cell.mine {
+            background: #ff464d;
+        }
+
+        .cell.diamond {
+            background: #4dffb8;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .control-button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .skip-ad {
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+        }
+
+        .skip-coin {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+
+        .restart {
+            background: linear-gradient(to right, #1d976c, #93f9b9);
+        }
+
+        .withdraw-form {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .submit-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            top: 50px;
+            left: 0;
+        }
+
+        .dropdown-content button {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dropdown-content button:hover {
+            background: rgba(78, 84, 200, 0.7);
+        }
+
+        .dropdown.show .dropdown-content {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .modal h2 {
+            font-size: 28px;
             margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .modal p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+
+        .modal-button:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
             animation: pulse 2s infinite;
         }
-        
-        h1 {
-            font-size: 28px;
-            margin-bottom: 15px;
-            color: #4dffb8;
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
         }
-        
-        p {
-            font-size: 18px;
+
+        .bounce {
+            animation: bounce 1s;
+        }
+
+        @keyframes diamondGlow {
+            0% { box-shadow: 0 0 5px #4dffb8; }
+            50% { box-shadow: 0 0 20px #4dffb8; }
+            100% { box-shadow: 0 0 5px #4dffb8; }
+        }
+
+        .diamond-glow {
+            animation: diamondGlow 1.5s infinite;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .channel-restriction {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .channel-restriction h2 {
             margin-bottom: 20px;
+            color: #ff8a00;
+        }
+
+        .channel-restriction p {
+            margin-bottom: 25px;
             line-height: 1.6;
         }
-        
+
         .join-button {
             background: linear-gradient(to right, #00c9ff, #92fe9d);
             border: none;
@@ -86,245 +538,968 @@
             padding: 15px 30px;
             font-size: 18px;
             font-weight: bold;
-            border-radius: 50px;
-            text-decoration: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 10px 0;
             display: inline-block;
-            margin: 15px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-decoration: none;
         }
-        
-        .verify-button {
-            background: linear-gradient(to right, #ff8a00, #da1b60);
+
+        .channel-icon {
+            font-size: 60px;
+            color: #4dffb8;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .check-membership {
+            background: #4e54c8;
             border: none;
             color: white;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
+            padding: 10px 20px;
+            border-radius: 30px;
             cursor: pointer;
-            width: 100%;
-            max-width: 300px;
-            margin: 20px 0;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        .hint {
-            font-size: 14px;
-            opacity: 0.8;
             margin-top: 15px;
         }
-        
-        .ad-container {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: center;
-        }
-        
-        .ad-label {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
+
+        .error-message {
+            color: #ff6b6b;
             font-size: 14px;
-            display: inline-block;
-            margin-bottom: 10px;
+            margin-top: 5px;
+            display: none;
         }
-        
-        .status-container {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
-            margin: 20px 0;
-        }
-        
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .status-label {
-            font-weight: bold;
-        }
-        
-        .status-value {
-            color: #4dffb8;
-        }
-        
-        .loader {
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top: 5px solid #4dffb8;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
+
         @media (max-width: 480px) {
-            .restriction-container {
-                padding: 20px 15px;
+            .game-grid {
+                gap: 6px;
             }
-            
-            h1 {
+            .control-button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .game-title {
                 font-size: 24px;
             }
-            
-            p {
-                font-size: 16px;
-            }
-            
-            .join-button, .verify-button {
-                padding: 12px 25px;
-                font-size: 16px;
+            .start-button {
+                padding: 15px 30px;
+                font-size: 20px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <div class="logo">
-                <i class="fas fa-gem"></i>
-                <span>MINEZWALL</span>
-            </div>
-        </div>
-        
-        <div class="restriction-container" id="restrictionPage">
-            <div class="channel-icon">
-                <i class="fab fa-telegram"></i>
-            </div>
-            
-            <h1>🔒 Channel Membership Required</h1>
-            
-            <p>To play Minezwall and earn real rewards, you have to join our official Telegram channel first.</p>
-            
-            <a href="https://t.me/MinezwallOfficial" class="join-button" target="_blank">
-                <i class="fab fa-telegram"></i> Join Channel Now
-            </a>
-            
-            <p>After joining, click below to verify your membership:</p>
-            
-            <button class="verify-button" id="verifyButton" onclick="verifyMembership()">
-                <i class="fas fa-check-circle"></i> Verify Membership
-            </button>
-            
-            <p class="hint">
-                <i class="fas fa-lightbulb"></i> This will open a chat with our verification bot
-            </p>
-            
-            <div class="status-container" id="statusContainer">
-                <div class="status-item">
-                    <span class="status-label">Channel Joined:</span>
-                    <span class="status-value" id="channelStatus">Not verified</span>
+        <!-- Restriction Page (shown by default) -->
+        <div id="restrictionPage" class="page active">
+            <div class="game-title">Minewall</div>
+            <div class="channel-restriction">
+                <div class="channel-icon">
+                    <i class="fab fa-telegram"></i>
                 </div>
-                <div class="status-item">
-                    <span class="status-label">Verification Status:</span>
-                    <span class="status-value" id="verificationStatus">Pending</span>
+                <h2>Join Our Telegram Channel</h2>
+                <p>To access this game and start earning rewards, you need to join our official Telegram channel.</p>
+                <p>This helps us build a community and provide updates about the game.</p>
+                <a href="https://t.me/Minezwall" class="join-button" target="_blank">
+                    <i class="fab fa-telegram"></i> Join Channel
+                </a>
+                <p style="margin-top: 20px;">After joining, click the button below to verify and access the game:</p>
+                <button class="check-membership" onclick="checkChannelMembership()">
+                    <i class="fas fa-check-circle"></i> I've Joined the Channel
+                </button>
+            </div>
+            <div class="ad-container">
+                <div class="ad-label">AD</div>
+                <div id="topAd">Advertisement Space</div>
+            </div>
+        </div>
+
+        <!-- Home Page (shown after joining channel) -->
+        <div id="homePage" class="page">
+            <div class="header">
+                <div class="dropdown" id="dropdownMenu">
+                    <button class="menu-button">≡</button>
+                    <div class="dropdown-content">
+                        <button onclick="showPage('withdraw')">Withdraw</button>
+                        <button onclick="showPage('settings')">Settings</button>
+                    </div>
+                </div>
+                <div class="game-title">Minewall</div>
+                <button class="daily-bonus" onclick="claimDailyBonus()">Daily Bonus</button>
+            </div>
+            <div class="ad-container">
+                <div class="ad-label">AD</div>
+                <div id="topAd">Advertisement Space</div>
+            </div>
+            <h1 class="game-title">MINEWALL</h1>
+            <div class="username-display" id="usernameDisplay">Welcome, Player!</div>
+            <button class="start-button pulse" onclick="startGame()">START GAME</button>
+            <div class="ad-container">
+                <div class="ad-label">AD</div>
+                <div id="bottomAd">Advertisement Space</div>
+            </div>
+            <div class="footer">
+                Minewall Mini App © 2025 | Play and Earn
+            </div>
+        </div>
+
+        <!-- Game Page -->
+        <div id="gamePage" class="page">
+            <div class="header">
+                <button class="back-button" onclick="showPage('home')">←</button>
+                <div class="game-title">Level: <span id="currentLevel">1</span></div>
+                <div></div>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">COINS</div>
+                    <div class="stat-value" id="coinDisplay">200</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="usdDisplay">$0.00</div>
+                </div>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">TIME</div>
+                    <div class="stat-value" id="timerDisplay">00:00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">DIAMONDS FOUND</div>
+                    <div class="stat-value" id="diamondsFound">0/4</div>
+                </div>
+            </div>
+            <div class="game-grid" id="gameGrid"></div>
+            <div class="game-controls">
+                <button class="control-button skip-ad" onclick="skipWithAd()">
+                    <i class="fas fa-ad"></i> Skip with Ad
+                </button>
+                <button class="control-button skip-coin" onclick="skipWithCoins()">
+                    <i class="fas fa-coins"></i> Skip with Coins
+                </button>
+                <button class="control-button restart" onclick="restartLevel()">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+            </div>
+            <div class="ad-container">
+                <div class="ad-label">AD</div>
+                <div id="bottomAd">Advertisement Space</div>
+            </div>
+        </div>
+
+        <!-- Withdraw Page -->
+        <div id="withdrawPage" class="page">
+            <div class="header">
+                <button class="back-button" onclick="showPage('home')">←</button>
+                <div class="game-title">Withdraw Funds</div>
+                <div></div>
+            </div>
+            <div class="withdraw-form">
+                <h2 style="text-align: center; margin-bottom: 20px;">Withdraw Your Earnings</h2>
+                <p style="text-align: center; margin-bottom: 20px; color: #ff8a00;">
+                    Minimum withdrawal: $5.00 | Maximum: $50.00
+                </p>
+                <div class="stats-bar" style="margin-bottom: 20px;">
+                    <div class="stat-item">
+                        <div class="stat-label">AVAILABLE BALANCE</div>
+                        <div class="stat-value" id="withdrawUsdDisplay">$0.00</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="withdrawAmount">Amount to Withdraw (USDT)</label>
+                    <input type="number" id="withdrawAmount" placeholder="5.00" step="0.01" min="5" max="50">
+                    <div class="error-message" id="amountError"></div>
+                </div>
+                <div class="input-group">
+                    <label for="walletAddress">USDT Wallet Address (Polygon Network)</label>
+                    <input type="text" id="walletAddress" placeholder="0x...">
+                    <div class="error-message" id="walletError"></div>
+                </div>
+                <button class="submit-button" onclick="submitWithdrawal()">Submit Withdrawal Request</button>
+                <p style="text-align: center; margin-top: 20px; font-size: 12px; opacity: 0.7;">
+                    Withdrawals are processed within 24-72 hours
+                </p>
+            </div>
+            <div class="ad-container">
+                <div class="ad-label">AD</div>
+                <div id="bottomAd">Advertisement Space</div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settingsPage" class="page">
+            <div class="header">
+                <button class="back-button" onclick="showPage('home')">←</button>
+                <div class="game-title">Settings</div>
+                <div></div>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <h3>Sound Effects</h3>
+                    <p>Enable or disable game sounds</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <h3>Background Music</h3>
+                    <p>Enable or disable background music</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="musicToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="settings-item">
+                <div>
+                    <h3>Difficulty</h3>
+                    <p>Change game difficulty</p>
+                </div>
+                <select id="difficultySelect" style="padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.9);">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+            <div class="footer">
+                Minewall Mini App © 2025 | Version 1.1.0
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div class="modal" id="winModal">
+            <div class="modal-content">
+                <h2>Congratulations!</h2>
+                <p>You found all diamonds and completed the level!</p>
+                <p>Reward: +$0.05 USD</p>
+                <button class="modal-button" onclick="nextLevel()">Next Level</button>
+            </div>
+        </div>
+        <div class="modal" id="loseModal">
+            <div class="modal-content">
+                <h2>Game Over!</h2>
+                <p>You hit a mine. Try again or skip the level.</p>
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <button class="modal-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="skipWithAd()">Skip with Ad</button>
+                    <button class="modal-button" style="background: linear-gradient(to right, #00b09b, #96c93d);" onclick="skipWithCoins()">Skip with Coins</button>
+                    <button class="modal-button" style="background: linear-gradient(to right, #1d976c, #93f9b9);" onclick="restartLevel()">Restart Level</button>
                 </div>
             </div>
         </div>
-        
-        <div class="ad-container">
-            <div class="ad-label">ADVERTISEMENT</div>
-            <div id="adContent">Sponsored Content</div>
+        <div class="modal" id="dailyBonusModal">
+            <div class="modal-content">
+                <h2>Daily Bonus!</h2>
+                <p>You received 5 coins!</p>
+                <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
+            </div>
         </div>
-        
-        <div id="gamePreview" style="display: none;">
-            <!-- Game content will appear here after verification -->
+        <div class="modal" id="withdrawModal">
+            <div class="modal-content">
+                <h2>Withdrawal Requested</h2>
+                <p>Your withdrawal request has been submitted. Please allow 24-72 hours for processing.</p>
+                <button class="modal-button" onclick="closeModal('withdrawModal')">OK</button>
+            </div>
         </div>
+        <div class="modal" id="errorModal">
+            <div class="modal-content">
+                <h2>Error</h2>
+                <p id="errorMessage">An error occurred. Please try again.</p>
+                <button class="modal-button" onclick="closeModal('errorModal')">OK</button>
+            </div>
+        </div>
+        <div class="modal" id="adModal">
+            <div class="modal-content">
+                <h2>Advertisement</h2>
+                <p>Please watch this ad to continue. The ad will close in <span id="adCountdown">5</span> seconds...</p>
+                <div class="ad-banner">SPECIAL OFFER: Get 5 FREE coins!</div>
+                <div class="ad-timer">Ad completes in: <span id="adCountdown">5</span>s</div>
+            </div>
+        </div>
+
+        <!-- Audio Elements -->
+        <audio id="backgroundMusic" loop>
+            <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="clickSound">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="winSound">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="loseSound">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-losing-drums-2023.mp3" type="audio/mpeg">
+        </audio>
     </div>
 
     <script>
-        // Initialize Telegram WebApp
+        // Telegram configuration
+        const CHANNEL_ID = '@Minezwall';
+        const WITHDRAWAL_CHANNEL_ID = '@MinezwallWithdrawalpage';
+        const BOT_TOKEN = '8317302657:AAF4sLIS7xTmPKgDhtlXj7e15vwYkD9Nwxc';
+
+        // Game state
+        const gameState = {
+            coins: 200,
+            usd: 0,
+            level: 1,
+            diamondsFound: 0,
+            diamondsToFind: 4,
+            minesCount: 4,
+            grid: [],
+            gameActive: false,
+            timer: 0,
+            timerInterval: null,
+            soundEnabled: true,
+            musicEnabled: true,
+            difficulty: 'easy',
+            username: 'Player',
+            walletAddress: '',
+            hasJoinedChannel: false
+        };
+
+        // Telegram WebApp initialization
         const tg = window.Telegram.WebApp;
-        
-        // Get user ID from Telegram
-        const userId = tg.initDataUnsafe?.user?.id || "unknown";
-        
-        // Update status display
-        document.getElementById('channelStatus').textContent = 'Not verified';
-        document.getElementById('verificationStatus').textContent = 'Click verify button';
-        
-        // Verify membership function
-        function verifyMembership() {
-            const verifyButton = document.getElementById('verifyButton');
-            const statusContainer = document.getElementById('statusContainer');
+
+        // Initialize the game
+        function init() {
+            tg.ready();
+            tg.expand();
             
-            // Show loading state
-            verifyButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-            verifyButton.disabled = true;
+            // Get Telegram user info if available
+            if (tg.initDataUnsafe?.user) {
+                gameState.username = tg.initDataUnsafe.user.first_name || 'Player';
+                if (tg.initDataUnsafe.user.username) {
+                    gameState.username += ` (@${tg.initDataUnsafe.user.username})`;
+                }
+                document.getElementById('usernameDisplay').textContent = `Welcome, ${gameState.username}`;
+            }
             
-            // Update status
-            document.getElementById('verificationStatus').textContent = 'Request sent to bot';
+            loadGameState();
+            setupEventListeners();
+            startBackgroundMusic();
+            initAdContainers();
             
-            // Open chat with bot (using BotMill.io integration)
-            const botUsername = "@Minezwall_Bot"; // Replace with your bot username
-            const deepLink = `https://t.me/${botUsername}?start=verify_${userId}`;
+            setInterval(showPeriodicAd, 420000); // Show ad every 7 minutes
             
-            // Open in Telegram app
-            window.open(deepLink, '_blank');
-            
-            // Check verification status every 5 seconds
-            const verificationCheck = setInterval(() => {
-                document.getElementById('verificationStatus').textContent = 'Checking with bot...';
-                
-                // In a real implementation, this would check your backend
-                // For this demo, we'll simulate a successful verification after 10 seconds
-                setTimeout(() => {
-                    // Simulate successful verification
-                    document.getElementById('channelStatus').textContent = 'Verified!';
-                    document.getElementById('verificationStatus').textContent = 'Access granted';
-                    verifyButton.innerHTML = '<i class="fas fa-check"></i> Verified!';
-                    
-                    // Show success message
-                    setTimeout(() => {
-                        // Hide restriction page
-                        document.getElementById('restrictionPage').style.display = 'none';
-                        
-                        // Show game preview
-                        document.getElementById('gamePreview').style.display = 'block';
-                        document.getElementById('gamePreview').innerHTML = `
-                            <div class="restriction-container">
-                                <h1>🎮 Access Granted!</h1>
-                                <p>You can now play Minezwall and start earning rewards.</p>
-                                <button class="join-button" onclick="startGame()">
-                                    <i class="fas fa-play"></i> Start Playing Now
-                                </button>
-                                <div style="margin-top: 30px; font-size: 40px;">
-                                    🎉🎊✨
-                                </div>
-                            </div>
-                        `;
-                    }, 1500);
-                    
-                    // Clear interval
-                    clearInterval(verificationCheck);
-                }, 10000);
-            }, 5000);
+            if (gameState.hasJoinedChannel) {
+                showPage('home');
+            } else {
+                showPage('restriction');
+            }
         }
-        
+
+        // Initialize ad containers
+        function initAdContainers() {
+            const topAd = document.getElementById('topAd');
+            const bottomAd = document.getElementById('bottomAd');
+            
+            topAd.innerHTML = `
+                <div class="ad-content">
+                    <h3>Special Offer!</h3>
+                    <p>Get 5 free coins when you watch an ad</p>
+                    <button class="ad-button" onclick="showAdModal()">Watch Now</button>
+                </div>
+            `;
+            
+            bottomAd.innerHTML = `
+                <div class="ad-content">
+                    <h3>Double Your Rewards!</h3>
+                    <p>Watch an ad to earn extra coins</p>
+                    <button class="ad-button" onclick="showAdModal()">Watch Now</button>
+                </div>
+            `;
+        }
+
+        // Show ad modal
+        function showAdModal(callback) {
+            const modal = document.getElementById('adModal');
+            modal.style.display = 'flex';
+            
+            let countdown = 5;
+            document.getElementById('adCountdown').textContent = countdown;
+            
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('adCountdown').textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    modal.style.display = 'none';
+                    
+                    // Reward user for watching ad
+                    gameState.coins += 5;
+                    saveGameState();
+                    updateUI();
+                    
+                    if (callback) callback();
+                }
+            }, 1000);
+        }
+
+        // Show periodic ad
+        function showPeriodicAd() {
+            const currentPage = document.querySelector('.page.active').id;
+            if (currentPage === 'homePage' || currentPage === 'restrictionPage') {
+                showAdModal();
+            }
+        }
+
+        // Load game state from localStorage
+        function loadGameState() {
+            const savedState = localStorage.getItem('minewallState');
+            if (savedState) {
+                Object.assign(gameState, JSON.parse(savedState));
+            }
+            updateUI();
+        }
+
+        // Save game state to localStorage
+        function saveGameState() {
+            localStorage.setItem('minewallState', JSON.stringify(gameState));
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Dropdown menu
+            document.querySelector('.menu-button').addEventListener('click', function() {
+                document.getElementById('dropdownMenu').classList.toggle('show');
+            });
+            
+            // Close dropdown when clicking outside
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.menu-button')) {
+                    const dropdowns = document.getElementsByClassName('dropdown-content');
+                    for (let i = 0; i < dropdowns.length; i++) {
+                        const openDropdown = dropdowns[i];
+                        if (openDropdown.style.display === 'block') {
+                            openDropdown.style.display = 'none';
+                        }
+                    }
+                }
+            });
+            
+            // Settings toggles
+            document.getElementById('soundToggle').checked = gameState.soundEnabled;
+            document.getElementById('musicToggle').checked = gameState.musicEnabled;
+            document.getElementById('difficultySelect').value = gameState.difficulty;
+            
+            document.getElementById('soundToggle').addEventListener('change', toggleSound);
+            document.getElementById('musicToggle').addEventListener('change', toggleMusic);
+            document.getElementById('difficultySelect').addEventListener('change', function() {
+                gameState.difficulty = this.value;
+                saveGameState();
+            });
+        }
+
+        // Toggle sound effects
+        function toggleSound() {
+            gameState.soundEnabled = this.checked;
+            saveGameState();
+        }
+
+        // Toggle background music
+        function toggleMusic() {
+            gameState.musicEnabled = this.checked;
+            if (gameState.musicEnabled) {
+                startBackgroundMusic();
+            } else {
+                stopBackgroundMusic();
+            }
+            saveGameState();
+        }
+
+        // Start background music
+        function startBackgroundMusic() {
+            if (gameState.musicEnabled) {
+                const bgMusic = document.getElementById('backgroundMusic');
+                bgMusic.volume = 0.3;
+                bgMusic.play().catch(e => console.log('Auto-play prevented:', e));
+            }
+        }
+
+        // Stop background music
+        function stopBackgroundMusic() {
+            document.getElementById('backgroundMusic').pause();
+        }
+
+        // Play sound effect
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+            const sound = document.getElementById(`${type}Sound`);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log('Sound play prevented:', e));
+            }
+        }
+
+        // Show page function
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show requested page
+            document.getElementById(pageId + 'Page').classList.add('active');
+            
+            // Close dropdown
+            document.getElementById('dropdownMenu').classList.remove('show');
+            
+            // Update UI when showing certain pages
+            if (pageId === 'game') {
+                initGame();
+            } else if (pageId === 'withdraw') {
+                document.getElementById('withdrawUsdDisplay').textContent = `$${gameState.usd.toFixed(2)}`;
+            }
+        }
+
+        // Check channel membership using Telegram API
+        async function checkChannelMembership() {
+            const button = document.querySelector('.check-membership');
+            const originalText = button.innerHTML;
+            
+            try {
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+                button.disabled = true;
+                
+                const userId = tg.initDataUnsafe.user?.id;
+                if (!userId) {
+                    throw new Error('User information not available. Please make sure you\'re accessing this through Telegram.');
+                }
+                
+                // Check channel membership
+                const isMember = await verifyChannelMembership(userId);
+                
+                if (isMember) {
+                    gameState.hasJoinedChannel = true;
+                    saveGameState();
+                    showSuccessMessage("Thank you for joining our channel! You now have full access to the game.");
+                    showPage('home');
+                } else {
+                    showErrorMessage("We couldn't verify your membership. Please make sure you've joined the channel and try again.");
+                }
+            } catch (error) {
+                console.error('Membership check failed:', error);
+                showErrorMessage("Verification failed. Please try again later or contact support.");
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Verify channel membership with Telegram API
+        async function verifyChannelMembership(userId) {
+            // For public channels, we can use getChatMember
+            const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember`;
+            const params = `?chat_id=${CHANNEL_ID}&user_id=${userId}`;
+            
+            try {
+                const response = await fetch(apiUrl + params);
+                const data = await response.json();
+                
+                if (!data.ok) {
+                    console.error('Telegram API error:', data);
+                    throw new Error(data.description || 'Failed to verify membership');
+                }
+                
+                // Valid statuses: 'member', 'administrator', 'creator'
+                const validStatuses = ['member', 'administrator', 'creator'];
+                return validStatuses.includes(data.result.status);
+            } catch (error) {
+                console.error('Verification error:', error);
+                throw error;
+            }
+        }
+
         // Start game function
         function startGame() {
-            alert("Game would start now! In a real implementation, this would launch the full game.");
-            // Here you would show the game interface
+            // Prevent access if not joined channel
+            if (!gameState.hasJoinedChannel) {
+                showErrorMessage('Please join our Telegram channel first!');
+                showPage('restriction');
+                return;
+            }
+            showPage('game');
         }
-        
-        // Initialize
-        tg.ready();
+
+        // Initialize game grid
+        function initGame() {
+            gameState.diamondsFound = 0;
+            gameState.gameActive = true;
+            gameState.diamondsToFind = 4;
+            
+            // Set mines count based on level and difficulty (4-8 mines)
+            gameState.minesCount = calculateMinesCount();
+            
+            // Create grid
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = "";
+            gameState.grid = [];
+            
+            // Create cells
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => revealCell(i));
+                grid.appendChild(cell);
+                gameState.grid.push({ isMine: false, isRevealed: false, isDiamond: false });
+            }
+            
+            // Place mines
+            placeMines();
+            
+            // Place diamonds (4 diamonds in random non-mine cells)
+            placeDiamonds();
+            
+            // Update UI
+            updateUI();
+            
+            // Start timer
+            startTimer();
+        }
+
+        // Calculate mines count based on level and difficulty (4-8 mines)
+        function calculateMinesCount() {
+            let baseMines = 4;
+            const maxMines = 8; // Cap at 8 mines
+            
+            // Calculate difficulty factor
+            let difficultyFactor = 0;
+            if (gameState.difficulty === 'medium') difficultyFactor = 1;
+            if (gameState.difficulty === 'hard') difficultyFactor = 2;
+            
+            // Progressive scaling with cap
+            let mines = baseMines + Math.min(
+                Math.floor(gameState.level / 3) + difficultyFactor,
+                maxMines - baseMines
+            );
+            
+            // Ensure minimum 4 mines
+            return Math.max(mines, 4);
+        }
+
+        // Place mines randomly (4-8 mines)
+        function placeMines() {
+            let minesPlaced = 0;
+            const maxAttempts = 100; // to avoid infinite loop
+            
+            while (minesPlaced < gameState.minesCount && minesPlaced < maxAttempts) {
+                const randomIndex = Math.floor(Math.random() * 25);
+                if (!gameState.grid[randomIndex].isMine) {
+                    gameState.grid[randomIndex].isMine = true;
+                    minesPlaced++;
+                }
+            }
+        }
+
+        // Place diamonds (4 diamonds in random non-mine cells)
+        function placeDiamonds() {
+            let diamondsPlaced = 0;
+            const maxAttempts = 100; // to avoid infinite loop
+            
+            // First collect all non-mine cells
+            const nonMineCells = [];
+            for (let i = 0; i < 25; i++) {
+                if (!gameState.grid[i].isMine) {
+                    nonMineCells.push(i);
+                }
+            }
+            
+            // Shuffle the non-mine cells
+            shuffleArray(nonMineCells);
+            
+            // Place exactly 4 diamonds in random non-mine cells
+            while (diamondsPlaced < 4 && diamondsPlaced < nonMineCells.length) {
+                const cellIndex = nonMineCells[diamondsPlaced];
+                gameState.grid[cellIndex].isDiamond = true;
+                diamondsPlaced++;
+            }
+        }
+
+        // Helper function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Reveal cell function
+        function revealCell(index) {
+            if (!gameState.gameActive) return;
+            
+            const cell = gameState.grid[index];
+            const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
+            
+            if (cell.isRevealed) return;
+            
+            cell.isRevealed = true;
+            cellElement.classList.add('revealed');
+            
+            // Play sound
+            playSound('click');
+            
+            if (cell.isMine) {
+                // Mine hit - game over
+                cellElement.classList.add('mine');
+                cellElement.innerHTML = '💣';
+                gameOver();
+                return;
+            }
+            
+            if (cell.isDiamond) {
+                // Diamond found
+                cellElement.classList.add('diamond');
+                cellElement.innerHTML = '💎';
+                gameState.diamondsFound++;
+                playSound('win');
+                
+                // Add glow effect to found diamond
+                cellElement.classList.add('diamond-glow');
+                
+                if (gameState.diamondsFound === gameState.diamondsToFind) {
+                    // Level complete
+                    levelComplete();
+                }
+            } else {
+                // Empty cell
+                cellElement.innerHTML = "";
+            }
+            
+            updateUI();
+        }
+
+        // Game over function with delay
+        function gameOver() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            playSound('lose');
+            
+            // Reveal all mines
+            gameState.grid.forEach((cell, index) => {
+                if (cell.isMine) {
+                    const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
+                    cellElement.classList.add('mine', 'revealed');
+                    cellElement.innerHTML = '💣';
+                }
+            });
+            
+            // Show lose modal after delay
+            setTimeout(() => {
+                document.getElementById('loseModal').style.display = 'flex';
+            }, 2000); // 2 second delay
+        }
+
+        // Level complete function with delay
+        function levelComplete() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update game state
+            gameState.coins += 0;
+            gameState.usd += 0.05;
+            gameState.level++;
+            saveGameState();
+            
+            playSound('win');
+            
+            // Show win modal after delay
+            setTimeout(() => {
+                document.getElementById('winModal').style.display = 'flex';
+            }, 2000); // 2 second delay
+        }
+
+        // Next level function
+        function nextLevel() {
+            closeModal('winModal');
+            initGame();
+        }
+
+        // Start timer
+        function startTimer() {
+            gameState.timer = 0;
+            clearInterval(gameState.timerInterval);
+            
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer++;
+                updateTimer();
+            }, 1000);
+        }
+
+        // Update timer display
+        function updateTimer() {
+            const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
+            const seconds = (gameState.timer % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').textContent = `${minutes}:${seconds}`;
+        }
+
+        // Update UI elements
+        function updateUI() {
+            document.getElementById('currentLevel').textContent = gameState.level;
+            document.getElementById('coinDisplay').textContent = gameState.coins;
+            document.getElementById('usdDisplay').textContent = `$${gameState.usd.toFixed(2)}`;
+            document.getElementById('withdrawUsdDisplay').textContent = `$${gameState.usd.toFixed(2)}`;
+            document.getElementById('diamondsFound').textContent = `${gameState.diamondsFound}/${gameState.diamondsToFind}`;
+        }
+
+        // Skip level with ad
+        function skipWithAd() {
+            closeModal('loseModal');
+            showAdModal(() => {
+                skipLevelActions();
+            });
+        }
+
+        // Skip level with coins
+        function skipWithCoins() {
+            if (gameState.coins >= 10) {
+                gameState.coins -= 10;
+                skipLevelActions();
+                closeModal('loseModal');
+                saveGameState();
+                updateUI();
+            } else {
+                showErrorMessage('Not enough coins!');
+            }
+        }
+
+        // Actions when skipping level
+        function skipLevelActions() {
+            gameState.usd += 0.05;
+            gameState.level++;
+            saveGameState();
+            updateUI();
+            initGame();
+        }
+
+        // Restart level
+        function restartLevel() {
+            if (gameState.coins >= 5) {
+                gameState.coins -= 5;
+                saveGameState();
+                updateUI();
+                closeModal('loseModal');
+                initGame();
+            } else {
+                showErrorMessage('Not enough coins to restart!');
+            }
+        }
+
+        // Claim daily bonus
+        function claimDailyBonus() {
+            const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
+            const today = new Date().toDateString();
+            
+            if (lastClaimed !== today) {
+                gameState.coins += 5;
+                saveGameState();
+                updateUI();
+                localStorage.setItem('dailyBonusLastClaimed', today);
+                document.getElementById('dailyBonusModal').style.display = 'flex';
+            } else {
+                showErrorMessage('You already claimed your daily bonus today!');
+            }
+        }
+
+        // Submit withdrawal request
+        async function submitWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const walletAddress = document.getElementById('walletAddress').value.trim();
+            
+            // Reset error messages
+            document.getElementById('amountError').style.display = 'none';
+            document.getElementById('walletError').style.display = 'none';
+            
+            // Validate inputs
+            if (isNaN(amount) || amount < 5 || amount > 50) {
+                document.getElementById('amountError').textContent = "Please enter a valid amount between $5.00 and $50.00";
+                document.getElementById('amountError').style.display = 'block';
+                return;
+            }
+            
+            if (!walletAddress || !walletAddress.startsWith('0x') || walletAddress.length < 20) {
+                document.getElementById('walletError').textContent = "Please enter a valid Polygon USDT wallet address";
+                document.getElementById('walletError').style.display = 'block';
+                return;
+            }
+            
+            if (amount > gameState.usd) {
+                showErrorMessage(`Insufficient funds! Your balance is $${gameState.usd.toFixed(2)}`);
+                return;
+            }
+            
+            try {
+                // Prepare withdrawal message
+                const message = `🚀 New Withdrawal Request 🚀
+👤 User: ${gameState.username}
+💰 Amount: $${amount.toFixed(5)}
+📭 Wallet: ${walletAddress}
+#withdrawal #request`;
+                
+                // Send to Telegram channel
+                await sendToTelegramChannel(message);
+                
+                // Update user balance
+                gameState.usd -= amount;
+                saveGameState();
+                updateUI();
+                
+                // Clear form
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('walletAddress').value = '';
+                
+            } catch (error) {
+                console.error('Withdrawal failed:', error);
+                showErrorMessage("Failed to process withdrawal. Please try again later.");
+            }
+        }
+
+        // Send message to Telegram channel
+        async function sendToTelegramChannel(message) {
+            const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: WITHDRAWAL_CHANNEL_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+            
+            const data = await response.json();
+            if (!data.ok) {
+                throw new Error(data.description || 'Failed to send message');
+            }
+            
+            return data;
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Show error message
+        function showErrorMessage(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorModal').style.display = 'flex';
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            alert(message); // Replace with a proper success modal if needed
+        }
+
+        // Initialize game when page loads
+        window.onload = init;
     </script>
 </body>
 </html>
