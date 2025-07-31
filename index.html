@@ -956,28 +956,36 @@ gameState.minesCount = 5;
             document.getElementById('loseModal').style.display = 'flex';
         }
 
-        // Level complete function
-        function levelComplete() {
-            gameState.gameActive = false;
-            clearInterval(gameState.timerInterval);
-            
-            // Update game state
-            gameState.coins -= 10;
-            gameState.usd += 0.02;
-            gameState.level++;
-            
-            // Save state
-            saveGameState();
-            
-            // Play win sound
-            playSound('win');
-            
-            // Show win modal
-            document.getElementById('winModal').style.display = 'flex';
-            
-            // Show ad after level completion
-            showRewardedAd();
-        }
+        // Level complete function - MODIFIED to check coin balance
+function levelComplete() {
+    // Check if player has enough coins to proceed
+    if (gameState.coins <= 0) {
+        alert("You don't have enough coins to proceed to the next level!");
+        gameState.gameActive = false;
+        clearInterval(gameState.timerInterval);
+        return;
+    }
+    
+    gameState.gameActive = false;
+    clearInterval(gameState.timerInterval);
+    
+    // Update game state
+    gameState.coins -= 10;
+    gameState.usd += 0.02;
+    gameState.level++;
+    
+    // Save state
+    saveGameState();
+    
+    // Play win sound
+    playSound('win');
+    
+    // Show win modal
+    document.getElementById('winModal').style.display = 'flex';
+    
+    // Show ad after level completion
+    showRewardedAd();
+}
 
         // Next level function
         function nextLevel() {
