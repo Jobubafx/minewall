@@ -255,42 +255,28 @@
         }
         
         /* Withdraw Page */
-        .withdraw-form {
+        .withdraw-instructions {
             background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        
-        .input-group {
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 15px;
         }
         
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
+        .withdraw-instructions h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .withdraw-instructions p {
+            margin-bottom: 10px;
             font-size: 14px;
         }
         
-        .input-group input {
-            width: 100%;
-            padding: 12px;
+        .google-form-container {
+            flex: 1;
+            overflow: hidden;
             border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .submit-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 10px;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 10px;
+            background: white;
         }
         
         /* Settings Page */
@@ -527,8 +513,6 @@
             </div>
         </div>
         
-
-        
         <!-- Page Container -->
         <div id="homePage" class="page active">
             <h1 class="game-title">MINEZWALL</h1>
@@ -548,21 +532,21 @@
                 <div class="header-right"></div>
             </div>
             
-<!-- Combined Stats Bar -->
-<div class="stats-bar">
-    <div class="stat-item">
-        <div class="stat-label">COINS</div>
-        <div class="stat-value" id="coinDisplay">100</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-label">USD BALANCE</div>
-        <div class="stat-value" id="usdDisplay">$0.00</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-label">DIAMONDS FOUND</div>
-        <div class="stat-value" id="diamondsFound">0/4</div>
-    </div>
-</div>
+            <!-- Combined Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">COINS</div>
+                    <div class="stat-value" id="coinDisplay">100</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="usdDisplay">$0.00</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">DIAMONDS FOUND</div>
+                    <div class="stat-value" id="diamondsFound">0/4</div>
+                </div>
+            </div>
             
             <!-- Game Grid -->
             <div class="game-grid" id="gameGrid"></div>
@@ -600,24 +584,24 @@
                 </div>
             </div>
             
-            <div class="withdraw-form">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter your username">
+            <div style="padding: 10px; flex: 1; display: flex; flex-direction: column;">
+                <div class="withdraw-instructions">
+                    <h3>Withdrawal Instructions</h3>
+                    <p>1. Minimum withdrawal amount: $2.00</p>
+                    <p>2. Complete the form below to request withdrawal</p>
+                    <p>3. Withdrawals processed within 24-72 hours</p>
                 </div>
                 
-                <div class="input-group">
-                    <label for="withdrawAmount">Amount to Withdraw (USD)</label>
-                    <input type="number" id="withdrawAmount" placeholder="Minimum $2.00" min="2" step="0.01">
+                <div class="google-form-container">
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScOFTvTs54H9mFU_W8Z3ZmcFdplfafvL4x7_E5CaJY5uUVHfQ/viewform?embedded=true" 
+                            width="100%" 
+                            height="500" 
+                            frameborder="0" 
+                            marginheight="0" 
+                            marginwidth="0">
+                        Loading…
+                    </iframe>
                 </div>
-                
-                <div class="input-group">
-                    <label for="walletAddress">USDT Wallet Address</label>
-                    <input type="text" id="walletAddress" placeholder="Your USDT (polygon network) wallet address">
-                </div>
-                
-                <button class="submit-button" onclick="setWalletAddress()">Set Wallet Address</button>
-                <button class="submit-button" onclick="withdrawFunds()">Withdraw Funds</button>
             </div>
         </div>
         
@@ -653,7 +637,7 @@
                 <div><i class="fas fa-palette"></i> Theme</div>
                 <select id="themeSelect" onchange="changeTheme()">
                     <option value="dark">Dark Mode</option>
-                           <option value="light">Light Mode</option>
+                    <option value="light">Light Mode</option>
                 </select>
             </div>
             
@@ -666,8 +650,6 @@
                 </select>
             </div>
         </div>
-        
-        
         
         <!-- Footer -->
         <div class="footer">
@@ -743,8 +725,7 @@
             soundEnabled: true,
             musicEnabled: true,
             difficulty: 'easy',
-            username: 'Player',
-            walletAddress: ''
+            username: 'Player'
         };
 
         // Initialize the game
@@ -764,7 +745,7 @@
 
         // Load game state from localStorage
         function loadGameState() {
-            const savedState = localStorage.getItem('minewallGameState');
+            const savedState = localStorage.getItem('minezwallGameState');
             if (savedState) {
                 Object.assign(gameState, JSON.parse(savedState));
             }
@@ -834,8 +815,8 @@
             gameState.gameActive = true;
             gameState.diamondsToFind = 4;
             
-// Set fixed mines count (e.g., 10 mines) for all levels
-gameState.minesCount = 5;
+            // Set fixed mines count (e.g., 10 mines) for all levels
+            gameState.minesCount = 5;
             
             // Create grid
             const grid = document.getElementById('gameGrid');
@@ -861,14 +842,6 @@ gameState.minesCount = 5;
             
             // Start timer
             startTimer();
-        }
-
-        // Calculate mines count based on level and difficulty
-        function calculateMinesCount() {
-            let baseMines = 4;
-            const difficultyFactor = gameState.difficulty === 'easy' ? 0 : 
-                                    gameState.difficulty === 'medium' ? 1 : 2;
-            return baseMines + Math.floor(gameState.level / 3) + difficultyFactor;
         }
 
         // Place mines randomly
@@ -957,35 +930,35 @@ gameState.minesCount = 5;
         }
 
         // Level complete function - MODIFIED to check coin balance
-function levelComplete() {
-    // Check if player has enough coins to proceed
-    if (gameState.coins <= 0) {
-        alert("You don't have enough coins to proceed to the next level!");
-        gameState.gameActive = false;
-        clearInterval(gameState.timerInterval);
-        return;
-    }
-    
-    gameState.gameActive = false;
-    clearInterval(gameState.timerInterval);
-    
-    // Update game state
-    gameState.coins -= 10;
-    gameState.usd += 0.02;
-    gameState.level++;
-    
-    // Save state
-    saveGameState();
-    
-    // Play win sound
-    playSound('win');
-    
-    // Show win modal
-    document.getElementById('winModal').style.display = 'flex';
-    
-    // Show ad after level completion
-    showRewardedAd();
-}
+        function levelComplete() {
+            // Check if player has enough coins to proceed
+            if (gameState.coins <= 0) {
+                alert("You don't have enough coins to proceed to the next level!");
+                gameState.gameActive = false;
+                clearInterval(gameState.timerInterval);
+                return;
+            }
+            
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            
+            // Update game state
+            gameState.coins -= 10;
+            gameState.usd += 0.02;
+            gameState.level++;
+            
+            // Save state
+            saveGameState();
+            
+            // Play win sound
+            playSound('win');
+            
+            // Show win modal
+            document.getElementById('winModal').style.display = 'flex';
+            
+            // Show ad after level completion
+            showRewardedAd();
+        }
 
         // Next level function
         function nextLevel() {
@@ -1042,7 +1015,7 @@ function levelComplete() {
 
         // Actions when skipping level
         function skipLevelActions() {
-            gameState.usd += 0.03;
+            gameState.usd += 0.01;
             gameState.level++;
             saveGameState();
             updateUI();
@@ -1076,51 +1049,6 @@ function levelComplete() {
             } else {
                 alert('You already claimed your daily bonus today!');
             }
-        }
-
-        // Set wallet address
-        function setWalletAddress() {
-            const walletAddress = document.getElementById('walletAddress').value;
-            if (walletAddress) {
-                gameState.walletAddress = walletAddress;
-                saveGameState();
-                alert('Wallet address set successfully!');
-            } else {
-                alert('Please enter a valid wallet address');
-            }
-        }
-
-        // Withdraw funds
-        function withdrawFunds() {
-            const amount = parseFloat(document.getElementById('withdrawAmount').value);
-            const username = document.getElementById('username').value;
-            
-            if (!username) {
-                alert('Please enter your username');
-                return;
-            }
-            
-            if (!gameState.walletAddress) {
-                alert('Please set your wallet address first');
-                return;
-            }
-            
-            if (isNaN(amount) || amount < 2) {
-                alert('Minimum withdrawal amount is $2.00');
-                return;
-            }
-            
-            if (amount > gameState.usd) {
-                alert('Insufficient balance');
-                return;
-            }
-            
-            // In a real app, you would process the withdrawal here
-            gameState.usd -= amount;
-            saveGameState();
-            updateUI();
-            
-            document.getElementById('withdrawModal').style.display = 'flex';
         }
 
         // Change theme
@@ -1212,7 +1140,7 @@ function levelComplete() {
             }
         }
 
-             // Show rewarded ad
+        // Show rewarded ad
         function showRewardedAd(callback) {
             try {
                 show_9630287('pop').then(() => {
