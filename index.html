@@ -536,7 +536,7 @@
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-label">COINS</div>
-                    <div class="stat-value" id="coinDisplay">100</div>
+                    <div class="stat-value" id="coinDisplay">150</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
@@ -587,7 +587,7 @@
             <div style="padding: 10px; flex: 1; display: flex; flex-direction: column;">
                 <div class="withdraw-instructions">
                     <h3>Withdrawal Instructions</h3>
-                    <p>1. Minimum withdrawal amount: $2.00</p>
+                    <p>1. Minimum withdrawal amount: $5.00</p>
                     <p>2. Complete the form below to request withdrawal</p>
                     <p>3. Withdrawals processed within 24-72 hours</p>
                 </div>
@@ -596,9 +596,9 @@
                     <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScOFTvTs54H9mFU_W8Z3ZmcFdplfafvL4x7_E5CaJY5uUVHfQ/viewform?embedded=true" 
                             width="100%" 
                             height="500" 
-                            frameborder="0" 
-                            marginheight="0" 
-                            marginwidth="0">
+                            frameborder="7" 
+                            marginheight="3" 
+                            marginwidth="3">
                         Loading…
                     </iframe>
                 </div>
@@ -662,7 +662,7 @@
         <div class="modal-content">
             <h2>Congratulations!</h2>
             <p>You found all diamonds and completed the level!</p>
-            <p>Reward: +$0.02 USD</p>
+            <p>Reward: +$0.005 USD</p>
             <button class="modal-button" onclick="nextLevel()">Next Level</button>
         </div>
     </div>
@@ -682,7 +682,7 @@
     <div class="modal" id="dailyBonusModal">
         <div class="modal-content">
             <h2>Daily Bonus!</h2>
-            <p>You received 5 coins!</p>
+            <p>You received 15 coins!</p>
             <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
         </div>
     </div>
@@ -712,7 +712,7 @@
     <script>
         // Game state
         const gameState = {
-            coins: 100,
+            coins: 150,
             usd: 0,
             level: 1,
             diamondsFound: 0,
@@ -944,7 +944,7 @@
             
             // Update game state
             gameState.coins -= 10;
-            gameState.usd += 0.02;
+            gameState.usd += 0.005;
             gameState.level++;
             
             // Save state
@@ -1015,7 +1015,7 @@
 
         // Actions when skipping level
         function skipLevelActions() {
-            gameState.usd += 0.01;
+            gameState.usd += 0.005;
             gameState.level++;
             saveGameState();
             updateUI();
@@ -1041,7 +1041,7 @@
             const today = new Date().toDateString();
             
             if (lastClaimed !== today) {
-                gameState.coins += 5;
+                gameState.coins += 15;
                 saveGameState();
                 updateUI();
                 localStorage.setItem('dailyBonusLastClaimed', today);
@@ -1097,7 +1097,7 @@
         function startBackgroundMusic() {
             if (gameState.musicEnabled) {
                 const bgMusic = document.getElementById('backgroundMusic');
-                bgMusic.volume = 0.3;
+                bgMusic.volume = 0.8;
                 bgMusic.play().catch(e => console.log('Autoplay allowed:', e));
             }
         }
