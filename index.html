@@ -752,21 +752,11 @@
 
         // Initialize the game
         function init() {
-            // Try to get Telegram user data
-            if (window.Telegram && window.Telegram.WebApp) {
-                const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
-                if (tgUser) {
-                    gameState.username = tgUser.username ? `@${tgUser.username}` : 
-                                      tgUser.first_name ? tgUser.first_name : 'Player';
-                    localStorage.setItem('username', gameState.username);
-                }
-            }
-            
             loadGameState();
             setupEventListeners();
             
-            // Update username display
-            document.getElementById('usernameDisplay').textContent = `Welcome, ${gameState.username}!`;
+            // Initialize username display
+            updateUsernameDisplay();
             
             if (!hasJoinedChannel()) {
                 showPage('restriction');
@@ -777,6 +767,14 @@
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
+        }
+
+        // Update username display
+        function updateUsernameDisplay() {
+            const usernameDisplay = document.getElementById('usernameDisplay');
+            if (usernameDisplay) {
+                usernameDisplay.textContent = `Welcome, ${gameState.username}!`;
+            }
         }
 
         // Check if user has joined channel (with time-based verification)
@@ -806,16 +804,21 @@
                     gameState.channelJoined = true;
                     gameState.lastChannelCheck = Date.now();
                     gameState.verificationAttempts = 0;
+                    
+                    // Get username from Telegram (simulated here)
+                    const telegramUser = getTelegramUserData();
+                    if (telegramUser && telegramUser.username) {
+                        gameState.username = telegramUser.username;
+                        localStorage.setItem('username', gameState.username);
+                        updateUsernameDisplay();
+                    }
+                    
                     localStorage.setItem('channelJoined', 'true');
                     localStorage.setItem('lastChannelCheck', gameState.lastChannelCheck);
                     saveGameState();
                     
-                    // Update username display and show home page
-                    document.getElementById('usernameDisplay').textContent = `Welcome, ${gameState.username}!`;
                     showPage('home');
-                    
-                    // Show welcome message with username
-                    alert(`Verification successful! Welcome to Minezwall, ${gameState.username}.`);
+                    alert('Verification successful! Welcome to Minezwall.');
                 } else {
                     // Failed verification
                     gameState.verificationAttempts++;
@@ -833,6 +836,17 @@
                 checkBtn.disabled = false;
                 checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
             }, 2000);
+        }
+
+        // Simulate getting Telegram user data
+        function getTelegramUserData() {
+            // In a real app, this would use Telegram WebApp.initData
+            // For demo purposes, we'll simulate getting the username
+            return {
+                username: 'TelegramUser' + Math.floor(Math.random() * 1000),
+                first_name: 'Telegram',
+                last_name: 'User'
+            };
         }
 
         // Simulate actual channel membership check
