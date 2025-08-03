@@ -1086,7 +1086,7 @@
             const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
             const today = new Date().toDateString();
             if (lastClaimed !== today) {
-                gameState.coins += 5;
+                gameState.coins += 15;
                 saveGameState();
                 updateUI();
                 localStorage.setItem('dailyBonusLastClaimed', today);
@@ -1140,7 +1140,7 @@
         function startBackgroundMusic() {
             if (gameState.musicEnabled) {
                 const bgMusic = document.getElementById('backgroundMusic');
-                bgMusic.volume = 0.3;
+                bgMusic.volume = 0.8;
                 bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
             }
         }
@@ -1200,8 +1200,8 @@
                 alert('Please enter a valid amount');
                 return;
             }
-            if (amount < 5) {
-                alert('Minimum withdrawal amount is $5.00');
+            if (amount < 0.050) {
+                alert('Minimum withdrawal amount is $0.050');
                 return;
             }
             if (amount > gameState.usd) {
