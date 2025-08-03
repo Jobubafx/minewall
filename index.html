@@ -255,28 +255,42 @@
         }
         
         /* Withdraw Page */
-        .withdraw-instructions {
+        .withdraw-form {
             background: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .input-group {
             margin-bottom: 15px;
         }
         
-        .withdraw-instructions h3 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        
-        .withdraw-instructions p {
-            margin-bottom: 10px;
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
             font-size: 14px;
         }
         
-        .google-form-container {
-            flex: 1;
-            overflow: hidden;
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
             border-radius: 10px;
-            background: white;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .submit-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
         }
         
         /* Settings Page */
@@ -427,6 +441,74 @@
         .modal-button:hover {
             transform: scale(1.05);
         }
+
+        /* New styles for join channel modal */
+        .join-channel-modal {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .telegram-button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .telegram-button:hover {
+            background: #0077b3;
+        }
+        
+        .check-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        /* Withdrawal Success Modal */
+        .withdrawal-success-modal {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .form-redirect-button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
         
         /* Animations */
         @keyframes pulse {
@@ -491,7 +573,7 @@
 </head>
 <body>
     <!-- Ad SDK -->
-    <script src='//libtl.com/sdk.js' data-zone='9630287' data-sdk='show_9630287'></script>
+    <script src='//libtl.com/sdk.js' data-zone='9662480' data-sdk='show_9662480'></script>
 
     <div class="container">
         <!-- Header -->
@@ -514,7 +596,7 @@
         </div>
         
         <!-- Page Container -->
-        <div id="homePage" class="page active">
+        <div id="homePage" class="page">
             <h1 class="game-title">MINEZWALL</h1>
             <div class="username-display">Welcome, Player!</div>
             <button class="start-button pulse" onclick="startGame()">START GAME</button>
@@ -540,7 +622,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="usdDisplay">$0.00</div>
+                    <div class="stat-value" id="usdDisplay">$0.000</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">DIAMONDS FOUND</div>
@@ -580,28 +662,31 @@
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="withdrawUsdDisplay">$0.00</div>
+                    <div class="stat-value" id="withdrawUsdDisplay">$0.000</div>
                 </div>
             </div>
             
-            <div style="padding: 10px; flex: 1; display: flex; flex-direction: column;">
-                <div class="withdraw-instructions">
-                    <h3>Withdrawal Instructions</h3>
-                    <p>1. Minimum withdrawal amount: $5.00</p>
-                    <p>2. Complete the form below to request withdrawal</p>
-                    <p>3. Withdrawals processed within 24-72 hours</p>
+            <div class="withdraw-form">
+                <div class="input-group">
+                    <label for="withdrawAmount">Amount to Withdraw (USD)</label>
+                    <input type="number" id="withdrawAmount" placeholder="Minimum $5.00" min="5" step="0.001">
                 </div>
                 
-                <div class="google-form-container">
-                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScOFTvTs54H9mFU_W8Z3ZmcFdplfafvL4x7_E5CaJY5uUVHfQ/viewform?embedded=true" 
-                            width="100%" 
-                            height="500" 
-                            frameborder="7" 
-                            marginheight="3" 
-                            marginwidth="3">
-                        Loading…
-                    </iframe>
+                <div class="input-group">
+                    <label for="withdrawMethod">Withdrawal Method</label>
+                    <select id="withdrawMethod">
+                        <option value="usdt">USDT (Polygon Network)</option>
+                        <option value="btc">Bitcoin</option>
+                        <option value="eth">Ethereum</option>
+                    </select>
                 </div>
+                
+                <div class="input-group">
+                    <label for="walletAddress">Wallet Address</label>
+                    <input type="text" id="walletAddress" placeholder="Enter your wallet address">
+                </div>
+                
+                <button class="submit-button" onclick="processWithdrawal()">Withdraw Funds</button>
             </div>
         </div>
         
@@ -682,16 +767,33 @@
     <div class="modal" id="dailyBonusModal">
         <div class="modal-content">
             <h2>Daily Bonus!</h2>
-            <p>You received 15 coins!</p>
+            <p>You received 5 coins!</p>
             <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
         </div>
     </div>
     
-    <div class="modal" id="withdrawModal">
-        <div class="modal-content">
-            <h2>Withdrawal Requested</h2>
-            <p>Your withdrawal request has been submitted. Please allow 24-72 hours for processing.</p>
-            <button class="modal-button" onclick="closeModal('withdrawModal')">OK</button>
+    <!-- Join Channel Modal -->
+    <div class="modal" id="joinChannelModal" style="display: none;">
+        <div class="join-channel-modal">
+            <h2>Join Our Telegram Channel</h2>
+            <p>To play Minezwall and start earning, please join our official Telegram channel first.</p>
+            <p>After joining, click the "I've Joined" button to verify.</p>
+            <a href="https://t.me/minezwallofficial" class="telegram-button" target="_blank">
+                <i class="fab fa-telegram"></i> Join Channel
+            </a>
+            <button class="check-button" onclick="checkChannelJoined()">I've Joined</button>
+        </div>
+    </div>
+    
+    <!-- Withdrawal Success Modal -->
+    <div class="modal" id="withdrawalSuccessModal">
+        <div class="withdrawal-success-modal">
+            <h2>Withdrawal Request Received!</h2>
+            <p>Your withdrawal request has been submitted successfully.</p>
+            <p>Please complete our verification form to process your payment.</p>
+            <button class="form-redirect-button" onclick="redirectToGoogleForm()">
+                Complete Verification Form
+            </button>
         </div>
     </div>
     
@@ -725,13 +827,23 @@
             soundEnabled: true,
             musicEnabled: true,
             difficulty: 'easy',
-            username: 'Player'
+            username: 'Player',
+            channelJoined: false
         };
 
         // Initialize the game
         function init() {
             loadGameState();
-            showPage('home');
+            
+            // Check if user has joined channel
+            if (!gameState.channelJoined) {
+                document.getElementById('joinChannelModal').style.display = 'flex';
+                document.getElementById('homePage').style.display = 'none';
+            } else {
+                document.getElementById('joinChannelModal').style.display = 'none';
+                showPage('home');
+            }
+            
             setupEventListeners();
             startBackgroundMusic();
             showInAppAd();
@@ -741,6 +853,59 @@
             if (gameState.username) {
                 document.querySelector('.username-display').textContent = `Welcome, ${gameState.username}!`;
             }
+        }
+
+        // Check if user has joined channel
+        function checkChannelJoined() {
+            // In a real implementation, you would verify this with Telegram API
+            // For demo purposes, we'll just assume they joined
+            gameState.channelJoined = true;
+            saveGameState();
+            document.getElementById('joinChannelModal').style.display = 'none';
+            showPage('home');
+            
+            // Show welcome message
+            alert('Thank you for joining our channel! Enjoy the game.');
+        }
+
+        // Process Withdrawal
+        function processWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const walletAddress = document.getElementById('walletAddress').value;
+            
+            if (isNaN(amount) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            if (amount < 5) {
+                alert('Minimum withdrawal amount is $5.00');
+                return;
+            }
+            
+            if (amount > gameState.usd) {
+                alert('Insufficient balance');
+                return;
+            }
+            
+            if (!walletAddress) {
+                alert('Please enter your wallet address');
+                return;
+            }
+            
+            // Process withdrawal (in a real app, you would send this to your backend)
+            gameState.usd -= amount;
+            saveGameState();
+            updateUI();
+            
+            // Show success modal
+            document.getElementById('withdrawalSuccessModal').style.display = 'flex';
+        }
+
+        // Redirect to Google Form
+        function redirectToGoogleForm() {
+            window.open('https://forms.gle/dcV7SNonaC1BVvNdA', '_blank');
+            closeModal('withdrawalSuccessModal');
         }
 
         // Load game state from localStorage
@@ -806,6 +971,10 @@
 
         // Start game function
         function startGame() {
+            if (!gameState.channelJoined) {
+                document.getElementById('joinChannelModal').style.display = 'flex';
+                return;
+            }
             showPage('game');
         }
 
@@ -1041,7 +1210,7 @@
             const today = new Date().toDateString();
             
             if (lastClaimed !== today) {
-                gameState.coins += 15;
+                gameState.coins += 5;
                 saveGameState();
                 updateUI();
                 localStorage.setItem('dailyBonusLastClaimed', today);
@@ -1049,6 +1218,11 @@
             } else {
                 alert('You already claimed your daily bonus today!');
             }
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
         // Change theme
@@ -1097,7 +1271,7 @@
         function startBackgroundMusic() {
             if (gameState.musicEnabled) {
                 const bgMusic = document.getElementById('backgroundMusic');
-                bgMusic.volume = 0.8;
+                bgMusic.volume = 0.3;
                 bgMusic.play().catch(e => console.log('Autoplay allowed:', e));
             }
         }
@@ -1116,20 +1290,15 @@
             soundElement.play().catch(e => console.log('Sound play prevented:', e));
         }
 
-        // Close modal
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
         // AD INTEGRATION FUNCTIONS
         // Show in-app interstitial ad
         function showInAppAd() {
             try {
-                show_9630287({
+                show_9662480({
                     type: 'inApp',
                     inAppSettings: {
                         frequency: 3,
-                        capping: 0.1,
+                        capping: 0.3,
                         interval: 15,
                         timeout: 15,
                         everyPage: true
@@ -1143,7 +1312,7 @@
         // Show rewarded ad
         function showRewardedAd(callback) {
             try {
-                show_9630287('pop').then(() => {
+                show_9662480('pop').then(() => {
                     if (callback) callback();
                 }).catch(e => {
                     console.log('Ad error:', e);
@@ -1156,7 +1325,7 @@
         // Show periodic ad every 5 minutes
         function showPeriodicAd() {
             try {
-                show_9630287();
+                show_9662480();
             } catch (e) {
                 console.log('Ad error:', e);
             }
