@@ -541,7 +541,7 @@
         
         <div id="homePage" class="page">
             <h1 class="game-title">MINEZWALL</h1>
-            <div class="username-display">Welcome, Player!</div>
+            <div class="username-display" id="usernameDisplay">Welcome, Player!</div>
             <button class="start-button pulse" onclick="startGame()">START GAME</button>
         </div>
         
@@ -744,7 +744,7 @@
             soundEnabled: true,
             musicEnabled: true,
             difficulty: 'easy',
-            username: 'Player',
+            username: localStorage.getItem('username') || 'Player',
             channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
             lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
             verificationAttempts: 0
@@ -752,8 +752,21 @@
 
         // Initialize the game
         function init() {
+            // Try to get Telegram user data
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tgUser = window.Telegram.WebApp.initDataUnsafe.user;
+                if (tgUser) {
+                    gameState.username = tgUser.username ? `@${tgUser.username}` : 
+                                      tgUser.first_name ? tgUser.first_name : 'Player';
+                    localStorage.setItem('username', gameState.username);
+                }
+            }
+            
             loadGameState();
             setupEventListeners();
+            
+            // Update username display
+            document.getElementById('usernameDisplay').textContent = `Welcome, ${gameState.username}!`;
             
             if (!hasJoinedChannel()) {
                 showPage('restriction');
@@ -764,10 +777,6 @@
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
-            
-            if (gameState.username) {
-                document.querySelector('.username-display').textContent = `Welcome, ${gameState.username}!`;
-            }
         }
 
         // Check if user has joined channel (with time-based verification)
@@ -801,8 +810,12 @@
                     localStorage.setItem('lastChannelCheck', gameState.lastChannelCheck);
                     saveGameState();
                     
+                    // Update username display and show home page
+                    document.getElementById('usernameDisplay').textContent = `Welcome, ${gameState.username}!`;
                     showPage('home');
-                    alert('Verification successful! Welcome to Minezwall.');
+                    
+                    // Show welcome message with username
+                    alert(`Verification successful! Welcome to Minezwall, ${gameState.username}.`);
                 } else {
                     // Failed verification
                     gameState.verificationAttempts++;
