@@ -132,6 +132,11 @@
             border-radius: 30px;
             cursor: pointer;
             margin-top: 15px;
+            transition: all 0.3s;
+        }
+        .check-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         .ad-container {
             background: rgba(0, 0, 0, 0.6);
@@ -528,7 +533,7 @@
                 <a href="https://t.me/minezwallofficial" class="telegram-button" target="_blank">
                     <i class="fab fa-telegram"></i> Join Channel
                 </a>
-                <button class="check-button" onclick="checkChannelJoined()">
+                <button class="check-button" onclick="verifyChannelJoin()">
                     <i class="fas fa-check-circle"></i> I've Joined
                 </button>
             </div>
@@ -558,7 +563,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="usdDisplay">$0.000</div>
+                    <div class="stat-value" id="usdDisplay">$0.050</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">DIAMONDS FOUND</div>
@@ -602,15 +607,13 @@
             <div class="withdraw-form">
                 <div class="input-group">
                     <label for="withdrawAmount">Amount to Withdraw (USD)</label>
-                    <input type="number" id="withdrawAmount" placeholder="Minimum $0.010" min="0.010" step="0.001">
+                    <input type="number" id="withdrawAmount" placeholder="Minimum $0.050" min="0.050" step="0.001">
                 </div>
                 
                 <div class="input-group">
                     <label for="withdrawMethod">Withdrawal Method</label>
                     <select id="withdrawMethod">
                         <option value="usdt">USDT (Polygon Network)</option>
-                        <option value="btc">Bitcoin</option>
-                        <option value="eth">Ethereum</option>
                     </select>
                 </div>
                 
@@ -742,14 +745,17 @@
             musicEnabled: true,
             difficulty: 'easy',
             username: 'Player',
-            channelJoined: localStorage.getItem('channelJoined') === 'true' || false
+            channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
+            lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
+            verificationAttempts: 0
         };
 
+        // Initialize the game
         function init() {
             loadGameState();
             setupEventListeners();
             
-            if (!gameState.channelJoined) {
+            if (!hasJoinedChannel()) {
                 showPage('restriction');
             } else {
                 showPage('home');
@@ -764,18 +770,68 @@
             }
         }
 
-        function checkChannelJoined() {
-            // In a real app, you would verify channel membership here
-            // For demo purposes, we'll simulate successful verification
-            gameState.channelJoined = true;
-            localStorage.setItem('channelJoined', 'true');
-            saveGameState();
+        // Check if user has joined channel (with time-based verification)
+        function hasJoinedChannel() {
+            const now = Date.now();
+            const lastCheck = parseInt(gameState.lastChannelCheck);
+            // Require re-verification if last check was more than 1 hour ago
+            if (now - lastCheck > 3600000) {
+                return false;
+            }
+            return gameState.channelJoined;
+        }
+
+        // Verify channel membership
+        function verifyChannelJoin() {
+            const checkBtn = document.querySelector('.check-button');
+            checkBtn.disabled = true;
+            checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
             
-            // Hide restriction page and show home page
-            showPage('home');
+            // Simulate API call delay
+            setTimeout(() => {
+                // In a real app, replace this with actual Telegram API call
+                const hasJoined = checkActualChannelMembership();
+                
+                if (hasJoined) {
+                    // Successful verification
+                    gameState.channelJoined = true;
+                    gameState.lastChannelCheck = Date.now();
+                    gameState.verificationAttempts = 0;
+                    localStorage.setItem('channelJoined', 'true');
+                    localStorage.setItem('lastChannelCheck', gameState.lastChannelCheck);
+                    saveGameState();
+                    
+                    showPage('home');
+                    alert('Verification successful! Welcome to Minezwall.');
+                } else {
+                    // Failed verification
+                    gameState.verificationAttempts++;
+                    if (gameState.verificationAttempts >= 3) {
+                        alert('Please actually join our Telegram channel before clicking verification. You will need to wait 10 minutes before trying again.');
+                        // Implement cooldown
+                        setTimeout(() => {
+                            gameState.verificationAttempts = 0;
+                        }, 600000);
+                    } else {
+                        alert('We could not verify your channel membership. Please join our Telegram channel first and then click verification.');
+                    }
+                }
+                
+                checkBtn.disabled = false;
+                checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
+            }, 2000);
+        }
+
+        // Simulate actual channel membership check
+        function checkActualChannelMembership() {
+            // In a real app, this would use Telegram's API to verify membership
+            // For demo purposes, we'll simulate a 70% chance of successful verification
+            // after at least 1 failed attempt to encourage actual joining
             
-            // Show welcome message
-            alert('Thank you for joining our channel! Enjoy the game.');
+            if (gameState.verificationAttempts < 1) {
+                return false; // First attempt always fails to force actual joining
+            }
+            return Math.random() < 0.7; // 70% success rate after first attempt
         }
 
         function loadGameState() {
@@ -815,8 +871,17 @@
         }
 
         function showPage(pageId) {
-            // First check if user has joined channel for all pages except restriction
-            if (pageId !== 'restriction' && !gameState.channelJoined) {
+            // Always allow restriction page
+            if (pageId === 'restriction') {
+                document.querySelectorAll('.page').forEach(page => {
+                    page.classList.remove('active');
+                });
+                document.getElementById('restrictionPage').classList.add('active');
+                return;
+            }
+            
+            // For all other pages, check channel membership
+            if (!hasJoinedChannel()) {
                 showPage('restriction');
                 return;
             }
@@ -840,8 +905,9 @@
         }
 
         function startGame() {
-            if (!gameState.channelJoined) {
+            if (!hasJoinedChannel()) {
                 showPage('restriction');
+                alert('Please join our Telegram channel and verify your membership to play.');
                 return;
             }
             showPage('game');
