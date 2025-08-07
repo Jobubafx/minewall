@@ -559,7 +559,7 @@
             <div class="stats-bar">
                 <div class="stat-item">
                     <div class="stat-label">COINS</div>
-                    <div class="stat-value" id="coinDisplay">150</div>
+                    <div class="stat-value" id="coinDisplay">500</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
@@ -700,7 +700,7 @@
     <div class="modal" id="dailyBonusModal">
         <div class="modal-content">
             <h2>Daily Bonus!</h2>
-            <p>You received 15 coins!</p>
+            <p>You received 50 coins!</p>
             <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
         </div>
     </div>
@@ -731,7 +731,7 @@
     
     <script>
         const gameState = {
-            coins: 150,
+            coins: 500,
             usd: 0,
             level: 1,
             diamondsFound: 0,
@@ -822,7 +822,7 @@
                 } else {
                     // Failed verification
                     gameState.verificationAttempts++;
-                    if (gameState.verificationAttempts >= 3) {
+                    if (gameState.verificationAttempts >= 2) {
                         alert('Please actually join our Telegram channel before clicking verification. You will need to wait 10 minutes before trying again.');
                         // Implement cooldown
                         setTimeout(() => {
@@ -934,7 +934,7 @@
         function startGame() {
             if (!hasJoinedChannel()) {
                 showPage('restriction');
-                alert('Please join our Telegram channel and verify your membership to play.');
+                alert('Please join our official Telegram channel and verify your membership to play.');
                 return;
             }
             showPage('game');
@@ -1113,7 +1113,7 @@
             const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
             const today = new Date().toDateString();
             if (lastClaimed !== today) {
-                gameState.coins += 15;
+                gameState.coins += 50;
                 saveGameState();
                 updateUI();
                 localStorage.setItem('dailyBonusLastClaimed', today);
@@ -1188,11 +1188,11 @@
                 show_9662480({
                     type: 'inApp',
                     inAppSettings: {
-                        frequency: 3,
-                        capping: 0.3,
-                        interval: 15,
-                        timeout: 15,
-                        everyPage: true
+                        frequency: 6,
+                        capping: 0.2,
+                        interval: 120,
+                        timeout: 10,
+                        everyPage: false
                     }
                 });
             } catch (e) {
