@@ -703,7 +703,7 @@
     <div class="modal" id="dailyBonusModal">
         <div class="modal-content">
             <h2>Daily Bonus!</h2>
-            <p>You received 5 coins!</p>
+            <p>You received 50 coins!</p>
             <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
         </div>
     </div>
@@ -913,7 +913,7 @@
         function initGame() {
             gameState.diamondsFound = 0;
             gameState.gameActive = true;
-            gameState.diamondsToFind = 20; // All non-mine cells are diamonds (25 total - 5 mines = 20 diamonds)
+            gameState.diamondsToFind = 4; // All non-mine cells are diamonds (25 total - 5 mines = 20 diamonds)
             const grid = document.getElementById('gameGrid');
             grid.innerHTML = '';
             gameState.grid = [];
@@ -1088,7 +1088,7 @@
             const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
             const today = new Date().toDateString();
             if (lastClaimed !== today) {
-                gameState.coins += 5;
+                gameState.coins += 50;
                 saveGameState();
                 updateUI();
                 localStorage.setItem('dailyBonusLastClaimed', today);
@@ -1142,8 +1142,8 @@
         function startBackgroundMusic() {
             if (gameState.musicEnabled) {
                 const bgMusic = document.getElementById('backgroundMusic');
-                bgMusic.volume = 0.3;
-                bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
+                bgMusic.volume = 0.8;
+                bgMusic.play().catch(e => console.log('Autoplay allowed:', e));
             }
         }
 
