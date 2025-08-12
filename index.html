@@ -536,6 +536,7 @@
                 <button class="check-button" onclick="verifyChannelJoin()">
                     <i class="fas fa-check-circle"></i> I've Joined
                 </button>
+                <p id="verificationMessage" style="margin-top: 15px; color: #ff4d4d; display: none;"></p>
             </div>
         </div>
         
@@ -745,9 +746,9 @@
             musicEnabled: true,
             difficulty: 'easy',
             username: localStorage.getItem('username') || 'Player',
-            channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
-            lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-            verificationAttempts: 0
+            isVerified: localStorage.getItem('isVerified') === 'true' || false,
+            verificationAttempts: 0,
+            lastVerificationAttempt: localStorage.getItem('lastVerificationAttempt') || 0
         };
 
         // Initialize the game
@@ -758,7 +759,7 @@
             // Initialize username display
             updateUsernameDisplay();
             
-            if (!hasJoinedChannel()) {
+            if (!gameState.isVerified) {
                 showPage('restriction');
             } else {
                 showPage('home');
@@ -777,22 +778,26 @@
             }
         }
 
-        // Check if user has joined channel (with time-based verification)
-        function hasJoinedChannel() {
-            const now = Date.now();
-            const lastCheck = parseInt(gameState.lastChannelCheck);
-            // Require re-verification if last check was more than 1 hour ago
-            if (now - lastCheck > 3600000) {
-                return false;
-            }
-            return gameState.channelJoined;
-        }
-
         // Verify channel membership
         function verifyChannelJoin() {
             const checkBtn = document.querySelector('.check-button');
+            const verificationMessage = document.getElementById('verificationMessage');
+            const now = Date.now();
+            
+            // Check if user is on cooldown
+            if (now - gameState.lastVerificationAttempt < 60000 && gameState.verificationAttempts >= 3) {
+                const timeLeft = Math.ceil((60000 - (now - gameState.lastVerificationAttempt)) / 1000);
+                verificationMessage.textContent = `Please wait ${timeLeft} seconds before trying again.`;
+                verificationMessage.style.display = 'block';
+                return;
+            }
+            
             checkBtn.disabled = true;
             checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            
+            // Record verification attempt
+            gameState.lastVerificationAttempt = now;
+            localStorage.setItem('lastVerificationAttempt', now);
             
             // Simulate API call delay
             setTimeout(() => {
@@ -801,35 +806,32 @@
                 
                 if (hasJoined) {
                     // Successful verification
-                    gameState.channelJoined = true;
-                    gameState.lastChannelCheck = Date.now();
+                    gameState.isVerified = true;
                     gameState.verificationAttempts = 0;
                     
                     // Get username from Telegram (simulated here)
                     const telegramUser = getTelegramUserData();
-                    if (telegramUser && telegramUser.username) {
-                        gameState.username = telegramUser.username;
+                    if (telegramUser) {
+                        // Use username if available, otherwise use first_name + last_name
+                        gameState.username = telegramUser.username || 
+                                            (telegramUser.first_name + (telegramUser.last_name ? ' ' + telegramUser.last_name : ''));
                         localStorage.setItem('username', gameState.username);
                         updateUsernameDisplay();
                     }
                     
-                    localStorage.setItem('channelJoined', 'true');
-                    localStorage.setItem('lastChannelCheck', gameState.lastChannelCheck);
+                    localStorage.setItem('isVerified', 'true');
                     saveGameState();
                     
                     showPage('home');
-                    alert('Verification successful! Welcome to Minezwall.');
+                    verificationMessage.style.display = 'none';
                 } else {
                     // Failed verification
                     gameState.verificationAttempts++;
-                    if (gameState.verificationAttempts >= 2) {
-                        alert('Please actually join our Telegram channel before clicking verification. You will need to wait 10 minutes before trying again.');
-                        // Implement cooldown
-                        setTimeout(() => {
-                            gameState.verificationAttempts = 0;
-                        }, 600000);
-                    } else {
-                        alert('We could not verify your channel membership. Please join our Telegram channel first and then click verification.');
+                    verificationMessage.textContent = 'Verification failed. Please join our Telegram channel first.';
+                    verificationMessage.style.display = 'block';
+                    
+                    if (gameState.verificationAttempts >= 3) {
+                        verificationMessage.textContent += ' You have reached the maximum attempts. Please wait 1 minute before trying again.';
                     }
                 }
                 
@@ -841,24 +843,32 @@
         // Simulate getting Telegram user data
         function getTelegramUserData() {
             // In a real app, this would use Telegram WebApp.initData
-            // For demo purposes, we'll simulate getting the username
+            // For demo purposes, we'll simulate getting the user data
             return {
-                username: 'TelegramUser' + Math.floor(Math.random() * 1000),
-                first_name: 'Telegram',
-                last_name: 'User'
+                username: 'RealTelegramUser', // This would be the actual username from Telegram
+                first_name: 'John',
+                last_name: 'Doe'
             };
         }
 
         // Simulate actual channel membership check
         function checkActualChannelMembership() {
             // In a real app, this would use Telegram's API to verify membership
-            // For demo purposes, we'll simulate a 70% chance of successful verification
-            // after at least 1 failed attempt to encourage actual joining
+            // For demo purposes, we'll simulate verification
+            // This would be replaced with actual Telegram API calls in production
             
-            if (gameState.verificationAttempts < 1) {
-                return false; // First attempt always fails to force actual joining
+            // Check if user has actually visited the Telegram channel link
+            // This is a simulation - in reality you would use Telegram's API
+            const hasVisitedChannel = document.referrer.includes('t.me/minezwallofficial') || 
+                                     localStorage.getItem('hasVisitedChannel') === 'true';
+            
+            if (!hasVisitedChannel) {
+                localStorage.setItem('hasVisitedChannel', 'false');
+                return false;
             }
-            return Math.random() < 0.7; // 70% success rate after first attempt
+            
+            localStorage.setItem('hasVisitedChannel', 'true');
+            return true;
         }
 
         function loadGameState() {
@@ -907,8 +917,8 @@
                 return;
             }
             
-            // For all other pages, check channel membership
-            if (!hasJoinedChannel()) {
+            // For all other pages, check verification status
+            if (!gameState.isVerified) {
                 showPage('restriction');
                 return;
             }
@@ -932,9 +942,8 @@
         }
 
         function startGame() {
-            if (!hasJoinedChannel()) {
+            if (!gameState.isVerified) {
                 showPage('restriction');
-                alert('Please join our official Telegram channel and verify your membership to play.');
                 return;
             }
             showPage('game');
