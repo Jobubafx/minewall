@@ -742,7 +742,7 @@
             level: 1,
             diamondsFound: 0,
             diamondsToFind: 4,
-            minesCount: 4,
+            minesCount: 5,
             grid: [],
             gameActive: false,
             timer: 0,
@@ -913,11 +913,12 @@
         function initGame() {
             gameState.diamondsFound = 0;
             gameState.gameActive = true;
-            gameState.diamondsToFind = 4;
-            gameState.minesCount = 5;
+            gameState.diamondsToFind = 20; // All non-mine cells are diamonds (25 total - 5 mines = 20 diamonds)
             const grid = document.getElementById('gameGrid');
             grid.innerHTML = '';
             gameState.grid = [];
+            
+            // Create all cells
             for (let i = 0; i < 25; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
@@ -926,8 +927,13 @@
                 grid.appendChild(cell);
                 gameState.grid.push({ isMine: false, isRevealed: false, isDiamond: false });
             }
+            
+            // Place mines first
             placeMines();
+            
+            // Then make all non-mine cells diamonds
             placeDiamonds();
+            
             updateUI();
             startTimer();
         }
@@ -936,7 +942,7 @@
             let minesPlaced = 0;
             while (minesPlaced < gameState.minesCount) {
                 const randomIndex = Math.floor(Math.random() * 25);
-                if (!gameState.grid[randomIndex].isMine && !gameState.grid[randomIndex].isDiamond) {
+                if (!gameState.grid[randomIndex].isMine) {
                     gameState.grid[randomIndex].isMine = true;
                     minesPlaced++;
                 }
@@ -944,12 +950,10 @@
         }
 
         function placeDiamonds() {
-            let diamondsPlaced = 0;
-            while (diamondsPlaced < gameState.diamondsToFind) {
-                const randomIndex = Math.floor(Math.random() * 25);
-                if (!gameState.grid[randomIndex].isMine && !gameState.grid[randomIndex].isDiamond) {
-                    gameState.grid[randomIndex].isDiamond = true;
-                    diamondsPlaced++;
+            // Make all non-mine cells diamonds
+            for (let i = 0; i < gameState.grid.length; i++) {
+                if (!gameState.grid[i].isMine) {
+                    gameState.grid[i].isDiamond = true;
                 }
             }
         }
@@ -977,8 +981,6 @@
                 if (gameState.diamondsFound === gameState.diamondsToFind) {
                     levelComplete();
                 }
-            } else {
-                cellElement.innerHTML = '';
             }
             updateUI();
         }
