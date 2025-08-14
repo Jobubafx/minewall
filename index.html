@@ -564,7 +564,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="usdDisplay">$0.000</div>
+                    <div class="stat-value" id="usdDisplay">$1.000</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">DIAMONDS FOUND</div>
@@ -743,10 +743,10 @@
         
         const gameState = {
             coins: 500,
-            usd: 0.500,
+            usd: 1.000,
             level: 1,
             diamondsFound: 0,
-            diamondsToFind: 20, // 25 cells - 5 mines = 20 diamonds
+            diamondsToFind: 4, // 25 cells - 5 mines = 20 diamonds
             minesCount: 5,
             grid: [],
             gameActive: false,
@@ -1015,7 +1015,7 @@
             }
             gameState.gameActive = false;
             clearInterval(gameState.timerInterval);
-            gameState.coins -= 8;
+            gameState.coins -= 7;
             gameState.usd += 0.005;
             gameState.level++;
             saveGameState();
@@ -1060,8 +1060,8 @@
         }
 
         function skipWithCoins() {
-            if (gameState.coins >= 25) {
-                gameState.coins -= 25;
+            if (gameState.coins >= 30) {
+                gameState.coins -= 30;
                 skipLevelActions();
                 closeModal('loseModal');
                 saveGameState();
@@ -1072,7 +1072,7 @@
         }
 
         function skipLevelActions() {
-            gameState.usd += 0.005;
+            gameState.usd += 0.003;
             gameState.level++;
             saveGameState();
             updateUI();
@@ -1080,8 +1080,8 @@
         }
 
         function restartLevel() {
-            if (gameState.coins >= 5) {
-                gameState.coins -= 5;
+            if (gameState.coins >= 4) {
+                gameState.coins -= 4;
                 saveGameState();
                 updateUI();
                 closeModal('loseModal');
@@ -1170,9 +1170,9 @@
                 show_9662480({
                     type: 'inApp',
                     inAppSettings: {
-                        frequency: 3,
+                        frequency: 4,
                         capping: 0.3,
-                        interval: 60,
+                        interval: 25,
                         timeout: 10,
                         everyPage: true
                     }
