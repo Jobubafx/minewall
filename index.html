@@ -886,41 +886,43 @@
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         
-        // GitHub Gist configuration (replace with your own)
-        const GIST_CONFIG = {
-            codes: {
-                id: "YOUR_GIST_ID_FOR_CODES", // Replace with your Gist ID
-                filename: "redeem_codes.json"
-            },
-            users: {
-                id: "YOUR_GIST_ID_FOR_USERS", // Replace with your Gist ID
-                filename: "users_data.json"
-            },
-            token: "YOUR_GITHUB_TOKEN" // Replace with your GitHub personal access token
+        // Simple in-memory database
+        const appData = {
+          // Store redemption codes (format: {code: "ABC123", value: 1.00, used: false})
+          redemptionCodes: [
+            {code: "FREE1", value: 1.00, used: false},
+            {code: "BONUS5", value: 5.00, used: false},
+            {code: "MINEZWALL", value: 2.00, used: false}
+          ],
+          
+          // Admin user IDs (YOUR ID IS INSERTED HERE)
+          adminUsers: [1558798885],
+          
+          // Store user redemption history
+          userRedemptions: {}
         };
-        
+
         const gameState = {
-            coins: 500,
-            usd: 1.000,
-            level: 1,
-            diamondsFound: 0,
-            diamondsToFind: 4, // 25 cells - 5 mines = 20 diamonds
-            minesCount: 5,
-            grid: [],
-            gameActive: false,
-            timer: 0,
-            timerInterval: null,
-            soundEnabled: true,
-            musicEnabled: true,
-            difficulty: 'easy',
-            username: 'Player',
-            fullName: '',
-            userId: null,
-            channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
-            lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-            verificationAttempts: 0,
-            isAdmin: false,
-            redeemedCodes: []
+          coins: 500,
+          usd: 1.000,
+          level: 1,
+          diamondsFound: 0,
+          diamondsToFind: 4,
+          minesCount: 5,
+          grid: [],
+          gameActive: false,
+          timer: 0,
+          timerInterval: null,
+          soundEnabled: true,
+          musicEnabled: true,
+          difficulty: 'easy',
+          username: 'Player',
+          fullName: '',
+          userId: null,
+          isAdmin: false,
+          channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
+          lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
+          verificationAttempts: 0
         };
 
         // Initialize the game
@@ -934,10 +936,7 @@
                 gameState.userId = user.id;
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
-                
-                // Check if user is admin (replace with your admin user IDs)
-                const adminUsers = [123456789, 987654321]; // Add your Telegram user IDs here
-                gameState.isAdmin = adminUsers.includes(user.id);
+                gameState.isAdmin = appData.adminUsers.includes(user.id);
                 
                 if (gameState.isAdmin) {
                     document.getElementById('adminButton').style.display = 'block';
@@ -964,7 +963,7 @@
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
             
-            // Load redemption codes from GitHub (for admin)
+            // Load redemption codes for admin
             if (gameState.isAdmin) {
                 loadRedeemCodes();
             }
@@ -1091,7 +1090,7 @@
             }
             
             // If showing redeem page, load history
-            if (pageId === 'redeem' && gameState.redeemedCodes.length > 0) {
+            if (pageId === 'redeem' && gameState.redeemedCodes && gameState.redeemedCodes.length > 0) {
                 displayRedeemHistory();
             }
             
@@ -1449,64 +1448,55 @@
         // ====================
         
         function redeemCode() {
-            const code = document.getElementById('redeemCode').value.trim();
+            const code = document.getElementById('redeemCode').value.trim().toUpperCase();
             if (!code) {
                 alert('Please enter a code');
                 return;
             }
             
-            // In a real app, you would verify the code with your backend
-            // For this demo, we'll simulate it with a delay
+            // Find the code
+            const codeData = appData.redemptionCodes.find(c => c.code === code && !c.used);
             
-            // Show loading
-            const redeemBtn = document.querySelector('.redeem-form .submit-button');
-            const originalText = redeemBtn.innerHTML;
-            redeemBtn.disabled = true;
-            redeemBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            if (!codeData) {
+                alert('Invalid or already used code');
+                return;
+            }
+
+            // Mark as used
+            codeData.used = true;
             
-            // Simulate API call
-            setTimeout(() => {
-                // Check if code is valid (in a real app, this would be a server check)
-                const isValidCode = Math.random() > 0.3; // 70% chance of being valid for demo
-                const codeValue = isValidCode ? (Math.random() * 5 + 0.5).toFixed(2) : 0;
-                
-                if (isValidCode) {
-                    // Add to user's balance
-                    gameState.usd += parseFloat(codeValue);
-                    saveGameState();
-                    updateUI();
-                    
-                    // Add to redemption history
-                    gameState.redeemedCodes.push({
-                        code: code,
-                        amount: parseFloat(codeValue),
-                        date: new Date().toLocaleString()
-                    });
-                    saveGameState();
-                    
-                    // Show success
-                    document.getElementById('redeemCode').value = '';
-                    document.getElementById('redeemSuccessMessage').textContent = 
-                        `You have successfully redeemed $${codeValue} USD!`;
-                    document.getElementById('redeemSuccessModal').style.display = 'flex';
-                    
-                    // Update history display
-                    displayRedeemHistory();
-                } else {
-                    alert('Invalid or expired code. Please try another one.');
-                }
-                
-                // Reset button
-                redeemBtn.disabled = false;
-                redeemBtn.innerHTML = originalText;
-            }, 1500);
+            // Add to user's balance
+            gameState.usd += codeData.value;
+            
+            // Save redemption history
+            if (!gameState.redeemedCodes) {
+                gameState.redeemedCodes = [];
+            }
+            gameState.redeemedCodes.push({
+                code: code,
+                amount: codeData.value,
+                date: new Date().toLocaleString()
+            });
+            
+            // Update UI
+            updateUI();
+            saveGameState();
+            document.getElementById('redeemCode').value = '';
+            
+            // Show success
+            document.getElementById('redeemSuccessMessage').textContent = 
+                `You have successfully redeemed $${codeData.value.toFixed(2)} USD!`;
+            document.getElementById('redeemSuccessModal').style.display = 'flex';
+            
+            // Update history display
+            displayRedeemHistory();
         }
         
         function displayRedeemHistory() {
             const historyContainer = document.getElementById('redeemHistory');
             const historyContent = document.getElementById('redeemHistoryContent');
             
-            if (gameState.redeemedCodes.length === 0) {
+            if (!gameState.redeemedCodes || gameState.redeemedCodes.length === 0) {
                 historyContainer.style.display = 'none';
                 return;
             }
@@ -1534,19 +1524,10 @@
         // ====================
         
         function loadRedeemCodes() {
-            // In a real app, you would fetch from your backend or GitHub Gist
-            // For this demo, we'll simulate with some dummy data
-            const dummyCodes = [
-                { code: "GOLD100", value: 1.00, used: false },
-                { code: "SILVER50", value: 0.50, used: true },
-                { code: "DIAMOND200", value: 2.00, used: false },
-                { code: "PLATINUM150", value: 1.50, used: false }
-            ];
-            
             const codesTable = document.getElementById('codesTable');
             codesTable.innerHTML = '';
             
-            dummyCodes.forEach(code => {
+            appData.redemptionCodes.forEach(code => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${code.code}</td>
@@ -1571,11 +1552,10 @@
                 return;
             }
             
-            // In a real app, this would save to your backend or GitHub Gist
-            const codes = [];
+            // Generate codes
             for (let i = 0; i < amount; i++) {
-                const code = generateRandomCode();
-                codes.push({
+                const code = 'MINE' + Math.floor(1000 + Math.random() * 9000);
+                appData.redemptionCodes.push({
                     code: code,
                     value: value,
                     used: false
@@ -1595,15 +1575,6 @@
             loadRedeemCodes();
         }
         
-        function generateRandomCode() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let code = '';
-            for (let i = 0; i < 8; i++) {
-                code += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return code;
-        }
-        
         function updateUserBalance() {
             const userId = document.getElementById('adminUserId').value;
             const amount = parseFloat(document.getElementById('adminUsdAmount').value);
@@ -1618,9 +1589,8 @@
                 return;
             }
             
-            // In a real app, this would update your backend or GitHub Gist
+            // In a real app, this would update your backend or database
             // For this demo, we'll just show a success message
-            
             document.getElementById('adminSuccessMessage').textContent = 
                 `Updated user ${userId} balance by $${amount.toFixed(3)}`;
             document.getElementById('adminSuccessModal').style.display = 'flex';
@@ -1638,14 +1608,12 @@
                 return;
             }
             
-            // In a real app, this would fetch from your backend or GitHub Gist
-            // For this demo, we'll simulate with dummy data
-            
             const userDataDisplay = document.getElementById('userDataDisplay');
             const userDataContent = document.getElementById('userDataContent');
             
-            // Simulate API call delay
+            // Simulate loading data
             setTimeout(() => {
+                // In a real app, you would fetch this from your backend
                 const dummyUser = {
                     id: userId,
                     username: `user${userId}`,
