@@ -451,6 +451,50 @@
             text-decoration: none;
             display: inline-block;
         }
+        .redeem-form {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .admin-controls {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .admin-table th, .admin-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .admin-table th {
+            background: rgba(78, 84, 200, 0.5);
+        }
+        .admin-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255,255,255,0.9);
+            margin-bottom: 10px;
+        }
+        .admin-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -496,6 +540,9 @@
                 padding: 15px 30px;
                 font-size: 20px;
             }
+            .admin-table {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -509,7 +556,9 @@
                     <button class="menu-button">☰</button>
                     <div class="dropdown-content">
                         <button onclick="showPage('withdraw')">Withdraw</button>
+                        <button onclick="showPage('redeem')">Redeem Code</button>
                         <button onclick="showPage('settings')">Settings</button>
+                        <button onclick="showPage('admin')" id="adminButton" style="display: none;">Admin Panel</button>
                     </div>
                 </div>
             </div>
@@ -634,6 +683,32 @@
             </div>
         </div>
         
+        <div id="redeemPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Redeem Code</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="redeem-form">
+                <div class="input-group">
+                    <label for="redeemCode">Enter Secret Code</label>
+                    <input type="text" id="redeemCode" placeholder="Enter your secret code">
+                </div>
+                
+                <button class="submit-button" onclick="redeemCode()">Redeem USD</button>
+            </div>
+            
+            <div id="redeemHistory" style="margin-top: 20px; display: none;">
+                <h3 style="text-align: center; margin-bottom: 10px;">Your Redemption History</h3>
+                <div id="redeemHistoryContent" style="background: rgba(0,0,0,0.5); border-radius: 10px; padding: 10px;"></div>
+            </div>
+        </div>
+        
         <div id="settingsPage" class="page">
             <div class="header">
                 <div class="header-left">
@@ -676,6 +751,60 @@
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
                 </select>
+            </div>
+        </div>
+        
+        <div id="adminPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Admin Panel</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="admin-controls">
+                <h3 style="text-align: center; margin-bottom: 15px;">Admin Controls</h3>
+                
+                <div class="input-group">
+                    <label>Generate New Codes</label>
+                    <input type="number" id="codeAmount" class="admin-input" placeholder="Number of codes" min="1" max="100">
+                    <input type="number" id="codeValue" class="admin-input" placeholder="USD value per code" min="0.1" step="0.1">
+                    <button class="admin-button" onclick="generateCodes()">Generate Codes</button>
+                </div>
+                
+                <div class="input-group">
+                    <label>Manage User Balance</label>
+                    <input type="text" id="adminUserId" class="admin-input" placeholder="User ID">
+                    <input type="number" id="adminUsdAmount" class="admin-input" placeholder="USD amount" step="0.001">
+                    <button class="admin-button" onclick="updateUserBalance()">Update Balance</button>
+                    <button class="admin-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="getUserData()">Get User Data</button>
+                </div>
+                
+                <div id="userDataDisplay" style="margin-top: 15px; display: none;">
+                    <h4 style="margin-bottom: 10px;">User Information</h4>
+                    <div id="userDataContent" style="background: rgba(0,0,0,0.5); border-radius: 10px; padding: 10px;"></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="margin-bottom: 10px;">Active Redemption Codes</h4>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Value</th>
+                                    <th>Used</th>
+                                </tr>
+                            </thead>
+                            <tbody id="codesTable">
+                                <!-- Codes will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -724,6 +853,22 @@
         </div>
     </div>
     
+    <div class="modal" id="redeemSuccessModal">
+        <div class="modal-content">
+            <h2>Code Redeemed!</h2>
+            <p id="redeemSuccessMessage">You have successfully redeemed $X USD!</p>
+            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">Continue</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="adminSuccessModal">
+        <div class="modal-content">
+            <h2>Success!</h2>
+            <p id="adminSuccessMessage">Operation completed successfully.</p>
+            <button class="modal-button" onclick="closeModal('adminSuccessModal')">OK</button>
+        </div>
+    </div>
+    
     <audio id="backgroundMusic" loop>
         <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
     </audio>
@@ -740,6 +885,19 @@
     <script>
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
+        
+        // GitHub Gist configuration (replace with your own)
+        const GIST_CONFIG = {
+            codes: {
+                id: "YOUR_GIST_ID_FOR_CODES", // Replace with your Gist ID
+                filename: "redeem_codes.json"
+            },
+            users: {
+                id: "YOUR_GIST_ID_FOR_USERS", // Replace with your Gist ID
+                filename: "users_data.json"
+            },
+            token: "YOUR_GITHUB_TOKEN" // Replace with your GitHub personal access token
+        };
         
         const gameState = {
             coins: 500,
@@ -760,7 +918,9 @@
             userId: null,
             channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
             lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-            verificationAttempts: 0
+            verificationAttempts: 0,
+            isAdmin: false,
+            redeemedCodes: []
         };
 
         // Initialize the game
@@ -774,6 +934,14 @@
                 gameState.userId = user.id;
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
+                
+                // Check if user is admin (replace with your admin user IDs)
+                const adminUsers = [123456789, 987654321]; // Add your Telegram user IDs here
+                gameState.isAdmin = adminUsers.includes(user.id);
+                
+                if (gameState.isAdmin) {
+                    document.getElementById('adminButton').style.display = 'block';
+                }
                 
                 // Update UI with user's full name
                 document.getElementById('userDisplay').textContent = `Welcome, ${gameState.fullName || gameState.username}!`;
@@ -795,6 +963,11 @@
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
+            
+            // Load redemption codes from GitHub (for admin)
+            if (gameState.isAdmin) {
+                loadRedeemCodes();
+            }
         }
 
         // Check if user has completed verification
@@ -842,7 +1015,16 @@
         function loadGameState() {
             const savedState = localStorage.getItem(`minezwallGameState_${gameState.userId}`);
             if (savedState) {
-                Object.assign(gameState, JSON.parse(savedState));
+                const parsedState = JSON.parse(savedState);
+                Object.assign(gameState, parsedState);
+                
+                // Load redeemed codes history if available
+                if (parsedState.redeemedCodes) {
+                    gameState.redeemedCodes = parsedState.redeemedCodes;
+                    if (gameState.redeemedCodes.length > 0) {
+                        displayRedeemHistory();
+                    }
+                }
             }
             updateUI();
         }
@@ -906,6 +1088,16 @@
             // If showing game page, initialize game
             if (pageId === 'game') {
                 initGame();
+            }
+            
+            // If showing redeem page, load history
+            if (pageId === 'redeem' && gameState.redeemedCodes.length > 0) {
+                displayRedeemHistory();
+            }
+            
+            // If showing admin page, load data
+            if (pageId === 'admin' && gameState.isAdmin) {
+                loadRedeemCodes();
             }
         }
 
@@ -1250,6 +1442,228 @@
         function redirectToGoogleForm() {
             window.open('https://forms.gle/dcV7SNonaC1BVvNdA', '_blank');
             closeModal('withdrawalSuccessModal');
+        }
+
+        // ====================
+        // REDEMPTION CODE SYSTEM
+        // ====================
+        
+        function redeemCode() {
+            const code = document.getElementById('redeemCode').value.trim();
+            if (!code) {
+                alert('Please enter a code');
+                return;
+            }
+            
+            // In a real app, you would verify the code with your backend
+            // For this demo, we'll simulate it with a delay
+            
+            // Show loading
+            const redeemBtn = document.querySelector('.redeem-form .submit-button');
+            const originalText = redeemBtn.innerHTML;
+            redeemBtn.disabled = true;
+            redeemBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Check if code is valid (in a real app, this would be a server check)
+                const isValidCode = Math.random() > 0.3; // 70% chance of being valid for demo
+                const codeValue = isValidCode ? (Math.random() * 5 + 0.5).toFixed(2) : 0;
+                
+                if (isValidCode) {
+                    // Add to user's balance
+                    gameState.usd += parseFloat(codeValue);
+                    saveGameState();
+                    updateUI();
+                    
+                    // Add to redemption history
+                    gameState.redeemedCodes.push({
+                        code: code,
+                        amount: parseFloat(codeValue),
+                        date: new Date().toLocaleString()
+                    });
+                    saveGameState();
+                    
+                    // Show success
+                    document.getElementById('redeemCode').value = '';
+                    document.getElementById('redeemSuccessMessage').textContent = 
+                        `You have successfully redeemed $${codeValue} USD!`;
+                    document.getElementById('redeemSuccessModal').style.display = 'flex';
+                    
+                    // Update history display
+                    displayRedeemHistory();
+                } else {
+                    alert('Invalid or expired code. Please try another one.');
+                }
+                
+                // Reset button
+                redeemBtn.disabled = false;
+                redeemBtn.innerHTML = originalText;
+            }, 1500);
+        }
+        
+        function displayRedeemHistory() {
+            const historyContainer = document.getElementById('redeemHistory');
+            const historyContent = document.getElementById('redeemHistoryContent');
+            
+            if (gameState.redeemedCodes.length === 0) {
+                historyContainer.style.display = 'none';
+                return;
+            }
+            
+            historyContainer.style.display = 'block';
+            historyContent.innerHTML = '';
+            
+            gameState.redeemedCodes.forEach(redemption => {
+                const redemptionItem = document.createElement('div');
+                redemptionItem.style.padding = '8px';
+                redemptionItem.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                redemptionItem.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>${redemption.code}</span>
+                        <span style="color: #4dffb8;">+$${redemption.amount}</span>
+                    </div>
+                    <div style="font-size: 12px; opacity: 0.7;">${redemption.date}</div>
+                `;
+                historyContent.appendChild(redemptionItem);
+            });
+        }
+        
+        // ====================
+        // ADMIN FUNCTIONS
+        // ====================
+        
+        function loadRedeemCodes() {
+            // In a real app, you would fetch from your backend or GitHub Gist
+            // For this demo, we'll simulate with some dummy data
+            const dummyCodes = [
+                { code: "GOLD100", value: 1.00, used: false },
+                { code: "SILVER50", value: 0.50, used: true },
+                { code: "DIAMOND200", value: 2.00, used: false },
+                { code: "PLATINUM150", value: 1.50, used: false }
+            ];
+            
+            const codesTable = document.getElementById('codesTable');
+            codesTable.innerHTML = '';
+            
+            dummyCodes.forEach(code => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${code.code}</td>
+                    <td>$${code.value.toFixed(2)}</td>
+                    <td>${code.used ? 'Yes' : 'No'}</td>
+                `;
+                codesTable.appendChild(row);
+            });
+        }
+        
+        function generateCodes() {
+            const amount = parseInt(document.getElementById('codeAmount').value);
+            const value = parseFloat(document.getElementById('codeValue').value);
+            
+            if (!amount || amount < 1 || amount > 100) {
+                alert('Please enter a valid number of codes (1-100)');
+                return;
+            }
+            
+            if (!value || value <= 0) {
+                alert('Please enter a valid USD value (>0)');
+                return;
+            }
+            
+            // In a real app, this would save to your backend or GitHub Gist
+            const codes = [];
+            for (let i = 0; i < amount; i++) {
+                const code = generateRandomCode();
+                codes.push({
+                    code: code,
+                    value: value,
+                    used: false
+                });
+            }
+            
+            // Show success
+            document.getElementById('adminSuccessMessage').textContent = 
+                `Generated ${amount} codes worth $${value.toFixed(2)} each!`;
+            document.getElementById('adminSuccessModal').style.display = 'flex';
+            
+            // Clear inputs
+            document.getElementById('codeAmount').value = '';
+            document.getElementById('codeValue').value = '';
+            
+            // Refresh codes list
+            loadRedeemCodes();
+        }
+        
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+        
+        function updateUserBalance() {
+            const userId = document.getElementById('adminUserId').value;
+            const amount = parseFloat(document.getElementById('adminUsdAmount').value);
+            
+            if (!userId) {
+                alert('Please enter a user ID');
+                return;
+            }
+            
+            if (isNaN(amount)) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            // In a real app, this would update your backend or GitHub Gist
+            // For this demo, we'll just show a success message
+            
+            document.getElementById('adminSuccessMessage').textContent = 
+                `Updated user ${userId} balance by $${amount.toFixed(3)}`;
+            document.getElementById('adminSuccessModal').style.display = 'flex';
+            
+            // Clear inputs
+            document.getElementById('adminUserId').value = '';
+            document.getElementById('adminUsdAmount').value = '';
+        }
+        
+        function getUserData() {
+            const userId = document.getElementById('adminUserId').value;
+            
+            if (!userId) {
+                alert('Please enter a user ID');
+                return;
+            }
+            
+            // In a real app, this would fetch from your backend or GitHub Gist
+            // For this demo, we'll simulate with dummy data
+            
+            const userDataDisplay = document.getElementById('userDataDisplay');
+            const userDataContent = document.getElementById('userDataContent');
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                const dummyUser = {
+                    id: userId,
+                    username: `user${userId}`,
+                    balance: (Math.random() * 10).toFixed(3),
+                    joined: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                    lastActive: new Date().toLocaleString()
+                };
+                
+                userDataContent.innerHTML = `
+                    <div><strong>ID:</strong> ${dummyUser.id}</div>
+                    <div><strong>Username:</strong> ${dummyUser.username}</div>
+                    <div><strong>Balance:</strong> $${dummyUser.balance}</div>
+                    <div><strong>Joined:</strong> ${dummyUser.joined}</div>
+                    <div><strong>Last Active:</strong> ${dummyUser.lastActive}</div>
+                `;
+                
+                userDataDisplay.style.display = 'block';
+            }, 800);
         }
 
         window.onload = init;
