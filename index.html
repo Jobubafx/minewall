@@ -887,12 +887,12 @@
         const tg = window.Telegram.WebApp;
         
         // Simple in-memory database
-        const appData = {
+        let appData = {
           // Store redemption codes (format: {code: "ABC123", value: 1.00, used: false})
           redemptionCodes: [
-            {code: "FREE1", value: 0.00, used: false},
-            {code: "BONUS5", value: 0.00, used: false},
-            {code: "MINEZWALL", value: 0.00, used: false}
+            {code: "FREE1", value: 1.00, used: false},
+            {code: "BONUS5", value: 5.00, used: false},
+            {code: "MINEZWALL", value: 2.00, used: false}
           ],
           
           // Admin user IDs (YOUR ID IS INSERTED HERE)
@@ -934,11 +934,8 @@
             // Initialize Telegram WebApp
             tg.expand();
             
-            // Load all users from localStorage
-            const savedUsers = localStorage.getItem('minezwallUsers');
-            if (savedUsers) {
-                appData.users = JSON.parse(savedUsers);
-            }
+            // Load app data from localStorage
+            loadAppData();
             
             // Get user data from Telegram
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -1000,6 +997,34 @@
             if (gameState.isAdmin) {
                 loadRedeemCodes();
             }
+            
+            // Save app data after initialization
+            saveAppData();
+        }
+
+        // Load app data from localStorage
+        function loadAppData() {
+            const savedAppData = localStorage.getItem('minezwallAppData');
+            if (savedAppData) {
+                try {
+                    const parsedData = JSON.parse(savedAppData);
+                    // Merge with existing appData, preserving current users array
+                    appData = {
+                        ...appData,
+                        ...parsedData,
+                        users: [...appData.users, ...(parsedData.users || [])].filter((user, index, self) => 
+                            index === self.findIndex(u => u.id === user.id)
+                        )
+                    };
+                } catch (e) {
+                    console.error('Error loading app data:', e);
+                }
+            }
+        }
+
+        // Save app data to localStorage
+        function saveAppData() {
+            localStorage.setItem('minezwallAppData', JSON.stringify(appData));
         }
 
         // Check if user has completed verification
@@ -1047,26 +1072,30 @@
         function loadGameState() {
             const savedState = localStorage.getItem(`minezwallGameState_${gameState.userId}`);
             if (savedState) {
-                const parsedState = JSON.parse(savedState);
-                Object.assign(gameState, parsedState);
-                
-                // Update the user's data in appData.users
-                const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-                if (userIndex !== -1) {
-                    appData.users[userIndex] = {
-                        ...appData.users[userIndex],
-                        balance: gameState.usd,
-                        coins: gameState.coins,
-                        level: gameState.level
-                    };
-                }
-                
-                // Load redeemed codes history if available
-                if (parsedState.redeemedCodes) {
-                    gameState.redeemedCodes = parsedState.redeemedCodes;
-                    if (gameState.redeemedCodes.length > 0) {
-                        displayRedeemHistory();
+                try {
+                    const parsedState = JSON.parse(savedState);
+                    Object.assign(gameState, parsedState);
+                    
+                    // Update the user's data in appData.users
+                    const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+                    if (userIndex !== -1) {
+                        appData.users[userIndex] = {
+                            ...appData.users[userIndex],
+                            balance: gameState.usd,
+                            coins: gameState.coins,
+                            level: gameState.level
+                        };
                     }
+                    
+                    // Load redeemed codes history if available
+                    if (parsedState.redeemedCodes) {
+                        gameState.redeemedCodes = parsedState.redeemedCodes;
+                        if (gameState.redeemedCodes.length > 0) {
+                            displayRedeemHistory();
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading game state:', e);
                 }
             }
             updateUI();
@@ -1083,10 +1112,22 @@
                     level: gameState.level,
                     lastActive: new Date().toISOString()
                 };
+            } else if (gameState.userId) {
+                // Add new user if not found
+                appData.users.push({
+                    id: gameState.userId,
+                    fullName: gameState.fullName,
+                    username: gameState.username,
+                    balance: gameState.usd,
+                    coins: gameState.coins,
+                    level: gameState.level,
+                    lastActive: new Date().toISOString(),
+                    joinDate: new Date().toISOString()
+                });
             }
             
             localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
-            localStorage.setItem('minezwallUsers', JSON.stringify(appData.users));
+            saveAppData();
         }
 
         function setupEventListeners() {
@@ -1538,6 +1579,7 @@
             // Update UI
             updateUI();
             saveGameState();
+            saveAppData(); // Save app data to persist code usage
             document.getElementById('redeemCode').value = '';
             
             // Show success
@@ -1611,7 +1653,7 @@
             
             // Generate codes
             for (let i = 0; i < amount; i++) {
-                const code = 'MINEZ' + Math.floor(1000 + Math.random() * 9000);
+                const code = 'MINE' + Math.floor(1000 + Math.random() * 9000);
                 appData.redemptionCodes.push({
                     code: code,
                     value: value,
@@ -1630,6 +1672,9 @@
             
             // Refresh codes list
             loadRedeemCodes();
+            
+            // Save app data to persist the new codes
+            saveAppData();
         }
         
         function updateUserBalance() {
@@ -1681,6 +1726,7 @@
             
             // Save changes
             saveGameState();
+            saveAppData();
         }
         
         function getUserData() {
