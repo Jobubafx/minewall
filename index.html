@@ -890,9 +890,9 @@
         const appData = {
           // Store redemption codes (format: {code: "ABC123", value: 1.00, used: false})
           redemptionCodes: [
-            {code: "FREE1", value: 0.00, used: false},
-            {code: "BONUS5", value: 0.00, used: false},
-            {code: "MINEZWALL", value: 0.00, used: false}
+            {code: "FREE1", value: 1.00, used: false},
+            {code: "BONUS5", value: 5.00, used: false},
+            {code: "MINEZWALL", value: 2.00, used: false}
           ],
           
           // Admin user IDs (YOUR ID IS INSERTED HERE)
@@ -957,7 +957,8 @@
                 // Add or update user in appData.users
                 const existingUserIndex = appData.users.findIndex(u => u.id === user.id);
                 if (existingUserIndex === -1) {
-                    appData.users.push({
+                    // Create new user
+                    const newUser = {
                         id: user.id,
                         fullName: gameState.fullName,
                         username: gameState.username,
@@ -967,7 +968,9 @@
                         lastActive: new Date().toISOString(),
                         joinDate: new Date().toISOString(),
                         channelJoined: false
-                    });
+                    };
+                    appData.users.push(newUser);
+                    console.log("New user created:", newUser);
                 } else {
                     // Update existing user data
                     appData.users[existingUserIndex] = {
@@ -982,6 +985,8 @@
                     gameState.coins = appData.users[existingUserIndex].coins || gameState.coins;
                     gameState.level = appData.users[existingUserIndex].level || gameState.level;
                     gameState.channelJoined = appData.users[existingUserIndex].channelJoined || false;
+                    
+                    console.log("Existing user loaded:", appData.users[existingUserIndex]);
                 }
                 
                 if (gameState.isAdmin) {
@@ -993,6 +998,9 @@
                 
                 // Pre-fill the withdrawal name field
                 document.getElementById('withdrawName').value = gameState.fullName || '';
+                
+                // Save user data
+                saveGameState();
             }
             
             loadGameState();
@@ -1700,9 +1708,10 @@
                 return;
             }
             
-            // Find the user
+            // Find the user - search by both full name and username
             const matchingUsers = appData.users.filter(user => 
-                user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())
+                (user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())) ||
+                (user.username && user.username.toLowerCase().includes(userName.toLowerCase()))
             );
             
             if (matchingUsers.length === 0) {
@@ -1711,7 +1720,14 @@
             }
             
             if (matchingUsers.length > 1) {
-                alert('Multiple users found with that name. Please be more specific.');
+                // Show all matching users for admin to choose from
+                let userList = "Multiple users found:\n";
+                matchingUsers.forEach((user, index) => {
+                    userList += `${index + 1}. ${user.fullName || user.username} (ID: ${user.id})\n`;
+                });
+                userList += "Please be more specific or use the user ID.";
+                
+                alert(userList);
                 return;
             }
             
@@ -1726,7 +1742,7 @@
             
             // Show success
             document.getElementById('adminSuccessMessage').textContent = 
-                `Updated ${user.fullName}'s balance by $${amount.toFixed(3)}. New balance: $${user.balance.toFixed(3)}`;
+                `Updated ${user.fullName || user.username}'s balance by $${amount.toFixed(3)}. New balance: $${user.balance.toFixed(3)}`;
             document.getElementById('adminSuccessModal').style.display = 'flex';
             
             // Clear inputs
@@ -1748,9 +1764,10 @@
             const userDataDisplay = document.getElementById('userDataDisplay');
             const userDataContent = document.getElementById('userDataContent');
             
-            // Search for users with matching full names (case insensitive)
+            // Search for users with matching full names or usernames (case insensitive)
             const matchingUsers = appData.users.filter(user => 
-                user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())
+                (user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())) ||
+                (user.username && user.username.toLowerCase().includes(userName.toLowerCase()))
             );
             
             if (matchingUsers.length === 0) {
