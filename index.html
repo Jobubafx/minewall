@@ -777,7 +777,7 @@
                 
                 <div class="input-group">
                     <label>Manage User Balance</label>
-                    <input type="text" id="adminUserId" class="admin-input" placeholder="User ID">
+                    <input type="text" id="adminUserName" class="admin-input" placeholder="User Full Name">
                     <input type="number" id="adminUsdAmount" class="admin-input" placeholder="USD amount" step="0.001">
                     <button class="admin-button" onclick="updateUserBalance()">Update Balance</button>
                     <button class="admin-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="getUserData()">Get User Data</button>
@@ -890,13 +890,16 @@
         const appData = {
           // Store redemption codes (format: {code: "ABC123", value: 1.00, used: false})
           redemptionCodes: [
-            {code: "FREE1", value: 1.00, used: false},
-            {code: "BONUS5", value: 5.00, used: false},
-            {code: "MINEZWALL", value: 2.00, used: false}
+            {code: "FREE1", value: 0.00, used: false},
+            {code: "BONUS5", value: 0.00, used: false},
+            {code: "MINEZWALL", value: 0.00, used: false}
           ],
           
           // Admin user IDs (YOUR ID IS INSERTED HERE)
           adminUsers: [1558798885],
+          
+          // Store user data
+          users: [],
           
           // Store user redemption history
           userRedemptions: {}
@@ -922,13 +925,20 @@
           isAdmin: false,
           channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
           lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-          verificationAttempts: 0
+          verificationAttempts: 0,
+          redeemedCodes: []
         };
 
         // Initialize the game
         function init() {
             // Initialize Telegram WebApp
             tg.expand();
+            
+            // Load all users from localStorage
+            const savedUsers = localStorage.getItem('minezwallUsers');
+            if (savedUsers) {
+                appData.users = JSON.parse(savedUsers);
+            }
             
             // Get user data from Telegram
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -937,6 +947,29 @@
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
                 gameState.isAdmin = appData.adminUsers.includes(user.id);
+                
+                // Add or update user in appData.users
+                const existingUserIndex = appData.users.findIndex(u => u.id === user.id);
+                if (existingUserIndex === -1) {
+                    appData.users.push({
+                        id: user.id,
+                        fullName: gameState.fullName,
+                        username: gameState.username,
+                        balance: gameState.usd,
+                        coins: gameState.coins,
+                        level: gameState.level,
+                        lastActive: new Date().toISOString(),
+                        joinDate: new Date().toISOString()
+                    });
+                } else {
+                    // Update existing user data
+                    appData.users[existingUserIndex] = {
+                        ...appData.users[existingUserIndex],
+                        fullName: gameState.fullName,
+                        username: gameState.username,
+                        lastActive: new Date().toISOString()
+                    };
+                }
                 
                 if (gameState.isAdmin) {
                     document.getElementById('adminButton').style.display = 'block';
@@ -1017,6 +1050,17 @@
                 const parsedState = JSON.parse(savedState);
                 Object.assign(gameState, parsedState);
                 
+                // Update the user's data in appData.users
+                const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+                if (userIndex !== -1) {
+                    appData.users[userIndex] = {
+                        ...appData.users[userIndex],
+                        balance: gameState.usd,
+                        coins: gameState.coins,
+                        level: gameState.level
+                    };
+                }
+                
                 // Load redeemed codes history if available
                 if (parsedState.redeemedCodes) {
                     gameState.redeemedCodes = parsedState.redeemedCodes;
@@ -1029,7 +1073,20 @@
         }
 
         function saveGameState() {
+            // Update the current user's data in appData.users
+            const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+            if (userIndex !== -1) {
+                appData.users[userIndex] = {
+                    ...appData.users[userIndex],
+                    balance: gameState.usd,
+                    coins: gameState.coins,
+                    level: gameState.level,
+                    lastActive: new Date().toISOString()
+                };
+            }
+            
             localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
+            localStorage.setItem('minezwallUsers', JSON.stringify(appData.users));
         }
 
         function setupEventListeners() {
@@ -1554,7 +1611,7 @@
             
             // Generate codes
             for (let i = 0; i < amount; i++) {
-                const code = 'MINE' + Math.floor(1000 + Math.random() * 9000);
+                const code = 'MINEZ' + Math.floor(1000 + Math.random() * 9000);
                 appData.redemptionCodes.push({
                     code: code,
                     value: value,
@@ -1576,11 +1633,11 @@
         }
         
         function updateUserBalance() {
-            const userId = document.getElementById('adminUserId').value;
+            const userName = document.getElementById('adminUserName').value.trim();
             const amount = parseFloat(document.getElementById('adminUsdAmount').value);
             
-            if (!userId) {
-                alert('Please enter a user ID');
+            if (!userName) {
+                alert('Please enter a user name');
                 return;
             }
             
@@ -1589,49 +1646,89 @@
                 return;
             }
             
-            // In a real app, this would update your backend or database
-            // For this demo, we'll just show a success message
+            // Find the user
+            const matchingUsers = appData.users.filter(user => 
+                user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())
+            );
+            
+            if (matchingUsers.length === 0) {
+                alert('No users found with that name');
+                return;
+            }
+            
+            if (matchingUsers.length > 1) {
+                alert('Multiple users found with that name. Please be more specific.');
+                return;
+            }
+            
+            const user = matchingUsers[0];
+            user.balance = (user.balance || 0) + amount;
+            
+            // Update the game state if it's the current user
+            if (gameState.userId === user.id) {
+                gameState.usd = user.balance;
+                updateUI();
+            }
+            
+            // Show success
             document.getElementById('adminSuccessMessage').textContent = 
-                `Updated user ${userId} balance by $${amount.toFixed(3)}`;
+                `Updated ${user.fullName}'s balance by $${amount.toFixed(3)}. New balance: $${user.balance.toFixed(3)}`;
             document.getElementById('adminSuccessModal').style.display = 'flex';
             
             // Clear inputs
-            document.getElementById('adminUserId').value = '';
+            document.getElementById('adminUserName').value = '';
             document.getElementById('adminUsdAmount').value = '';
+            
+            // Save changes
+            saveGameState();
         }
         
         function getUserData() {
-            const userId = document.getElementById('adminUserId').value;
+            const userName = document.getElementById('adminUserName').value.trim();
             
-            if (!userId) {
-                alert('Please enter a user ID');
+            if (!userName) {
+                alert('Please enter a user name');
                 return;
             }
             
             const userDataDisplay = document.getElementById('userDataDisplay');
             const userDataContent = document.getElementById('userDataContent');
             
-            // Simulate loading data
-            setTimeout(() => {
-                // In a real app, you would fetch this from your backend
-                const dummyUser = {
-                    id: userId,
-                    username: `user${userId}`,
-                    balance: (Math.random() * 10).toFixed(3),
-                    joined: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-                    lastActive: new Date().toLocaleString()
-                };
+            // Search for users with matching full names (case insensitive)
+            const matchingUsers = appData.users.filter(user => 
+                user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())
+            );
+            
+            if (matchingUsers.length === 0) {
+                userDataContent.innerHTML = '<div style="color: #ff4d4d;">No users found with that name.</div>';
+                userDataDisplay.style.display = 'block';
+                return;
+            }
+            
+            userDataContent.innerHTML = '';
+            
+            matchingUsers.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.style.marginBottom = '15px';
+                userDiv.style.padding = '10px';
+                userDiv.style.background = 'rgba(255,255,255,0.1)';
+                userDiv.style.borderRadius = '8px';
                 
-                userDataContent.innerHTML = `
-                    <div><strong>ID:</strong> ${dummyUser.id}</div>
-                    <div><strong>Username:</strong> ${dummyUser.username}</div>
-                    <div><strong>Balance:</strong> $${dummyUser.balance}</div>
-                    <div><strong>Joined:</strong> ${dummyUser.joined}</div>
-                    <div><strong>Last Active:</strong> ${dummyUser.lastActive}</div>
+                userDiv.innerHTML = `
+                    <div><strong>ID:</strong> ${user.id}</div>
+                    <div><strong>Full Name:</strong> ${user.fullName || 'N/A'}</div>
+                    <div><strong>Username:</strong> ${user.username || 'N/A'}</div>
+                    <div><strong>Balance:</strong> $${(user.balance || 0).toFixed(3)}</div>
+                    <div><strong>Coins:</strong> ${user.coins || 0}</div>
+                    <div><strong>Level:</strong> ${user.level || 1}</div>
+                    <div><strong>Joined:</strong> ${new Date(user.joinDate).toLocaleDateString()}</div>
+                    <div><strong>Last Active:</strong> ${new Date(user.lastActive).toLocaleString()}</div>
                 `;
                 
-                userDataDisplay.style.display = 'block';
-            }, 800);
+                userDataContent.appendChild(userDiv);
+            });
+            
+            userDataDisplay.style.display = 'block';
         }
 
         window.onload = init;
