@@ -887,12 +887,12 @@
         const tg = window.Telegram.WebApp;
         
         // Simple in-memory database
-        let appData = {
+        const appData = {
           // Store redemption codes (format: {code: "ABC123", value: 1.00, used: false})
           redemptionCodes: [
-            {code: "FREE1", value: 1.00, used: false},
-            {code: "BONUS5", value: 5.00, used: false},
-            {code: "MINEZWALL", value: 2.00, used: false}
+            {code: "FREE1", value: 0.00, used: false},
+            {code: "BONUS5", value: 0.00, used: false},
+            {code: "MINEZWALL", value: 0.00, used: false}
           ],
           
           // Admin user IDs (YOUR ID IS INSERTED HERE)
@@ -934,8 +934,17 @@
             // Initialize Telegram WebApp
             tg.expand();
             
-            // Load app data from localStorage
-            loadAppData();
+            // Load all users from localStorage
+            const savedUsers = localStorage.getItem('minezwallUsers');
+            if (savedUsers) {
+                appData.users = JSON.parse(savedUsers);
+            }
+            
+            // Load redemption codes from localStorage
+            const savedCodes = localStorage.getItem('minezwallRedemptionCodes');
+            if (savedCodes) {
+                appData.redemptionCodes = JSON.parse(savedCodes);
+            }
             
             // Get user data from Telegram
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
@@ -956,7 +965,8 @@
                         coins: gameState.coins,
                         level: gameState.level,
                         lastActive: new Date().toISOString(),
-                        joinDate: new Date().toISOString()
+                        joinDate: new Date().toISOString(),
+                        channelJoined: false
                     });
                 } else {
                     // Update existing user data
@@ -966,6 +976,12 @@
                         username: gameState.username,
                         lastActive: new Date().toISOString()
                     };
+                    
+                    // Load user's saved balance if exists
+                    gameState.usd = appData.users[existingUserIndex].balance || gameState.usd;
+                    gameState.coins = appData.users[existingUserIndex].coins || gameState.coins;
+                    gameState.level = appData.users[existingUserIndex].level || gameState.level;
+                    gameState.channelJoined = appData.users[existingUserIndex].channelJoined || false;
                 }
                 
                 if (gameState.isAdmin) {
@@ -997,34 +1013,6 @@
             if (gameState.isAdmin) {
                 loadRedeemCodes();
             }
-            
-            // Save app data after initialization
-            saveAppData();
-        }
-
-        // Load app data from localStorage
-        function loadAppData() {
-            const savedAppData = localStorage.getItem('minezwallAppData');
-            if (savedAppData) {
-                try {
-                    const parsedData = JSON.parse(savedAppData);
-                    // Merge with existing appData, preserving current users array
-                    appData = {
-                        ...appData,
-                        ...parsedData,
-                        users: [...appData.users, ...(parsedData.users || [])].filter((user, index, self) => 
-                            index === self.findIndex(u => u.id === user.id)
-                        )
-                    };
-                } catch (e) {
-                    console.error('Error loading app data:', e);
-                }
-            }
-        }
-
-        // Save app data to localStorage
-        function saveAppData() {
-            localStorage.setItem('minezwallAppData', JSON.stringify(appData));
         }
 
         // Check if user has completed verification
@@ -1033,8 +1021,12 @@
             if (!gameState.userId) return false;
             
             // Check if user has joined channel
-            const joined = localStorage.getItem(`channelJoined_${gameState.userId}`);
-            return joined === 'true';
+            const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+            if (userIndex !== -1 && appData.users[userIndex].channelJoined) {
+                return true;
+            }
+            
+            return false;
         }
 
         // Verify channel membership
@@ -1057,7 +1049,13 @@
                 
                 // After first attempt, simulate successful verification
                 gameState.channelJoined = true;
-                localStorage.setItem(`channelJoined_${gameState.userId}`, 'true');
+                
+                // Update user's channel joined status
+                const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+                if (userIndex !== -1) {
+                    appData.users[userIndex].channelJoined = true;
+                }
+                
                 localStorage.setItem('lastChannelCheck', Date.now());
                 saveGameState();
                 
@@ -1072,30 +1070,26 @@
         function loadGameState() {
             const savedState = localStorage.getItem(`minezwallGameState_${gameState.userId}`);
             if (savedState) {
-                try {
-                    const parsedState = JSON.parse(savedState);
-                    Object.assign(gameState, parsedState);
-                    
-                    // Update the user's data in appData.users
-                    const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-                    if (userIndex !== -1) {
-                        appData.users[userIndex] = {
-                            ...appData.users[userIndex],
-                            balance: gameState.usd,
-                            coins: gameState.coins,
-                            level: gameState.level
-                        };
+                const parsedState = JSON.parse(savedState);
+                Object.assign(gameState, parsedState);
+                
+                // Update the user's data in appData.users
+                const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+                if (userIndex !== -1) {
+                    appData.users[userIndex] = {
+                        ...appData.users[userIndex],
+                        balance: gameState.usd,
+                        coins: gameState.coins,
+                        level: gameState.level
+                    };
+                }
+                
+                // Load redeemed codes history if available
+                if (parsedState.redeemedCodes) {
+                    gameState.redeemedCodes = parsedState.redeemedCodes;
+                    if (gameState.redeemedCodes.length > 0) {
+                        displayRedeemHistory();
                     }
-                    
-                    // Load redeemed codes history if available
-                    if (parsedState.redeemedCodes) {
-                        gameState.redeemedCodes = parsedState.redeemedCodes;
-                        if (gameState.redeemedCodes.length > 0) {
-                            displayRedeemHistory();
-                        }
-                    }
-                } catch (e) {
-                    console.error('Error loading game state:', e);
                 }
             }
             updateUI();
@@ -1110,24 +1104,16 @@
                     balance: gameState.usd,
                     coins: gameState.coins,
                     level: gameState.level,
-                    lastActive: new Date().toISOString()
-                };
-            } else if (gameState.userId) {
-                // Add new user if not found
-                appData.users.push({
-                    id: gameState.userId,
-                    fullName: gameState.fullName,
-                    username: gameState.username,
-                    balance: gameState.usd,
-                    coins: gameState.coins,
-                    level: gameState.level,
                     lastActive: new Date().toISOString(),
-                    joinDate: new Date().toISOString()
-                });
+                    channelJoined: gameState.channelJoined
+                };
             }
             
+            // Save redemption codes to localStorage
+            localStorage.setItem('minezwallRedemptionCodes', JSON.stringify(appData.redemptionCodes));
+            
             localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
-            saveAppData();
+            localStorage.setItem('minezwallUsers', JSON.stringify(appData.users));
         }
 
         function setupEventListeners() {
@@ -1579,7 +1565,6 @@
             // Update UI
             updateUI();
             saveGameState();
-            saveAppData(); // Save app data to persist code usage
             document.getElementById('redeemCode').value = '';
             
             // Show success
@@ -1653,13 +1638,16 @@
             
             // Generate codes
             for (let i = 0; i < amount; i++) {
-                const code = 'MINE' + Math.floor(1000 + Math.random() * 9000);
+                const code = 'MINEZ' + Math.floor(1000 + Math.random() * 9000);
                 appData.redemptionCodes.push({
                     code: code,
                     value: value,
                     used: false
                 });
             }
+            
+            // Save codes to localStorage
+            localStorage.setItem('minezwallRedemptionCodes', JSON.stringify(appData.redemptionCodes));
             
             // Show success
             document.getElementById('adminSuccessMessage').textContent = 
@@ -1672,9 +1660,6 @@
             
             // Refresh codes list
             loadRedeemCodes();
-            
-            // Save app data to persist the new codes
-            saveAppData();
         }
         
         function updateUserBalance() {
@@ -1726,7 +1711,6 @@
             
             // Save changes
             saveGameState();
-            saveAppData();
         }
         
         function getUserData() {
@@ -1767,6 +1751,7 @@
                     <div><strong>Balance:</strong> $${(user.balance || 0).toFixed(3)}</div>
                     <div><strong>Coins:</strong> ${user.coins || 0}</div>
                     <div><strong>Level:</strong> ${user.level || 1}</div>
+                    <div><strong>Channel Joined:</strong> ${user.channelJoined ? 'Yes' : 'No'}</div>
                     <div><strong>Joined:</strong> ${new Date(user.joinDate).toLocaleDateString()}</div>
                     <div><strong>Last Active:</strong> ${new Date(user.lastActive).toLocaleString()}</div>
                 `;
