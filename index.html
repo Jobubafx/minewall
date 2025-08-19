@@ -495,6 +495,24 @@
             cursor: pointer;
             margin-right: 5px;
         }
+        .search-type-selector {
+            display: flex;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .search-type-selector button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            background: none;
+            color: white;
+            cursor: pointer;
+        }
+        .search-type-selector button.active {
+            background: #4e54c8;
+        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -777,7 +795,12 @@
                 
                 <div class="input-group">
                     <label>Manage User Balance</label>
+                    <div class="search-type-selector" id="searchTypeSelector">
+                        <button class="active" onclick="setSearchType('name')">By Name</button>
+                        <button onclick="setSearchType('phone')">By Phone</button>
+                    </div>
                     <input type="text" id="adminUserName" class="admin-input" placeholder="User Full Name">
+                    <input type="text" id="adminUserPhone" class="admin-input" placeholder="User Phone Number" style="display: none;">
                     <input type="number" id="adminUsdAmount" class="admin-input" placeholder="USD amount" step="0.001">
                     <button class="admin-button" onclick="updateUserBalance()">Update Balance</button>
                     <button class="admin-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="getUserData()">Get User Data</button>
@@ -922,11 +945,13 @@
           username: 'Player',
           fullName: '',
           userId: null,
+          phoneNumber: '',
           isAdmin: false,
           channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
           lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
           verificationAttempts: 0,
-          redeemedCodes: []
+          redeemedCodes: [],
+          searchType: 'name' // Default search type
         };
 
         // Initialize the game
@@ -954,6 +979,18 @@
                 gameState.username = user.username || `User${user.id}`;
                 gameState.isAdmin = appData.adminUsers.includes(user.id);
                 
+                // Try to get phone number from Telegram init data
+                try {
+                    if (tg.initDataUnsafe.user.phone_number) {
+                        gameState.phoneNumber = tg.initDataUnsafe.user.phone_number;
+                    } else if (tg.initDataUnsafe.start_param) {
+                        // Try to parse phone number from start parameter if available
+                        gameState.phoneNumber = tg.initDataUnsafe.start_param;
+                    }
+                } catch (e) {
+                    console.log("Could not get phone number:", e);
+                }
+                
                 // Add or update user in appData.users
                 const existingUserIndex = appData.users.findIndex(u => u.id === user.id);
                 if (existingUserIndex === -1) {
@@ -962,6 +999,7 @@
                         id: user.id,
                         fullName: gameState.fullName,
                         username: gameState.username,
+                        phoneNumber: gameState.phoneNumber,
                         balance: gameState.usd,
                         coins: gameState.coins,
                         level: gameState.level,
@@ -977,6 +1015,7 @@
                         ...appData.users[existingUserIndex],
                         fullName: gameState.fullName,
                         username: gameState.username,
+                        phoneNumber: gameState.phoneNumber || appData.users[existingUserIndex].phoneNumber,
                         lastActive: new Date().toISOString()
                     };
                     
@@ -1020,6 +1059,24 @@
             // Load redemption codes for admin
             if (gameState.isAdmin) {
                 loadRedeemCodes();
+            }
+        }
+
+        // Set search type (name or phone)
+        function setSearchType(type) {
+            gameState.searchType = type;
+            const buttons = document.querySelectorAll('#searchTypeSelector button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (type === 'phone') {
+                document.getElementById('adminUserName').style.display = 'none';
+                document.getElementById('adminUserPhone').style.display = 'block';
+                document.getElementById('adminUserPhone').placeholder = 'User Phone Number';
+            } else {
+                document.getElementById('adminUserName').style.display = 'block';
+                document.getElementById('adminUserPhone').style.display = 'none';
+                document.getElementById('adminUserName').placeholder = 'User Full Name';
             }
         }
 
@@ -1695,27 +1752,42 @@
         }
         
         function updateUserBalance() {
-            const userName = document.getElementById('adminUserName').value.trim();
-            const amount = parseFloat(document.getElementById('adminUsdAmount').value);
+            let searchValue, matchingUsers;
             
-            if (!userName) {
-                alert('Please enter a user name');
-                return;
+            if (gameState.searchType === 'phone') {
+                searchValue = document.getElementById('adminUserPhone').value.trim();
+                if (!searchValue) {
+                    alert('Please enter a phone number');
+                    return;
+                }
+                
+                // Find user by phone number
+                matchingUsers = appData.users.filter(user => 
+                    user.phoneNumber && user.phoneNumber.includes(searchValue)
+                );
+            } else {
+                searchValue = document.getElementById('adminUserName').value.trim();
+                if (!searchValue) {
+                    alert('Please enter a user name');
+                    return;
+                }
+                
+                // Find user by name
+                matchingUsers = appData.users.filter(user => 
+                    (user.fullName && user.fullName.toLowerCase().includes(searchValue.toLowerCase())) ||
+                    (user.username && user.username.toLowerCase().includes(searchValue.toLowerCase()))
+                );
             }
+            
+            const amount = parseFloat(document.getElementById('adminUsdAmount').value);
             
             if (isNaN(amount)) {
                 alert('Please enter a valid amount');
                 return;
             }
             
-            // Find the user - search by both full name and username
-            const matchingUsers = appData.users.filter(user => 
-                (user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())) ||
-                (user.username && user.username.toLowerCase().includes(userName.toLowerCase()))
-            );
-            
             if (matchingUsers.length === 0) {
-                alert('No users found with that name');
+                alert('No users found with that ' + (gameState.searchType === 'phone' ? 'phone number' : 'name'));
                 return;
             }
             
@@ -1724,6 +1796,9 @@
                 let userList = "Multiple users found:\n";
                 matchingUsers.forEach((user, index) => {
                     userList += `${index + 1}. ${user.fullName || user.username} (ID: ${user.id})\n`;
+                    if (user.phoneNumber) {
+                        userList += `   Phone: ${user.phoneNumber}\n`;
+                    }
                 });
                 userList += "Please be more specific or use the user ID.";
                 
@@ -1747,6 +1822,7 @@
             
             // Clear inputs
             document.getElementById('adminUserName').value = '';
+            document.getElementById('adminUserPhone').value = '';
             document.getElementById('adminUsdAmount').value = '';
             
             // Save changes
@@ -1754,24 +1830,39 @@
         }
         
         function getUserData() {
-            const userName = document.getElementById('adminUserName').value.trim();
+            let searchValue, matchingUsers;
             
-            if (!userName) {
-                alert('Please enter a user name');
-                return;
+            if (gameState.searchType === 'phone') {
+                searchValue = document.getElementById('adminUserPhone').value.trim();
+                if (!searchValue) {
+                    alert('Please enter a phone number');
+                    return;
+                }
+                
+                // Find user by phone number
+                matchingUsers = appData.users.filter(user => 
+                    user.phoneNumber && user.phoneNumber.includes(searchValue)
+                );
+            } else {
+                searchValue = document.getElementById('adminUserName').value.trim();
+                if (!searchValue) {
+                    alert('Please enter a user name');
+                    return;
+                }
+                
+                // Find user by name
+                matchingUsers = appData.users.filter(user => 
+                    (user.fullName && user.fullName.toLowerCase().includes(searchValue.toLowerCase())) ||
+                    (user.username && user.username.toLowerCase().includes(searchValue.toLowerCase()))
+                );
             }
             
             const userDataDisplay = document.getElementById('userDataDisplay');
             const userDataContent = document.getElementById('userDataContent');
             
-            // Search for users with matching full names or usernames (case insensitive)
-            const matchingUsers = appData.users.filter(user => 
-                (user.fullName && user.fullName.toLowerCase().includes(userName.toLowerCase())) ||
-                (user.username && user.username.toLowerCase().includes(userName.toLowerCase()))
-            );
-            
             if (matchingUsers.length === 0) {
-                userDataContent.innerHTML = '<div style="color: #ff4d4d;">No users found with that name.</div>';
+                userDataContent.innerHTML = '<div style="color: #ff4d4d;">No users found with that ' + 
+                    (gameState.searchType === 'phone' ? 'phone number.' : 'name.') + '</div>';
                 userDataDisplay.style.display = 'block';
                 return;
             }
@@ -1789,6 +1880,7 @@
                     <div><strong>ID:</strong> ${user.id}</div>
                     <div><strong>Full Name:</strong> ${user.fullName || 'N/A'}</div>
                     <div><strong>Username:</strong> ${user.username || 'N/A'}</div>
+                    <div><strong>Phone:</strong> ${user.phoneNumber || 'N/A'}</div>
                     <div><strong>Balance:</strong> $${(user.balance || 0).toFixed(3)}</div>
                     <div><strong>Coins:</strong> ${user.coins || 0}</div>
                     <div><strong>Level:</strong> ${user.level || 1}</div>
