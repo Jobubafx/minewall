@@ -1029,42 +1029,66 @@
             return false;
         }
 
-        // Verify channel membership
-        function verifyChannelJoin() {
+        // Verify channel membership using Telegram Bot API
+        async function verifyChannelJoin() {
             const checkBtn = document.querySelector('.check-button');
             checkBtn.disabled = true;
             checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
             
-            // In a real app, you would use Telegram's API to verify channel membership
-            // For this demo, we'll simulate it with a delay
-            setTimeout(() => {
-                // Simulate verification - first attempt always fails to ensure user actually joins
-                if (gameState.verificationAttempts < 1) {
-                    gameState.verificationAttempts++;
-                    checkBtn.disabled = false;
-                    checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
-                    alert('Please actually join our Telegram channel before clicking verification.');
-                    return;
+            try {
+                // In a real implementation, you would call your backend API
+                // which would use the Telegram Bot API to check channel membership
+                
+                // For demo purposes, we'll simulate the API call
+                const isMember = await checkTelegramMembership(gameState.userId);
+                
+                if (isMember) {
+                    // User is a member of the channel
+                    gameState.channelJoined = true;
+                    
+                    // Update user's channel joined status
+                    const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
+                    if (userIndex !== -1) {
+                        appData.users[userIndex].channelJoined = true;
+                    }
+                    
+                    localStorage.setItem('lastChannelCheck', Date.now());
+                    saveGameState();
+                    
+                    showPage('home');
+                    alert('Verification successful! Welcome to Minezwall.');
+                } else {
+                    // User is not a member of the channel
+                    alert('We could not verify your membership. Please make sure you have joined the channel and try again.');
                 }
-                
-                // After first attempt, simulate successful verification
-                gameState.channelJoined = true;
-                
-                // Update user's channel joined status
-                const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-                if (userIndex !== -1) {
-                    appData.users[userIndex].channelJoined = true;
-                }
-                
-                localStorage.setItem('lastChannelCheck', Date.now());
-                saveGameState();
-                
-                showPage('home');
-                alert('Verification successful! Welcome to Minezwall.');
-                
-                checkBtn.disabled = false;
-                checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
-            }, 2000);
+            } catch (error) {
+                console.error('Error verifying channel membership:', error);
+                alert('An error occurred during verification. Please try again.');
+            }
+            
+            checkBtn.disabled = false;
+            checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
+        }
+
+        // Simulate checking Telegram channel membership
+        // In a real implementation, this would be done on your server
+        async function checkTelegramMembership(userId) {
+            // This is a simulation - in a real app, you would call your backend API
+            // which would use the Telegram Bot API to check if the user is a channel member
+            
+            // For demo purposes, we'll simulate a successful verification after first attempt
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // First attempt always fails to encourage users to actually join
+                    if (gameState.verificationAttempts < 1) {
+                        gameState.verificationAttempts++;
+                        resolve(false);
+                    } else {
+                        // After first attempt, simulate successful verification
+                        resolve(true);
+                    }
+                }, 2000);
+            });
         }
 
         function loadGameState() {
