@@ -451,68 +451,6 @@
             text-decoration: none;
             display: inline-block;
         }
-        .redeem-form {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .admin-controls {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        .admin-table th, .admin-table td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .admin-table th {
-            background: rgba(78, 84, 200, 0.5);
-        }
-        .admin-input {
-            width: 100%;
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-            background: rgba(255,255,255,0.9);
-            margin-bottom: 10px;
-        }
-        .admin-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 5px;
-        }
-        .search-type-selector {
-            display: flex;
-            margin-bottom: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .search-type-selector button {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            background: none;
-            color: white;
-            cursor: pointer;
-        }
-        .search-type-selector button.active {
-            background: #4e54c8;
-        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -558,9 +496,6 @@
                 padding: 15px 30px;
                 font-size: 20px;
             }
-            .admin-table {
-                font-size: 12px;
-            }
         }
     </style>
 </head>
@@ -574,9 +509,7 @@
                     <button class="menu-button">☰</button>
                     <div class="dropdown-content">
                         <button onclick="showPage('withdraw')">Withdraw</button>
-                        <button onclick="showPage('redeem')">Redeem Code</button>
                         <button onclick="showPage('settings')">Settings</button>
-                        <button onclick="showPage('admin')" id="adminButton" style="display: none;">Admin Panel</button>
                     </div>
                 </div>
             </div>
@@ -631,7 +564,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="usdDisplay">$1.000</div>
+                    <div class="stat-value" id="usdDisplay">$0.000</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">DIAMONDS FOUND</div>
@@ -701,32 +634,6 @@
             </div>
         </div>
         
-        <div id="redeemPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Redeem Code</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="redeem-form">
-                <div class="input-group">
-                    <label for="redeemCode">Enter Secret Code</label>
-                    <input type="text" id="redeemCode" placeholder="Enter your secret code">
-                </div>
-                
-                <button class="submit-button" onclick="redeemCode()">Redeem USD</button>
-            </div>
-            
-            <div id="redeemHistory" style="margin-top: 20px; display: none;">
-                <h3 style="text-align: center; margin-bottom: 10px;">Your Redemption History</h3>
-                <div id="redeemHistoryContent" style="background: rgba(0,0,0,0.5); border-radius: 10px; padding: 10px;"></div>
-            </div>
-        </div>
-        
         <div id="settingsPage" class="page">
             <div class="header">
                 <div class="header-left">
@@ -769,65 +676,6 @@
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
                 </select>
-            </div>
-        </div>
-        
-        <div id="adminPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Admin Panel</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="admin-controls">
-                <h3 style="text-align: center; margin-bottom: 15px;">Admin Controls</h3>
-                
-                <div class="input-group">
-                    <label>Generate New Codes</label>
-                    <input type="number" id="codeAmount" class="admin-input" placeholder="Number of codes" min="1" max="100">
-                    <input type="number" id="codeValue" class="admin-input" placeholder="USD value per code" min="0.1" step="0.1">
-                    <button class="admin-button" onclick="generateCodes()">Generate Codes</button>
-                </div>
-                
-                <div class="input-group">
-                    <label>Manage User Balance</label>
-                    <div class="search-type-selector" id="searchTypeSelector">
-                        <button class="active" onclick="setSearchType('name')">By Name</button>
-                        <button onclick="setSearchType('phone')">By Phone</button>
-                    </div>
-                    <input type="text" id="adminUserName" class="admin-input" placeholder="User Full Name">
-                    <input type="text" id="adminUserPhone" class="admin-input" placeholder="User Phone Number" style="display: none;">
-                    <input type="number" id="adminUsdAmount" class="admin-input" placeholder="USD amount" step="0.001">
-                    <button class="admin-button" onclick="updateUserBalance()">Update Balance</button>
-                    <button class="admin-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="getUserData()">Get User Data</button>
-                </div>
-                
-                <div id="userDataDisplay" style="margin-top: 15px; display: none;">
-                    <h4 style="margin-bottom: 10px;">User Information</h4>
-                    <div id="userDataContent" style="background: rgba(0,0,0,0.5); border-radius: 10px; padding: 10px;"></div>
-                </div>
-                
-                <div style="margin-top: 20px;">
-                    <h4 style="margin-bottom: 10px;">Active Redemption Codes</h4>
-                    <div style="max-height: 200px; overflow-y: auto;">
-                        <table class="admin-table">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Value</th>
-                                    <th>Used</th>
-                                </tr>
-                            </thead>
-                            <tbody id="codesTable">
-                                <!-- Codes will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
         
@@ -876,22 +724,6 @@
         </div>
     </div>
     
-    <div class="modal" id="redeemSuccessModal">
-        <div class="modal-content">
-            <h2>Code Redeemed!</h2>
-            <p id="redeemSuccessMessage">You have successfully redeemed $X USD!</p>
-            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">Continue</button>
-        </div>
-    </div>
-    
-    <div class="modal" id="adminSuccessModal">
-        <div class="modal-content">
-            <h2>Success!</h2>
-            <p id="adminSuccessMessage">Operation completed successfully.</p>
-            <button class="modal-button" onclick="closeModal('adminSuccessModal')">OK</button>
-        </div>
-    </div>
-    
     <audio id="backgroundMusic" loop>
         <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
     </audio>
@@ -909,49 +741,26 @@
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         
-        // Simple in-memory database
-        const appData = {
-          // Store redemption codes (format: {code: "ABC123", value: 1.00, used: false})
-          redemptionCodes: [
-            {code: "FREE1", value: 1.00, used: false},
-            {code: "BONUS5", value: 5.00, used: false},
-            {code: "MINEZWALL", value: 2.00, used: false}
-          ],
-          
-          // Admin user IDs (YOUR ID IS INSERTED HERE)
-          adminUsers: [1558798885],
-          
-          // Store user data
-          users: [],
-          
-          // Store user redemption history
-          userRedemptions: {}
-        };
-
         const gameState = {
-          coins: 500,
-          usd: 1.000,
-          level: 1,
-          diamondsFound: 0,
-          diamondsToFind: 4,
-          minesCount: 5,
-          grid: [],
-          gameActive: false,
-          timer: 0,
-          timerInterval: null,
-          soundEnabled: true,
-          musicEnabled: true,
-          difficulty: 'easy',
-          username: 'Player',
-          fullName: '',
-          userId: null,
-          phoneNumber: '',
-          isAdmin: false,
-          channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
-          lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-          verificationAttempts: 0,
-          redeemedCodes: [],
-          searchType: 'name' // Default search type
+            coins: 500,
+            usd: 0.500,
+            level: 1,
+            diamondsFound: 0,
+            diamondsToFind: 20, // 25 cells - 5 mines = 20 diamonds
+            minesCount: 5,
+            grid: [],
+            gameActive: false,
+            timer: 0,
+            timerInterval: null,
+            soundEnabled: true,
+            musicEnabled: true,
+            difficulty: 'easy',
+            username: 'Player',
+            fullName: '',
+            userId: null,
+            channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
+            lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
+            verificationAttempts: 0
         };
 
         // Initialize the game
@@ -959,87 +768,18 @@
             // Initialize Telegram WebApp
             tg.expand();
             
-            // Load all users from localStorage
-            const savedUsers = localStorage.getItem('minezwallUsers');
-            if (savedUsers) {
-                appData.users = JSON.parse(savedUsers);
-            }
-            
-            // Load redemption codes from localStorage
-            const savedCodes = localStorage.getItem('minezwallRedemptionCodes');
-            if (savedCodes) {
-                appData.redemptionCodes = JSON.parse(savedCodes);
-            }
-            
             // Get user data from Telegram
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 gameState.userId = user.id;
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
-                gameState.isAdmin = appData.adminUsers.includes(user.id);
-                
-                // Try to get phone number from Telegram init data
-                try {
-                    if (tg.initDataUnsafe.user.phone_number) {
-                        gameState.phoneNumber = tg.initDataUnsafe.user.phone_number;
-                    } else if (tg.initDataUnsafe.start_param) {
-                        // Try to parse phone number from start parameter if available
-                        gameState.phoneNumber = tg.initDataUnsafe.start_param;
-                    }
-                } catch (e) {
-                    console.log("Could not get phone number:", e);
-                }
-                
-                // Add or update user in appData.users
-                const existingUserIndex = appData.users.findIndex(u => u.id === user.id);
-                if (existingUserIndex === -1) {
-                    // Create new user
-                    const newUser = {
-                        id: user.id,
-                        fullName: gameState.fullName,
-                        username: gameState.username,
-                        phoneNumber: gameState.phoneNumber,
-                        balance: gameState.usd,
-                        coins: gameState.coins,
-                        level: gameState.level,
-                        lastActive: new Date().toISOString(),
-                        joinDate: new Date().toISOString(),
-                        channelJoined: false
-                    };
-                    appData.users.push(newUser);
-                    console.log("New user created:", newUser);
-                } else {
-                    // Update existing user data
-                    appData.users[existingUserIndex] = {
-                        ...appData.users[existingUserIndex],
-                        fullName: gameState.fullName,
-                        username: gameState.username,
-                        phoneNumber: gameState.phoneNumber || appData.users[existingUserIndex].phoneNumber,
-                        lastActive: new Date().toISOString()
-                    };
-                    
-                    // Load user's saved balance if exists
-                    gameState.usd = appData.users[existingUserIndex].balance || gameState.usd;
-                    gameState.coins = appData.users[existingUserIndex].coins || gameState.coins;
-                    gameState.level = appData.users[existingUserIndex].level || gameState.level;
-                    gameState.channelJoined = appData.users[existingUserIndex].channelJoined || false;
-                    
-                    console.log("Existing user loaded:", appData.users[existingUserIndex]);
-                }
-                
-                if (gameState.isAdmin) {
-                    document.getElementById('adminButton').style.display = 'block';
-                }
                 
                 // Update UI with user's full name
                 document.getElementById('userDisplay').textContent = `Welcome, ${gameState.fullName || gameState.username}!`;
                 
                 // Pre-fill the withdrawal name field
                 document.getElementById('withdrawName').value = gameState.fullName || '';
-                
-                // Save user data
-                saveGameState();
             }
             
             loadGameState();
@@ -1055,29 +795,6 @@
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
-            
-            // Load redemption codes for admin
-            if (gameState.isAdmin) {
-                loadRedeemCodes();
-            }
-        }
-
-        // Set search type (name or phone)
-        function setSearchType(type) {
-            gameState.searchType = type;
-            const buttons = document.querySelectorAll('#searchTypeSelector button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            if (type === 'phone') {
-                document.getElementById('adminUserName').style.display = 'none';
-                document.getElementById('adminUserPhone').style.display = 'block';
-                document.getElementById('adminUserPhone').placeholder = 'User Phone Number';
-            } else {
-                document.getElementById('adminUserName').style.display = 'block';
-                document.getElementById('adminUserPhone').style.display = 'none';
-                document.getElementById('adminUserName').placeholder = 'User Full Name';
-            }
         }
 
         // Check if user has completed verification
@@ -1086,123 +803,52 @@
             if (!gameState.userId) return false;
             
             // Check if user has joined channel
-            const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-            if (userIndex !== -1 && appData.users[userIndex].channelJoined) {
-                return true;
-            }
-            
-            return false;
+            const joined = localStorage.getItem(`channelJoined_${gameState.userId}`);
+            return joined === 'true';
         }
 
-        // Verify channel membership using Telegram Bot API
-        async function verifyChannelJoin() {
+        // Verify channel membership
+        function verifyChannelJoin() {
             const checkBtn = document.querySelector('.check-button');
             checkBtn.disabled = true;
             checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
             
-            try {
-                // In a real implementation, you would call your backend API
-                // which would use the Telegram Bot API to check channel membership
-                
-                // For demo purposes, we'll simulate the API call
-                const isMember = await checkTelegramMembership(gameState.userId);
-                
-                if (isMember) {
-                    // User is a member of the channel
-                    gameState.channelJoined = true;
-                    
-                    // Update user's channel joined status
-                    const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-                    if (userIndex !== -1) {
-                        appData.users[userIndex].channelJoined = true;
-                    }
-                    
-                    localStorage.setItem('lastChannelCheck', Date.now());
-                    saveGameState();
-                    
-                    showPage('home');
-                    alert('Verification successful! Welcome to Minezwall.');
-                } else {
-                    // User is not a member of the channel
-                    alert('We could not verify your membership. Please make sure you have joined the channel and try again.');
+            // In a real app, you would use Telegram's API to verify channel membership
+            // For this demo, we'll simulate it with a delay
+            setTimeout(() => {
+                // Simulate verification - first attempt always fails to ensure user actually joins
+                if (gameState.verificationAttempts < 1) {
+                    gameState.verificationAttempts++;
+                    checkBtn.disabled = false;
+                    checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
+                    alert('Please actually join our Telegram channel before clicking verification.');
+                    return;
                 }
-            } catch (error) {
-                console.error('Error verifying channel membership:', error);
-                alert('An error occurred during verification. Please try again.');
-            }
-            
-            checkBtn.disabled = false;
-            checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
-        }
-
-        // Simulate checking Telegram channel membership
-        // In a real implementation, this would be done on your server
-        async function checkTelegramMembership(userId) {
-            // This is a simulation - in a real app, you would call your backend API
-            // which would use the Telegram Bot API to check if the user is a channel member
-            
-            // For demo purposes, we'll simulate a successful verification after first attempt
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // First attempt always fails to encourage users to actually join
-                    if (gameState.verificationAttempts < 1) {
-                        gameState.verificationAttempts++;
-                        resolve(false);
-                    } else {
-                        // After first attempt, simulate successful verification
-                        resolve(true);
-                    }
-                }, 2000);
-            });
+                
+                // After first attempt, simulate successful verification
+                gameState.channelJoined = true;
+                localStorage.setItem(`channelJoined_${gameState.userId}`, 'true');
+                localStorage.setItem('lastChannelCheck', Date.now());
+                saveGameState();
+                
+                showPage('home');
+                alert('Verification successful! Welcome to Minezwall.');
+                
+                checkBtn.disabled = false;
+                checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
+            }, 2000);
         }
 
         function loadGameState() {
             const savedState = localStorage.getItem(`minezwallGameState_${gameState.userId}`);
             if (savedState) {
-                const parsedState = JSON.parse(savedState);
-                Object.assign(gameState, parsedState);
-                
-                // Update the user's data in appData.users
-                const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-                if (userIndex !== -1) {
-                    appData.users[userIndex] = {
-                        ...appData.users[userIndex],
-                        balance: gameState.usd,
-                        coins: gameState.coins,
-                        level: gameState.level
-                    };
-                }
-                
-                // Load redeemed codes history if available
-                if (parsedState.redeemedCodes) {
-                    gameState.redeemedCodes = parsedState.redeemedCodes;
-                    if (gameState.redeemedCodes.length > 0) {
-                        displayRedeemHistory();
-                    }
-                }
+                Object.assign(gameState, JSON.parse(savedState));
             }
             updateUI();
         }
 
         function saveGameState() {
-            // Update the current user's data in appData.users
-            const userIndex = appData.users.findIndex(u => u.id === gameState.userId);
-            if (userIndex !== -1) {
-                appData.users[userIndex] = {
-                    ...appData.users[userIndex],
-                    balance: gameState.usd,
-                    coins: gameState.coins,
-                    level: gameState.level,
-                    lastActive: new Date().toISOString(),
-                    channelJoined: gameState.channelJoined
-                };
-            }
-            
-            // Save redemption codes to localStorage
-            localStorage.setItem('minezwallRedemptionCodes', JSON.stringify(appData.redemptionCodes));
-            
             localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
-            localStorage.setItem('minezwallUsers', JSON.stringify(appData.users));
         }
 
         function setupEventListeners() {
@@ -1260,16 +906,6 @@
             // If showing game page, initialize game
             if (pageId === 'game') {
                 initGame();
-            }
-            
-            // If showing redeem page, load history
-            if (pageId === 'redeem' && gameState.redeemedCodes && gameState.redeemedCodes.length > 0) {
-                displayRedeemHistory();
-            }
-            
-            // If showing admin page, load data
-            if (pageId === 'admin' && gameState.isAdmin) {
-                loadRedeemCodes();
             }
         }
 
@@ -1379,7 +1015,7 @@
             }
             gameState.gameActive = false;
             clearInterval(gameState.timerInterval);
-            gameState.coins -= 7;
+            gameState.coins -= 8;
             gameState.usd += 0.005;
             gameState.level++;
             saveGameState();
@@ -1424,8 +1060,8 @@
         }
 
         function skipWithCoins() {
-            if (gameState.coins >= 30) {
-                gameState.coins -= 30;
+            if (gameState.coins >= 25) {
+                gameState.coins -= 25;
                 skipLevelActions();
                 closeModal('loseModal');
                 saveGameState();
@@ -1436,7 +1072,7 @@
         }
 
         function skipLevelActions() {
-            gameState.usd += 0.003;
+            gameState.usd += 0.005;
             gameState.level++;
             saveGameState();
             updateUI();
@@ -1444,8 +1080,8 @@
         }
 
         function restartLevel() {
-            if (gameState.coins >= 4) {
-                gameState.coins -= 4;
+            if (gameState.coins >= 5) {
+                gameState.coins -= 5;
                 saveGameState();
                 updateUI();
                 closeModal('loseModal');
@@ -1534,9 +1170,9 @@
                 show_9662480({
                     type: 'inApp',
                     inAppSettings: {
-                        frequency: 2,
-                        capping: 0.1,
-                        interval: 30,
+                        frequency: 3,
+                        capping: 0.3,
+                        interval: 60,
                         timeout: 10,
                         everyPage: true
                     }
@@ -1614,285 +1250,6 @@
         function redirectToGoogleForm() {
             window.open('https://forms.gle/dcV7SNonaC1BVvNdA', '_blank');
             closeModal('withdrawalSuccessModal');
-        }
-
-        // ====================
-        // REDEMPTION CODE SYSTEM
-        // ====================
-        
-        function redeemCode() {
-            const code = document.getElementById('redeemCode').value.trim().toUpperCase();
-            if (!code) {
-                alert('Please enter a code');
-                return;
-            }
-            
-            // Find the code
-            const codeData = appData.redemptionCodes.find(c => c.code === code && !c.used);
-            
-            if (!codeData) {
-                alert('Invalid or already used code');
-                return;
-            }
-
-            // Mark as used
-            codeData.used = true;
-            
-            // Add to user's balance
-            gameState.usd += codeData.value;
-            
-            // Save redemption history
-            if (!gameState.redeemedCodes) {
-                gameState.redeemedCodes = [];
-            }
-            gameState.redeemedCodes.push({
-                code: code,
-                amount: codeData.value,
-                date: new Date().toLocaleString()
-            });
-            
-            // Update UI
-            updateUI();
-            saveGameState();
-            document.getElementById('redeemCode').value = '';
-            
-            // Show success
-            document.getElementById('redeemSuccessMessage').textContent = 
-                `You have successfully redeemed $${codeData.value.toFixed(2)} USD!`;
-            document.getElementById('redeemSuccessModal').style.display = 'flex';
-            
-            // Update history display
-            displayRedeemHistory();
-        }
-        
-        function displayRedeemHistory() {
-            const historyContainer = document.getElementById('redeemHistory');
-            const historyContent = document.getElementById('redeemHistoryContent');
-            
-            if (!gameState.redeemedCodes || gameState.redeemedCodes.length === 0) {
-                historyContainer.style.display = 'none';
-                return;
-            }
-            
-            historyContainer.style.display = 'block';
-            historyContent.innerHTML = '';
-            
-            gameState.redeemedCodes.forEach(redemption => {
-                const redemptionItem = document.createElement('div');
-                redemptionItem.style.padding = '8px';
-                redemptionItem.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-                redemptionItem.innerHTML = `
-                    <div style="display: flex; justify-content: space-between;">
-                        <span>${redemption.code}</span>
-                        <span style="color: #4dffb8;">+$${redemption.amount}</span>
-                    </div>
-                    <div style="font-size: 12px; opacity: 0.7;">${redemption.date}</div>
-                `;
-                historyContent.appendChild(redemptionItem);
-            });
-        }
-        
-        // ====================
-        // ADMIN FUNCTIONS
-        // ====================
-        
-        function loadRedeemCodes() {
-            const codesTable = document.getElementById('codesTable');
-            codesTable.innerHTML = '';
-            
-            appData.redemptionCodes.forEach(code => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${code.code}</td>
-                    <td>$${code.value.toFixed(2)}</td>
-                    <td>${code.used ? 'Yes' : 'No'}</td>
-                `;
-                codesTable.appendChild(row);
-            });
-        }
-        
-        function generateCodes() {
-            const amount = parseInt(document.getElementById('codeAmount').value);
-            const value = parseFloat(document.getElementById('codeValue').value);
-            
-            if (!amount || amount < 1 || amount > 100) {
-                alert('Please enter a valid number of codes (1-100)');
-                return;
-            }
-            
-            if (!value || value <= 0) {
-                alert('Please enter a valid USD value (>0)');
-                return;
-            }
-            
-            // Generate codes
-            for (let i = 0; i < amount; i++) {
-                const code = 'MINEZ' + Math.floor(1000 + Math.random() * 9000);
-                appData.redemptionCodes.push({
-                    code: code,
-                    value: value,
-                    used: false
-                });
-            }
-            
-            // Save codes to localStorage
-            localStorage.setItem('minezwallRedemptionCodes', JSON.stringify(appData.redemptionCodes));
-            
-            // Show success
-            document.getElementById('adminSuccessMessage').textContent = 
-                `Generated ${amount} codes worth $${value.toFixed(2)} each!`;
-            document.getElementById('adminSuccessModal').style.display = 'flex';
-            
-            // Clear inputs
-            document.getElementById('codeAmount').value = '';
-            document.getElementById('codeValue').value = '';
-            
-            // Refresh codes list
-            loadRedeemCodes();
-        }
-        
-        function updateUserBalance() {
-            let searchValue, matchingUsers;
-            
-            if (gameState.searchType === 'phone') {
-                searchValue = document.getElementById('adminUserPhone').value.trim();
-                if (!searchValue) {
-                    alert('Please enter a phone number');
-                    return;
-                }
-                
-                // Find user by phone number
-                matchingUsers = appData.users.filter(user => 
-                    user.phoneNumber && user.phoneNumber.includes(searchValue)
-                );
-            } else {
-                searchValue = document.getElementById('adminUserName').value.trim();
-                if (!searchValue) {
-                    alert('Please enter a user name');
-                    return;
-                }
-                
-                // Find user by name
-                matchingUsers = appData.users.filter(user => 
-                    (user.fullName && user.fullName.toLowerCase().includes(searchValue.toLowerCase())) ||
-                    (user.username && user.username.toLowerCase().includes(searchValue.toLowerCase()))
-                );
-            }
-            
-            const amount = parseFloat(document.getElementById('adminUsdAmount').value);
-            
-            if (isNaN(amount)) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            
-            if (matchingUsers.length === 0) {
-                alert('No users found with that ' + (gameState.searchType === 'phone' ? 'phone number' : 'name'));
-                return;
-            }
-            
-            if (matchingUsers.length > 1) {
-                // Show all matching users for admin to choose from
-                let userList = "Multiple users found:\n";
-                matchingUsers.forEach((user, index) => {
-                    userList += `${index + 1}. ${user.fullName || user.username} (ID: ${user.id})\n`;
-                    if (user.phoneNumber) {
-                        userList += `   Phone: ${user.phoneNumber}\n`;
-                    }
-                });
-                userList += "Please be more specific or use the user ID.";
-                
-                alert(userList);
-                return;
-            }
-            
-            const user = matchingUsers[0];
-            user.balance = (user.balance || 0) + amount;
-            
-            // Update the game state if it's the current user
-            if (gameState.userId === user.id) {
-                gameState.usd = user.balance;
-                updateUI();
-            }
-            
-            // Show success
-            document.getElementById('adminSuccessMessage').textContent = 
-                `Updated ${user.fullName || user.username}'s balance by $${amount.toFixed(3)}. New balance: $${user.balance.toFixed(3)}`;
-            document.getElementById('adminSuccessModal').style.display = 'flex';
-            
-            // Clear inputs
-            document.getElementById('adminUserName').value = '';
-            document.getElementById('adminUserPhone').value = '';
-            document.getElementById('adminUsdAmount').value = '';
-            
-            // Save changes
-            saveGameState();
-        }
-        
-        function getUserData() {
-            let searchValue, matchingUsers;
-            
-            if (gameState.searchType === 'phone') {
-                searchValue = document.getElementById('adminUserPhone').value.trim();
-                if (!searchValue) {
-                    alert('Please enter a phone number');
-                    return;
-                }
-                
-                // Find user by phone number
-                matchingUsers = appData.users.filter(user => 
-                    user.phoneNumber && user.phoneNumber.includes(searchValue)
-                );
-            } else {
-                searchValue = document.getElementById('adminUserName').value.trim();
-                if (!searchValue) {
-                    alert('Please enter a user name');
-                    return;
-                }
-                
-                // Find user by name
-                matchingUsers = appData.users.filter(user => 
-                    (user.fullName && user.fullName.toLowerCase().includes(searchValue.toLowerCase())) ||
-                    (user.username && user.username.toLowerCase().includes(searchValue.toLowerCase()))
-                );
-            }
-            
-            const userDataDisplay = document.getElementById('userDataDisplay');
-            const userDataContent = document.getElementById('userDataContent');
-            
-            if (matchingUsers.length === 0) {
-                userDataContent.innerHTML = '<div style="color: #ff4d4d;">No users found with that ' + 
-                    (gameState.searchType === 'phone' ? 'phone number.' : 'name.') + '</div>';
-                userDataDisplay.style.display = 'block';
-                return;
-            }
-            
-            userDataContent.innerHTML = '';
-            
-            matchingUsers.forEach(user => {
-                const userDiv = document.createElement('div');
-                userDiv.style.marginBottom = '15px';
-                userDiv.style.padding = '10px';
-                userDiv.style.background = 'rgba(255,255,255,0.1)';
-                userDiv.style.borderRadius = '8px';
-                
-                userDiv.innerHTML = `
-                    <div><strong>ID:</strong> ${user.id}</div>
-                    <div><strong>Full Name:</strong> ${user.fullName || 'N/A'}</div>
-                    <div><strong>Username:</strong> ${user.username || 'N/A'}</div>
-                    <div><strong>Phone:</strong> ${user.phoneNumber || 'N/A'}</div>
-                    <div><strong>Balance:</strong> $${(user.balance || 0).toFixed(3)}</div>
-                    <div><strong>Coins:</strong> ${user.coins || 0}</div>
-                    <div><strong>Level:</strong> ${user.level || 1}</div>
-                    <div><strong>Channel Joined:</strong> ${user.channelJoined ? 'Yes' : 'No'}</div>
-                    <div><strong>Joined:</strong> ${new Date(user.joinDate).toLocaleDateString()}</div>
-                    <div><strong>Last Active:</strong> ${new Date(user.lastActive).toLocaleString()}</div>
-                `;
-                
-                userDataContent.appendChild(userDiv);
-            });
-            
-            userDataDisplay.style.display = 'block';
         }
 
         window.onload = init;
