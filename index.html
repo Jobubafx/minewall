@@ -587,6 +587,55 @@
             cursor: pointer;
         }
         
+        /* Google Sheets Search */
+        .search-section {
+            margin-bottom: 20px;
+        }
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .search-button {
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .search-result-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        .search-result-item h4 {
+            margin-bottom: 8px;
+            color: #4dffb8;
+        }
+        .search-result-item p {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
         @media (max-width: 480px) {
             .game-grid {
                 gap: 6px;
@@ -833,6 +882,22 @@
             
             <div class="admin-panel">
                 <div class="admin-section">
+                    <h3>Google Sheets User Search</h3>
+                    <div class="search-section">
+                        <div class="search-input-group">
+                            <input type="text" id="searchQuery" class="search-input" placeholder="Search by User ID, Username, or Name">
+                            <button class="search-button" onclick="searchGoogleSheets()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                        
+                        <div id="searchResults" class="search-results">
+                            <!-- Search results will appear here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
                     <h3>User Management</h3>
                     <div class="user-list" id="userList">
                         <!-- Users will be populated here -->
@@ -951,7 +1016,14 @@
         const tg = window.Telegram.WebApp;
         
         // Admin user IDs (replace with actual admin user IDs)
-        const ADMIN_USER_IDS = [1558798885];
+        const ADMIN_USER_IDS = [123456789, 987654321];
+        
+        // Google Sheets API configuration
+        const GOOGLE_SHEETS_CONFIG = {
+            sheetId: '1NXdOpaMgXdtxTGFAjJdJsZgSZP5NPxMcVOjC8VchQpk',
+            apiKey: 'YOUR_GOOGLE_SHEETS_API_KEY', // Replace with your API key
+            sheetName: 'Sheet1' // Replace with your sheet name
+        };
         
         const gameState = {
             coins: 500,
@@ -1485,6 +1557,79 @@
             closeModal('withdrawalSuccessModal');
         }
 
+        // Google Sheets Integration Functions
+        async function searchGoogleSheets() {
+            const query = document.getElementById('searchQuery').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (!query) {
+                resultsContainer.innerHTML = '<div class="search-result-item">Please enter a search term</div>';
+                return;
+            }
+            
+            resultsContainer.innerHTML = '<div class="search-result-item"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+            
+            try {
+                // In a real implementation, you would call your backend API here
+                // which would then query the Google Sheets API
+                
+                // For demo purposes, we'll simulate a search with mock data
+                setTimeout(() => {
+                    const mockResults = [
+                        {
+                            userId: '123456789',
+                            username: 'john_doe',
+                            fullName: 'John Doe',
+                            coins: 1500,
+                            usd: 12.345,
+                            level: 5,
+                            lastActive: '2023-10-15 14:30:22'
+                        },
+                        {
+                            userId: '987654321',
+                            username: 'jane_smith',
+                            fullName: 'Jane Smith',
+                            coins: 2750,
+                            usd: 22.150,
+                            level: 8,
+                            lastActive: '2023-10-16 09:15:47'
+                        }
+                    ];
+                    
+                    displaySearchResults(mockResults);
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error searching Google Sheets:', error);
+                resultsContainer.innerHTML = '<div class="search-result-item">Error searching. Please try again.</div>';
+            }
+        }
+        
+        function displaySearchResults(results) {
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="search-result-item">No users found matching your search</div>';
+                return;
+            }
+            
+            resultsContainer.innerHTML = '';
+            
+            results.forEach(user => {
+                const resultItem = document.createElement('div');
+                resultItem.className = 'search-result-item';
+                resultItem.innerHTML = `
+                    <h4>${user.fullName} (@${user.username})</h4>
+                    <p><strong>User ID:</strong> ${user.userId}</p>
+                    <p><strong>Coins:</strong> ${user.coins.toLocaleString()}</p>
+                    <p><strong>USD Balance:</strong> $${user.usd.toFixed(3)}</p>
+                    <p><strong>Level:</strong> ${user.level}</p>
+                    <p><strong>Last Active:</strong> ${user.lastActive}</p>
+                `;
+                resultsContainer.appendChild(resultItem);
+            });
+        }
+        
         // Admin Panel Functions
         function loadUsers() {
             const userList = document.getElementById('userList');
