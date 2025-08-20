@@ -481,6 +481,112 @@
             font-size: 12px;
             opacity: 0.7;
         }
+        
+        /* Admin Panel Styles */
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .admin-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .admin-section h3 {
+            margin-bottom: 15px;
+            color: #4e54c8;
+        }
+        .user-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .user-item {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+        }
+        .user-item:hover {
+            background: rgba(78, 84, 200, 0.3);
+        }
+        .user-item.selected {
+            background: rgba(78, 84, 200, 0.5);
+        }
+        .admin-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .admin-button {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .add-balance {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+        .subtract-balance {
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+        }
+        .code-management {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .code-list {
+            max-height: 150px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .code-item {
+            padding: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+        }
+        
+        /* Redeem Section Styles */
+        .redeem-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .redeem-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .redeem-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .redeem-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
         @media (max-width: 480px) {
             .game-grid {
                 gap: 6px;
@@ -496,6 +602,12 @@
                 padding: 15px 30px;
                 font-size: 20px;
             }
+            .admin-controls {
+                grid-template-columns: 1fr;
+            }
+            .code-management {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -510,6 +622,9 @@
                     <div class="dropdown-content">
                         <button onclick="showPage('withdraw')">Withdraw</button>
                         <button onclick="showPage('settings')">Settings</button>
+                        <button onclick="showPage('redeem')">Redeem Code</button>
+                        <!-- Admin panel only visible to admin users -->
+                        <button id="adminButton" style="display: none;" onclick="showPage('admin')">Admin Panel</button>
                     </div>
                 </div>
             </div>
@@ -679,6 +794,92 @@
             </div>
         </div>
         
+        <!-- Redeem Code Page -->
+        <div id="redeemPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Redeem Code</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="redeem-section">
+                <div class="input-group">
+                    <label for="redeemCode">Enter Redeem Code</label>
+                    <div class="redeem-input-group">
+                        <input type="text" id="redeemCode" class="redeem-input" placeholder="Enter code here">
+                        <button class="redeem-button" onclick="redeemCode()">Redeem</button>
+                    </div>
+                </div>
+                
+                <div id="redeemResult" style="text-align: center; margin-top: 15px;"></div>
+            </div>
+        </div>
+        
+        <!-- Admin Panel Page -->
+        <div id="adminPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Admin Panel</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="admin-panel">
+                <div class="admin-section">
+                    <h3>User Management</h3>
+                    <div class="user-list" id="userList">
+                        <!-- Users will be populated here -->
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="adminUserId">User ID</label>
+                        <input type="text" id="adminUserId" readonly>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="adminUsername">Username</label>
+                        <input type="text" id="adminUsername" readonly>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="adminCoins">Coins</label>
+                        <input type="number" id="adminCoins">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="adminUsd">USD Balance</label>
+                        <input type="number" id="adminUsd" step="0.001">
+                    </div>
+                    
+                    <div class="admin-controls">
+                        <button class="admin-button add-balance" onclick="updateUserBalance('add')">Add Balance</button>
+                        <button class="admin-button subtract-balance" onclick="updateUserBalance('subtract')">Subtract Balance</button>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>Code Management</h3>
+                    <div class="code-management">
+                        <input type="text" id="newCodeValue" placeholder="Code value">
+                        <input type="number" id="newCodeCoins" placeholder="Coins">
+                        <input type="number" id="newCodeUsd" step="0.001" placeholder="USD">
+                    </div>
+                    <button class="submit-button" onclick="generateCode()">Generate Code</button>
+                    
+                    <div class="code-list" id="codeList">
+                        <!-- Codes will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="footer">
             Minezwall Mini App © 2025 | Play and Earn
         </div>
@@ -724,6 +925,14 @@
         </div>
     </div>
     
+    <div class="modal" id="redeemSuccessModal">
+        <div class="modal-content">
+            <h2>Code Redeemed!</h2>
+            <p id="redeemSuccessMessage">You received coins and USD!</p>
+            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">Great!</button>
+        </div>
+    </div>
+    
     <audio id="backgroundMusic" loop>
         <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
     </audio>
@@ -740,6 +949,9 @@
     <script>
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
+        
+        // Admin user IDs (replace with actual admin user IDs)
+        const ADMIN_USER_IDS = [123456789, 987654321];
         
         const gameState = {
             coins: 500,
@@ -760,7 +972,8 @@
             userId: null,
             channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
             lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-            verificationAttempts: 0
+            verificationAttempts: 0,
+            isAdmin: false
         };
 
         // Initialize the game
@@ -774,6 +987,12 @@
                 gameState.userId = user.id;
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
+                
+                // Check if user is admin
+                gameState.isAdmin = ADMIN_USER_IDS.includes(user.id);
+                if (gameState.isAdmin) {
+                    document.getElementById('adminButton').style.display = 'block';
+                }
                 
                 // Update UI with user's full name
                 document.getElementById('userDisplay').textContent = `Welcome, ${gameState.fullName || gameState.username}!`;
@@ -795,6 +1014,12 @@
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
+            
+            // Load users and codes if admin
+            if (gameState.isAdmin) {
+                loadUsers();
+                loadCodes();
+            }
         }
 
         // Check if user has completed verification
@@ -849,6 +1074,8 @@
 
         function saveGameState() {
             localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
+            // Also update Google Sheets if possible
+            updateGoogleSheets();
         }
 
         function setupEventListeners() {
@@ -906,6 +1133,12 @@
             // If showing game page, initialize game
             if (pageId === 'game') {
                 initGame();
+            }
+            
+            // If showing admin page, load users and codes
+            if (pageId === 'admin' && gameState.isAdmin) {
+                loadUsers();
+                loadCodes();
             }
         }
 
@@ -1250,6 +1483,221 @@
         function redirectToGoogleForm() {
             window.open('https://forms.gle/dcV7SNonaC1BVvNdA', '_blank');
             closeModal('withdrawalSuccessModal');
+        }
+
+        // Admin Panel Functions
+        function loadUsers() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            
+            // Get all users from localStorage
+            const users = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('minezwallGameState_')) {
+                    const userId = key.replace('minezwallGameState_', '');
+                    const userData = JSON.parse(localStorage.getItem(key));
+                    users.push({
+                        id: userId,
+                        username: userData.username || `User${userId}`,
+                        fullName: userData.fullName || '',
+                        coins: userData.coins || 0,
+                        usd: userData.usd || 0
+                    });
+                }
+            }
+            
+            // Add users to the list
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `${user.username} (${user.fullName}) - ${user.coins} coins, $${user.usd.toFixed(3)}`;
+                userItem.addEventListener('click', () => selectUser(user));
+                userList.appendChild(userItem);
+            });
+        }
+        
+        function selectUser(user) {
+            document.getElementById('adminUserId').value = user.id;
+            document.getElementById('adminUsername').value = user.username;
+            document.getElementById('adminCoins').value = user.coins;
+            document.getElementById('adminUsd').value = user.usd.toFixed(3);
+            
+            // Highlight selected user
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+        
+        function updateUserBalance(action) {
+            const userId = document.getElementById('adminUserId').value;
+            if (!userId) {
+                alert('Please select a user first');
+                return;
+            }
+            
+            const coins = parseInt(document.getElementById('adminCoins').value) || 0;
+            const usd = parseFloat(document.getElementById('adminUsd').value) || 0;
+            
+            if (isNaN(coins) || isNaN(usd)) {
+                alert('Please enter valid numbers');
+                return;
+            }
+            
+            const userData = JSON.parse(localStorage.getItem(`minezwallGameState_${userId}`));
+            if (!userData) {
+                alert('User not found');
+                return;
+            }
+            
+            if (action === 'add') {
+                userData.coins += coins;
+                userData.usd += usd;
+            } else if (action === 'subtract') {
+                userData.coins = Math.max(0, userData.coins - coins);
+                userData.usd = Math.max(0, userData.usd - usd);
+            }
+            
+            localStorage.setItem(`minezwallGameState_${userId}`, JSON.stringify(userData));
+            alert('Balance updated successfully');
+            loadUsers();
+        }
+        
+        function loadCodes() {
+            const codeList = document.getElementById('codeList');
+            codeList.innerHTML = '';
+            
+            const codes = JSON.parse(localStorage.getItem('redeemCodes')) || [];
+            
+            codes.forEach(code => {
+                const codeItem = document.createElement('div');
+                codeItem.className = 'code-item';
+                codeItem.innerHTML = `${code.code} - ${code.coins} coins, $${code.usd.toFixed(3)} USD (${code.used ? 'Used' : 'Active'})`;
+                codeList.appendChild(codeItem);
+            });
+        }
+        
+        function generateCode() {
+            const codeValue = document.getElementById('newCodeValue').value;
+            const coins = parseInt(document.getElementById('newCodeCoins').value) || 0;
+            const usd = parseFloat(document.getElementById('newCodeUsd').value) || 0;
+            
+            if (!codeValue) {
+                alert('Please enter a code value');
+                return;
+            }
+            
+            if (coins <= 0 && usd <= 0) {
+                alert('Please enter coins or USD value');
+                return;
+            }
+            
+            const codes = JSON.parse(localStorage.getItem('redeemCodes')) || [];
+            
+            // Check if code already exists
+            if (codes.some(c => c.code === codeValue)) {
+                alert('This code already exists');
+                return;
+            }
+            
+            codes.push({
+                code: codeValue,
+                coins: coins,
+                usd: usd,
+                used: false,
+                created: new Date().toISOString()
+            });
+            
+            localStorage.setItem('redeemCodes', JSON.stringify(codes));
+            alert('Code generated successfully');
+            loadCodes();
+            
+            // Clear input fields
+            document.getElementById('newCodeValue').value = '';
+            document.getElementById('newCodeCoins').value = '';
+            document.getElementById('newCodeUsd').value = '';
+        }
+        
+        // Redeem Code Functions
+        function redeemCode() {
+            const codeValue = document.getElementById('redeemCode').value;
+            const resultElement = document.getElementById('redeemResult');
+            
+            if (!codeValue) {
+                resultElement.innerHTML = '<span style="color: #ff4d4d;">Please enter a code</span>';
+                return;
+            }
+            
+            const codes = JSON.parse(localStorage.getItem('redeemCodes')) || [];
+            const codeIndex = codes.findIndex(c => c.code === codeValue);
+            
+            if (codeIndex === -1) {
+                resultElement.innerHTML = '<span style="color: #ff4d4d;">Invalid code</span>';
+                return;
+            }
+            
+            const code = codes[codeIndex];
+            
+            if (code.used) {
+                resultElement.innerHTML = '<span style="color: #ff4d4d;">This code has already been used</span>';
+                return;
+            }
+            
+            // Mark code as used and update user balance
+            codes[codeIndex].used = true;
+            codes[codeIndex].usedBy = gameState.userId;
+            codes[codeIndex].usedAt = new Date().toISOString();
+            
+            localStorage.setItem('redeemCodes', JSON.stringify(codes));
+            
+            // Update user balance
+            gameState.coins += code.coins;
+            gameState.usd += code.usd;
+            saveGameState();
+            updateUI();
+            
+            // Show success message
+            let message = 'You received ';
+            if (code.coins > 0) {
+                message += `${code.coins} coins`;
+            }
+            if (code.coins > 0 && code.usd > 0) {
+                message += ' and ';
+            }
+            if (code.usd > 0) {
+                message += `$${code.usd.toFixed(3)} USD`;
+            }
+            
+            document.getElementById('redeemSuccessMessage').textContent = message;
+            document.getElementById('redeemSuccessModal').style.display = 'flex';
+            
+            // Clear input field
+            document.getElementById('redeemCode').value = '';
+            resultElement.innerHTML = '';
+        }
+        
+        // Google Sheets Integration
+        function updateGoogleSheets() {
+            // This is a placeholder function for Google Sheets integration
+            // In a real implementation, you would use the Google Sheets API
+            // to update the spreadsheet with user data
+            
+            console.log('User data updated - would sync with Google Sheets');
+            
+            // Example of how you might structure the data for Google Sheets
+            const userData = {
+                userId: gameState.userId,
+                username: gameState.username,
+                fullName: gameState.fullName,
+                coins: gameState.coins,
+                usd: gameState.usd,
+                level: gameState.level,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            // In a real implementation, you would send this data to your backend
+            // which would then update the Google Sheet
         }
 
         window.onload = init;
