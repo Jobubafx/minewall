@@ -451,6 +451,89 @@
             text-decoration: none;
             display: inline-block;
         }
+        
+        /* Admin Panel Styles */
+        .admin-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .admin-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .admin-section h3 {
+            margin-bottom: 15px;
+            color: #4e54c8;
+        }
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        .admin-table th, .admin-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .admin-table th {
+            background: rgba(78, 84, 200, 0.3);
+        }
+        .admin-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+        }
+        .admin-button {
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .admin-button.delete {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+        }
+        .admin-button.success {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+        
+        /* Redeem Code Styles */
+        .redeem-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .redeem-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .redeem-input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .redeem-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -481,161 +564,6 @@
             font-size: 12px;
             opacity: 0.7;
         }
-        
-        /* Admin Panel Styles */
-        .admin-panel {
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .admin-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        .admin-section h3 {
-            margin-bottom: 15px;
-            color: #4e54c8;
-        }
-        .user-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .user-item {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-        }
-        .user-item:hover {
-            background: rgba(78, 84, 200, 0.3);
-        }
-        .user-item.selected {
-            background: rgba(78, 84, 200, 0.5);
-        }
-        .admin-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .admin-button {
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .add-balance {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-        }
-        .subtract-balance {
-            background: linear-gradient(to right, #ff8a00, #e52e71);
-        }
-        .code-management {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .code-list {
-            max-height: 150px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        .code-item {
-            padding: 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 12px;
-        }
-        
-        /* Redeem Section Styles */
-        .redeem-section {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .redeem-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .redeem-input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        .redeem-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        
-        /* Google Sheets Search */
-        .search-section {
-            margin-bottom: 20px;
-        }
-        .search-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .search-input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        .search-button {
-            background: linear-gradient(to right, #4e54c8, #8f94fb);
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-        .search-results {
-            max-height: 300px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .search-result-item {
-            padding: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-        }
-        .search-result-item h4 {
-            margin-bottom: 8px;
-            color: #4dffb8;
-        }
-        .search-result-item p {
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        
         @media (max-width: 480px) {
             .game-grid {
                 gap: 6px;
@@ -651,11 +579,8 @@
                 padding: 15px 30px;
                 font-size: 20px;
             }
-            .admin-controls {
-                grid-template-columns: 1fr;
-            }
-            .code-management {
-                grid-template-columns: 1fr;
+            .admin-table {
+                font-size: 12px;
             }
         }
     </style>
@@ -672,8 +597,8 @@
                         <button onclick="showPage('withdraw')">Withdraw</button>
                         <button onclick="showPage('settings')">Settings</button>
                         <button onclick="showPage('redeem')">Redeem Code</button>
-                        <!-- Admin panel only visible to admin users -->
-                        <button id="adminButton" style="display: none;" onclick="showPage('admin')">Admin Panel</button>
+                        <!-- Admin panel button only shown to admin users -->
+                        <button id="adminPanelButton" style="display: none;" onclick="showPage('admin')">Admin Panel</button>
                     </div>
                 </div>
             </div>
@@ -857,9 +782,9 @@
             
             <div class="redeem-section">
                 <div class="input-group">
-                    <label for="redeemCode">Enter Redeem Code</label>
+                    <label for="redeemCode">Enter your redeem code:</label>
                     <div class="redeem-input-group">
-                        <input type="text" id="redeemCode" class="redeem-input" placeholder="Enter code here">
+                        <input type="text" id="redeemCode" class="redeem-input" placeholder="e.g., USD100-ABC123">
                         <button class="redeem-button" onclick="redeemCode()">Redeem</button>
                     </div>
                 </div>
@@ -882,64 +807,82 @@
             
             <div class="admin-panel">
                 <div class="admin-section">
-                    <h3>Google Sheets User Search</h3>
-                    <div class="search-section">
-                        <div class="search-input-group">
-                            <input type="text" id="searchQuery" class="search-input" placeholder="Search by User ID, Username, or Name">
-                            <button class="search-button" onclick="searchGoogleSheets()">
-                                <i class="fas fa-search"></i> Search
-                            </button>
-                        </div>
-                        
-                        <div id="searchResults" class="search-results">
-                            <!-- Search results will appear here -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="admin-section">
                     <h3>User Management</h3>
-                    <div class="user-list" id="userList">
-                        <!-- Users will be populated here -->
-                    </div>
-                    
                     <div class="input-group">
-                        <label for="adminUserId">User ID</label>
-                        <input type="text" id="adminUserId" readonly>
+                        <label for="searchUser">Search User by ID:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="searchUser" class="admin-input" placeholder="Enter User ID">
+                            <button class="admin-button" onclick="searchUser()">Search</button>
+                        </div>
                     </div>
                     
-                    <div class="input-group">
-                        <label for="adminUsername">Username</label>
-                        <input type="text" id="adminUsername" readonly>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="adminCoins">Coins</label>
-                        <input type="number" id="adminCoins">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="adminUsd">USD Balance</label>
-                        <input type="number" id="adminUsd" step="0.001">
-                    </div>
-                    
-                    <div class="admin-controls">
-                        <button class="admin-button add-balance" onclick="updateUserBalance('add')">Add Balance</button>
-                        <button class="admin-button subtract-balance" onclick="updateUserBalance('subtract')">Subtract Balance</button>
+                    <div id="userDetails" style="display: none; margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <h4>User Details</h4>
+                        <p><strong>ID:</strong> <span id="detailUserId"></span></p>
+                        <p><strong>Username:</strong> <span id="detailUsername"></span></p>
+                        <p><strong>Full Name:</strong> <span id="detailFullName"></span></p>
+                        <p><strong>Coins:</strong> <span id="detailCoins"></span></p>
+                        <p><strong>USD Balance:</strong> <span id="detailUsd"></span></p>
+                        <p><strong>Level:</strong> <span id="detailLevel"></span></p>
+                        <p><strong>Channel Joined:</strong> <span id="detailChannel"></span></p>
+                        
+                        <div style="margin-top: 15px;">
+                            <h4>Update Balance</h4>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="number" id="updateCoins" class="admin-input" placeholder="New coin amount">
+                                <button class="admin-button success" onclick="updateUserCoins()">Update Coins</button>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="updateUsd" class="admin-input" placeholder="New USD amount" step="0.001">
+                                <button class="admin-button success" onclick="updateUserUsd()">Update USD</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="admin-section">
-                    <h3>Code Management</h3>
-                    <div class="code-management">
-                        <input type="text" id="newCodeValue" placeholder="Code value">
-                        <input type="number" id="newCodeCoins" placeholder="Coins">
-                        <input type="number" id="newCodeUsd" step="0.001" placeholder="USD">
+                    <h3>Generate Redeem Codes</h3>
+                    <div class="input-group">
+                        <label for="codeType">Code Type:</label>
+                        <select id="codeType" class="admin-input">
+                            <option value="coin">Coins</option>
+                            <option value="usd">USD</option>
+                        </select>
                     </div>
-                    <button class="submit-button" onclick="generateCode()">Generate Code</button>
+                    <div class="input-group">
+                        <label for="codeValue">Value:</label>
+                        <input type="number" id="codeValue" class="admin-input" placeholder="Enter value">
+                    </div>
+                    <div class="input-group">
+                        <label for="codeExpiry">Expiry Date:</label>
+                        <input type="date" id="codeExpiry" class="admin-input">
+                    </div>
+                    <button class="admin-button" onclick="generateRedeemCode()">Generate Code</button>
                     
-                    <div class="code-list" id="codeList">
-                        <!-- Codes will be populated here -->
+                    <div id="generatedCode" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; display: none;">
+                        <p><strong>Generated Code:</strong> <span id="codeOutput"></span></p>
+                        <p><strong>Value:</strong> <span id="codeValueOutput"></span></p>
+                        <p><strong>Expires:</strong> <span id="codeExpiryOutput"></span></p>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3>All Users</h3>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Coins</th>
+                                    <th>USD</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allUsersTable">
+                                <!-- Users will be populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -993,8 +936,8 @@
     <div class="modal" id="redeemSuccessModal">
         <div class="modal-content">
             <h2>Code Redeemed!</h2>
-            <p id="redeemSuccessMessage">You received coins and USD!</p>
-            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">Great!</button>
+            <p id="redeemSuccessMessage">Your code has been successfully redeemed!</p>
+            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">Continue</button>
         </div>
     </div>
     
@@ -1015,15 +958,8 @@
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         
-        // Admin user IDs (replace with actual admin user IDs)
-        const ADMIN_USER_IDS = [123456789, 987654321];
-        
-        // Google Sheets API configuration
-        const GOOGLE_SHEETS_CONFIG = {
-            sheetId: '1NXdOpaMgXdtxTGFAjJdJsZgSZP5NPxMcVOjC8VchQpk',
-            apiKey: 'YOUR_GOOGLE_SHEETS_API_KEY', // Replace with your API key
-            sheetName: 'Sheet1' // Replace with your sheet name
-        };
+        // Admin user ID
+        const ADMIN_USER_ID = '1558798885';
         
         const gameState = {
             coins: 500,
@@ -1044,8 +980,7 @@
             userId: null,
             channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
             lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-            verificationAttempts: 0,
-            isAdmin: false
+            verificationAttempts: 0
         };
 
         // Initialize the game
@@ -1060,17 +995,16 @@
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
                 
-                // Check if user is admin
-                gameState.isAdmin = ADMIN_USER_IDS.includes(user.id);
-                if (gameState.isAdmin) {
-                    document.getElementById('adminButton').style.display = 'block';
-                }
-                
                 // Update UI with user's full name
                 document.getElementById('userDisplay').textContent = `Welcome, ${gameState.fullName || gameState.username}!`;
                 
                 // Pre-fill the withdrawal name field
                 document.getElementById('withdrawName').value = gameState.fullName || '';
+                
+                // Show admin panel button if user is admin
+                if (gameState.userId == ADMIN_USER_ID) {
+                    document.getElementById('adminPanelButton').style.display = 'block';
+                }
             }
             
             loadGameState();
@@ -1086,12 +1020,6 @@
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
-            
-            // Load users and codes if admin
-            if (gameState.isAdmin) {
-                loadUsers();
-                loadCodes();
-            }
         }
 
         // Check if user has completed verification
@@ -1146,8 +1074,20 @@
 
         function saveGameState() {
             localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
-            // Also update Google Sheets if possible
-            updateGoogleSheets();
+            
+            // Also save to all users data
+            const allUsers = JSON.parse(localStorage.getItem('minezwallAllUsers') || '{}');
+            allUsers[gameState.userId] = {
+                id: gameState.userId,
+                username: gameState.username,
+                fullName: gameState.fullName,
+                coins: gameState.coins,
+                usd: gameState.usd,
+                level: gameState.level,
+                channelJoined: gameState.channelJoined,
+                lastActive: new Date().toISOString()
+            };
+            localStorage.setItem('minezwallAllUsers', JSON.stringify(allUsers));
         }
 
         function setupEventListeners() {
@@ -1207,10 +1147,9 @@
                 initGame();
             }
             
-            // If showing admin page, load users and codes
-            if (pageId === 'admin' && gameState.isAdmin) {
-                loadUsers();
-                loadCodes();
+            // If showing admin page, load admin data
+            if (pageId === 'admin') {
+                loadAllUsers();
             }
         }
 
@@ -1557,292 +1496,227 @@
             closeModal('withdrawalSuccessModal');
         }
 
-        // Google Sheets Integration Functions
-        async function searchGoogleSheets() {
-            const query = document.getElementById('searchQuery').value.trim();
-            const resultsContainer = document.getElementById('searchResults');
+        // Redeem Code System
+        function redeemCode() {
+            const code = document.getElementById('redeemCode').value.trim();
+            const resultElement = document.getElementById('redeemResult');
             
-            if (!query) {
-                resultsContainer.innerHTML = '<div class="search-result-item">Please enter a search term</div>';
+            if (!code) {
+                resultElement.innerHTML = '<p style="color: #ff4d4d;">Please enter a code</p>';
                 return;
             }
             
-            resultsContainer.innerHTML = '<div class="search-result-item"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+            // Get all redeem codes
+            const redeemCodes = JSON.parse(localStorage.getItem('minezwallRedeemCodes') || '{}');
             
-            try {
-                // In a real implementation, you would call your backend API here
-                // which would then query the Google Sheets API
-                
-                // For demo purposes, we'll simulate a search with mock data
-                setTimeout(() => {
-                    const mockResults = [
-                        {
-                            userId: '123456789',
-                            username: 'john_doe',
-                            fullName: 'John Doe',
-                            coins: 1500,
-                            usd: 12.345,
-                            level: 5,
-                            lastActive: '2023-10-15 14:30:22'
-                        },
-                        {
-                            userId: '987654321',
-                            username: 'jane_smith',
-                            fullName: 'Jane Smith',
-                            coins: 2750,
-                            usd: 22.150,
-                            level: 8,
-                            lastActive: '2023-10-16 09:15:47'
-                        }
-                    ];
-                    
-                    displaySearchResults(mockResults);
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Error searching Google Sheets:', error);
-                resultsContainer.innerHTML = '<div class="search-result-item">Error searching. Please try again.</div>';
-            }
-        }
-        
-        function displaySearchResults(results) {
-            const resultsContainer = document.getElementById('searchResults');
-            
-            if (results.length === 0) {
-                resultsContainer.innerHTML = '<div class="search-result-item">No users found matching your search</div>';
+            // Check if code exists
+            if (!redeemCodes[code]) {
+                resultElement.innerHTML = '<p style="color: #ff4d4d;">Invalid code</p>';
                 return;
             }
             
-            resultsContainer.innerHTML = '';
+            const codeData = redeemCodes[code];
             
-            results.forEach(user => {
-                const resultItem = document.createElement('div');
-                resultItem.className = 'search-result-item';
-                resultItem.innerHTML = `
-                    <h4>${user.fullName} (@${user.username})</h4>
-                    <p><strong>User ID:</strong> ${user.userId}</p>
-                    <p><strong>Coins:</strong> ${user.coins.toLocaleString()}</p>
-                    <p><strong>USD Balance:</strong> $${user.usd.toFixed(3)}</p>
-                    <p><strong>Level:</strong> ${user.level}</p>
-                    <p><strong>Last Active:</strong> ${user.lastActive}</p>
-                `;
-                resultsContainer.appendChild(resultItem);
-            });
+            // Check if code is expired
+            if (codeData.expiry && new Date() > new Date(codeData.expiry)) {
+                resultElement.innerHTML = '<p style="color: #ff4d4d;">This code has expired</p>';
+                return;
+            }
+            
+            // Check if code has already been used by this user
+            if (codeData.usedBy && codeData.usedBy.includes(gameState.userId)) {
+                resultElement.innerHTML = '<p style="color: #ff4d4d;">You have already used this code</p>';
+                return;
+            }
+            
+            // Apply the code benefits
+            if (codeData.type === 'coin') {
+                gameState.coins += codeData.value;
+                resultElement.innerHTML = `<p style="color: #4dffb8;">Success! ${codeData.value} coins added to your account</p>`;
+            } else if (codeData.type === 'usd') {
+                gameState.usd += codeData.value;
+                resultElement.innerHTML = `<p style="color: #4dffb8;">Success! $${codeData.value.toFixed(3)} USD added to your account</p>`;
+            }
+            
+            // Mark code as used by this user
+            if (!codeData.usedBy) codeData.usedBy = [];
+            codeData.usedBy.push(gameState.userId);
+            redeemCodes[code] = codeData;
+            localStorage.setItem('minezwallRedeemCodes', JSON.stringify(redeemCodes));
+            
+            // Save updated game state
+            saveGameState();
+            updateUI();
+            
+            // Clear input
+            document.getElementById('redeemCode').value = '';
+            
+            // Show success modal
+            document.getElementById('redeemSuccessMessage').textContent = 
+                codeData.type === 'coin' 
+                    ? `You received ${codeData.value} coins!` 
+                    : `You received $${codeData.value.toFixed(3)} USD!`;
+            document.getElementById('redeemSuccessModal').style.display = 'flex';
         }
-        
+
         // Admin Panel Functions
-        function loadUsers() {
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
+        function searchUser() {
+            const userId = document.getElementById('searchUser').value.trim();
+            const allUsers = JSON.parse(localStorage.getItem('minezwallAllUsers') || '{}');
             
-            // Get all users from localStorage
-            const users = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('minezwallGameState_')) {
-                    const userId = key.replace('minezwallGameState_', '');
-                    const userData = JSON.parse(localStorage.getItem(key));
-                    users.push({
-                        id: userId,
-                        username: userData.username || `User${userId}`,
-                        fullName: userData.fullName || '',
-                        coins: userData.coins || 0,
-                        usd: userData.usd || 0
-                    });
-                }
-            }
-            
-            // Add users to the list
-            users.forEach(user => {
-                const userItem = document.createElement('div');
-                userItem.className = 'user-item';
-                userItem.innerHTML = `${user.username} (${user.fullName}) - ${user.coins} coins, $${user.usd.toFixed(3)}`;
-                userItem.addEventListener('click', () => selectUser(user));
-                userList.appendChild(userItem);
-            });
-        }
-        
-        function selectUser(user) {
-            document.getElementById('adminUserId').value = user.id;
-            document.getElementById('adminUsername').value = user.username;
-            document.getElementById('adminCoins').value = user.coins;
-            document.getElementById('adminUsd').value = user.usd.toFixed(3);
-            
-            // Highlight selected user
-            document.querySelectorAll('.user-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            event.target.classList.add('selected');
-        }
-        
-        function updateUserBalance(action) {
-            const userId = document.getElementById('adminUserId').value;
             if (!userId) {
-                alert('Please select a user first');
+                alert('Please enter a user ID');
                 return;
             }
             
-            const coins = parseInt(document.getElementById('adminCoins').value) || 0;
-            const usd = parseFloat(document.getElementById('adminUsd').value) || 0;
+            const user = allUsers[userId];
             
-            if (isNaN(coins) || isNaN(usd)) {
-                alert('Please enter valid numbers');
-                return;
-            }
-            
-            const userData = JSON.parse(localStorage.getItem(`minezwallGameState_${userId}`));
-            if (!userData) {
+            if (!user) {
                 alert('User not found');
                 return;
             }
             
-            if (action === 'add') {
-                userData.coins += coins;
-                userData.usd += usd;
-            } else if (action === 'subtract') {
-                userData.coins = Math.max(0, userData.coins - coins);
-                userData.usd = Math.max(0, userData.usd - usd);
-            }
+            // Display user details
+            document.getElementById('userDetails').style.display = 'block';
+            document.getElementById('detailUserId').textContent = user.id;
+            document.getElementById('detailUsername').textContent = user.username;
+            document.getElementById('detailFullName').textContent = user.fullName;
+            document.getElementById('detailCoins').textContent = user.coins;
+            document.getElementById('detailUsd').textContent = `$${user.usd.toFixed(3)}`;
+            document.getElementById('detailLevel').textContent = user.level;
+            document.getElementById('detailChannel').textContent = user.channelJoined ? 'Yes' : 'No';
             
-            localStorage.setItem(`minezwallGameState_${userId}`, JSON.stringify(userData));
-            alert('Balance updated successfully');
-            loadUsers();
+            // Pre-fill update fields
+            document.getElementById('updateCoins').value = user.coins;
+            document.getElementById('updateUsd').value = user.usd;
         }
-        
-        function loadCodes() {
-            const codeList = document.getElementById('codeList');
-            codeList.innerHTML = '';
+
+        function updateUserCoins() {
+            const userId = document.getElementById('detailUserId').textContent;
+            const newCoins = parseInt(document.getElementById('updateCoins').value);
             
-            const codes = JSON.parse(localStorage.getItem('redeemCodes')) || [];
+            if (isNaN(newCoins)) {
+                alert('Please enter a valid number for coins');
+                return;
+            }
             
-            codes.forEach(code => {
-                const codeItem = document.createElement('div');
-                codeItem.className = 'code-item';
-                codeItem.innerHTML = `${code.code} - ${code.coins} coins, $${code.usd.toFixed(3)} USD (${code.used ? 'Used' : 'Active'})`;
-                codeList.appendChild(codeItem);
-            });
+            // Update in all users data
+            const allUsers = JSON.parse(localStorage.getItem('minezwallAllUsers') || '{}');
+            if (allUsers[userId]) {
+                allUsers[userId].coins = newCoins;
+                localStorage.setItem('minezwallAllUsers', JSON.stringify(allUsers));
+                
+                // If it's the current user, update their game state too
+                if (userId == gameState.userId) {
+                    gameState.coins = newCoins;
+                    saveGameState();
+                    updateUI();
+                }
+                
+                alert('Coins updated successfully');
+                searchUser(); // Refresh the display
+            }
         }
-        
-        function generateCode() {
-            const codeValue = document.getElementById('newCodeValue').value;
-            const coins = parseInt(document.getElementById('newCodeCoins').value) || 0;
-            const usd = parseFloat(document.getElementById('newCodeUsd').value) || 0;
+
+        function updateUserUsd() {
+            const userId = document.getElementById('detailUserId').textContent;
+            const newUsd = parseFloat(document.getElementById('updateUsd').value);
             
-            if (!codeValue) {
-                alert('Please enter a code value');
+            if (isNaN(newUsd)) {
+                alert('Please enter a valid number for USD');
                 return;
             }
             
-            if (coins <= 0 && usd <= 0) {
-                alert('Please enter coins or USD value');
-                return;
+            // Update in all users data
+            const allUsers = JSON.parse(localStorage.getItem('minezwallAllUsers') || '{}');
+            if (allUsers[userId]) {
+                allUsers[userId].usd = newUsd;
+                localStorage.setItem('minezwallAllUsers', JSON.stringify(allUsers));
+                
+                // If it's the current user, update their game state too
+                if (userId == gameState.userId) {
+                    gameState.usd = newUsd;
+                    saveGameState();
+                    updateUI();
+                }
+                
+                alert('USD updated successfully');
+                searchUser(); // Refresh the display
             }
-            
-            const codes = JSON.parse(localStorage.getItem('redeemCodes')) || [];
-            
-            // Check if code already exists
-            if (codes.some(c => c.code === codeValue)) {
-                alert('This code already exists');
-                return;
-            }
-            
-            codes.push({
-                code: codeValue,
-                coins: coins,
-                usd: usd,
-                used: false,
-                created: new Date().toISOString()
-            });
-            
-            localStorage.setItem('redeemCodes', JSON.stringify(codes));
-            alert('Code generated successfully');
-            loadCodes();
-            
-            // Clear input fields
-            document.getElementById('newCodeValue').value = '';
-            document.getElementById('newCodeCoins').value = '';
-            document.getElementById('newCodeUsd').value = '';
         }
-        
-        // Redeem Code Functions
-        function redeemCode() {
-            const codeValue = document.getElementById('redeemCode').value;
-            const resultElement = document.getElementById('redeemResult');
+
+        function generateRedeemCode() {
+            const type = document.getElementById('codeType').value;
+            const value = parseFloat(document.getElementById('codeValue').value);
+            const expiry = document.getElementById('codeExpiry').value;
             
-            if (!codeValue) {
-                resultElement.innerHTML = '<span style="color: #ff4d4d;">Please enter a code</span>';
+            if (isNaN(value) || value <= 0) {
+                alert('Please enter a valid value');
                 return;
             }
             
-            const codes = JSON.parse(localStorage.getItem('redeemCodes')) || [];
-            const codeIndex = codes.findIndex(c => c.code === codeValue);
-            
-            if (codeIndex === -1) {
-                resultElement.innerHTML = '<span style="color: #ff4d4d;">Invalid code</span>';
-                return;
+            // Generate a random code
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 8; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
             }
             
-            const code = codes[codeIndex];
-            
-            if (code.used) {
-                resultElement.innerHTML = '<span style="color: #ff4d4d;">This code has already been used</span>';
-                return;
+            // Add prefix based on type
+            if (type === 'coin') {
+                code = 'COIN' + value + '-' + code;
+            } else {
+                code = 'USD' + value + '-' + code;
             }
             
-            // Mark code as used and update user balance
-            codes[codeIndex].used = true;
-            codes[codeIndex].usedBy = gameState.userId;
-            codes[codeIndex].usedAt = new Date().toISOString();
-            
-            localStorage.setItem('redeemCodes', JSON.stringify(codes));
-            
-            // Update user balance
-            gameState.coins += code.coins;
-            gameState.usd += code.usd;
-            saveGameState();
-            updateUI();
-            
-            // Show success message
-            let message = 'You received ';
-            if (code.coins > 0) {
-                message += `${code.coins} coins`;
-            }
-            if (code.coins > 0 && code.usd > 0) {
-                message += ' and ';
-            }
-            if (code.usd > 0) {
-                message += `$${code.usd.toFixed(3)} USD`;
-            }
-            
-            document.getElementById('redeemSuccessMessage').textContent = message;
-            document.getElementById('redeemSuccessModal').style.display = 'flex';
-            
-            // Clear input field
-            document.getElementById('redeemCode').value = '';
-            resultElement.innerHTML = '';
-        }
-        
-        // Google Sheets Integration
-        function updateGoogleSheets() {
-            // This is a placeholder function for Google Sheets integration
-            // In a real implementation, you would use the Google Sheets API
-            // to update the spreadsheet with user data
-            
-            console.log('User data updated - would sync with Google Sheets');
-            
-            // Example of how you might structure the data for Google Sheets
-            const userData = {
-                userId: gameState.userId,
-                username: gameState.username,
-                fullName: gameState.fullName,
-                coins: gameState.coins,
-                usd: gameState.usd,
-                level: gameState.level,
-                lastUpdated: new Date().toISOString()
+            // Save the code
+            const redeemCodes = JSON.parse(localStorage.getItem('minezwallRedeemCodes') || '{}');
+            redeemCodes[code] = {
+                type: type,
+                value: value,
+                expiry: expiry ? new Date(expiry).toISOString() : null,
+                created: new Date().toISOString(),
+                createdBy: gameState.userId
             };
+            localStorage.setItem('minezwallRedeemCodes', JSON.stringify(redeemCodes));
             
-            // In a real implementation, you would send this data to your backend
-            // which would then update the Google Sheet
+            // Display the generated code
+            document.getElementById('generatedCode').style.display = 'block';
+            document.getElementById('codeOutput').textContent = code;
+            document.getElementById('codeValueOutput').textContent = type === 'coin' 
+                ? `${value} coins` 
+                : `$${value.toFixed(3)} USD`;
+            document.getElementById('codeExpiryOutput').textContent = expiry 
+                ? new Date(expiry).toLocaleDateString() 
+                : 'No expiry';
+        }
+
+        function loadAllUsers() {
+            const allUsers = JSON.parse(localStorage.getItem('minezwallAllUsers') || '{}');
+            const tableBody = document.getElementById('allUsersTable');
+            tableBody.innerHTML = '';
+            
+            for (const userId in allUsers) {
+                const user = allUsers[userId];
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.coins}</td>
+                    <td>$${user.usd.toFixed(3)}</td>
+                    <td>
+                        <button class="admin-button" onclick="loadUserForEdit('${user.id}')">Edit</button>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            }
+        }
+
+        function loadUserForEdit(userId) {
+            document.getElementById('searchUser').value = userId;
+            searchUser();
         }
 
         window.onload = init;
