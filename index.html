@@ -7,8 +7,451 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ... (keep all existing styles) ... */
-
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 10px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .menu-button, .back-button {
+            background: #4e54c8;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .daily-bonus {
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .game-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+        .page {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+        }
+        .restriction-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            margin: 20px;
+        }
+        .restriction-icon {
+            font-size: 60px;
+            color: #ff4d4d;
+            margin-bottom: 20px;
+        }
+        .restriction-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .restriction-message {
+            font-size: 16px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .telegram-button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .telegram-button:hover {
+            background: #0077b3;
+        }
+        .check-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+        .check-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .ad-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .start-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 20px 40px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 50px;
+            margin: 20px auto;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+        .start-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .username-display {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin: 20px auto;
+            width: 100%;
+            max-width: 350px;
+        }
+        .cell {
+            aspect-ratio: 1/1;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .cell::before {
+            content: "?";
+            position: absolute;
+            font-size: 24px;
+            color: rgba(255,255,255,0.7);
+        }
+        .cell.revealed {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        .cell.revealed::before {
+            display: none;
+        }
+        .cell.mine {
+            background: #ff4d4d;
+        }
+        .cell.diamond {
+            background: #4dffb8;
+        }
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .game-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .control-button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .skip-ad {
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+        }
+        .skip-coin {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+        }
+        .restart {
+            background: linear-gradient(to right, #1d976c, #93f9b9);
+        }
+        .withdraw-form {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .submit-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .settings-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            top: 50px;
+            left: 0;
+        }
+        .dropdown-content button {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: noe;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .dropdown-content button:hover {
+            background: rgba(78, 84, 200, 0.7);
+        }
+        .dropdown.show .dropdown-content {
+            display: block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .modal p {
+            font-size: 18px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .modal-button {
+            background: linear-gradient(to right, #00c9ff, #92fe9d);
+            border: none;
+            color: #1a2a6c;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+        .modal-button:hover {
+            transform: scale(1.05);
+        }
+        .withdrawal-success-modal {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            width: 350px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .form-redirect-button {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
         /* New styles for admin panel and redeem code */
         .admin-panel {
             background: rgba(0, 0, 0, 0.8);
@@ -67,6 +510,53 @@
             cursor: pointer;
             margin-left: 10px;
         }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        .bounce {
+            animation: bounce 1s;
+        }
+        @keyframes diamondGlow {
+            0% { box-shadow: 0 0 5px #4dffb8; }
+            50% { box-shadow: 0 0 20px #4dffb8; }
+            100% { box-shadow: 0 0 5px #4dffb8; }
+        }
+        .diamond-glow {
+            animation: diamondGlow 1.5s infinite;
+        }
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        @media (max-width: 480px) {
+            .game-grid {
+                gap: 6px;
+            }
+            .control-button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .game-title {
+                font-size: 24px;
+            }
+            .start-button {
+                padding: 15px 30px;
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -95,7 +585,6 @@
             </div>
         </div>
         
-        <!-- Restriction Page (unchanged) -->
         <div id="restrictionPage" class="page active">
             <div class="restriction-page">
                 <div class="restriction-icon">
@@ -115,26 +604,143 @@
             </div>
         </div>
         
-        <!-- Home Page (unchanged) -->
         <div id="homePage" class="page">
             <h1 class="game-title">MINEZWALL</h1>
             <div class="username-display" id="userDisplay">Welcome, Player!</div>
             <button class="start-button pulse" onclick="startGame()">START GAME</button>
         </div>
         
-        <!-- Game Page (unchanged) -->
         <div id="gamePage" class="page">
-            <!-- ... (unchanged game page content) ... -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Level: <span id="currentLevel">1</span></div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">COINS</div>
+                    <div class="stat-value" id="coinDisplay">500</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="usdDisplay">$0.000</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">DIAMONDS FOUND</div>
+                    <div class="stat-value" id="diamondsFound">0/4</div>
+                </div>
+            </div>
+            
+            <div class="game-grid" id="gameGrid"></div>
+            
+            <div class="game-controls">
+                <button class="control-button skip-ad" onclick="skipWithAd()">
+                    <i class="fas fa-ad"></i> Skip with Ad
+                </button>
+                <button class="control-button skip-coin" onclick="skipWithCoins()">
+                    <i class="fas fa-coins"></i> Skip with Coins
+                </button>
+                <button class="control-button restart" onclick="restartLevel()">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+            </div>
         </div>
         
-        <!-- Withdraw Page (unchanged) -->
         <div id="withdrawPage" class="page">
-            <!-- ... (unchanged withdraw page content) ... -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Withdraw</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="withdrawUsdDisplay">$0.000</div>
+                </div>
+            </div>
+            
+            <div class="withdraw-form">
+                <div class="input-group">
+                    <label for="withdrawName">Full Name</label>
+                    <input type="text" id="withdrawName" placeholder="Enter your full name">
+                </div>
+                
+                <div class="input-group">
+                    <label for="withdrawAmount">Amount to Withdraw (USD)</label>
+                    <input type="number" id="withdrawAmount" placeholder="Minimum $5.00" min="5" step="0.001">
+                </div>
+                
+                <div class="input-group">
+                    <label for="withdrawMethod">Withdrawal Method</label>
+                    <select id="withdrawMethod">
+                        <option value="usdt">USDT (Polygon Network)</option>
+                        <option value="btc">Bitcoin</option>
+                        <option value="eth">Ethereum</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="walletAddress">Wallet Address</label>
+                    <input type="text" id="walletAddress" placeholder="Enter your wallet address">
+                </div>
+                
+                <button class="submit-button" onclick="processWithdrawal()">Withdraw Funds</button>
+            </div>
         </div>
         
-        <!-- Settings Page (unchanged) -->
         <div id="settingsPage" class="page">
-            <!-- ... (unchanged settings page content) ... -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Settings</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="settings-item">
+                <div><i class="fas fa-volume-up"></i> Sound Effects</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div><i class="fas fa-music"></i> Background Music</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="musicToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-item">
+                <div><i class="fas fa-palette"></i> Theme</div>
+                <select id="themeSelect" onchange="changeTheme()">
+                    <option value="dark">Dark Mode</option>
+                    <option value="light">Light Mode</option>
+                </select>
+            </div>
+            
+            <div class="settings-item">
+                <div><i class="fas fa-cog"></i> Difficulty</div>
+                <select id="difficultySelect" onchange="changeDifficulty()">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
         </div>
         
         <!-- NEW: Redeem Code Page -->
@@ -287,7 +893,45 @@
         </div>
     </div>
     
-    <!-- ... (keep all existing modals) ... -->
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2>Congratulations!</h2>
+            <p>You found all diamonds and completed the level!</p>
+            <p>Reward: +$0.005 USD</p>
+            <button class="modal-button" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="loseModal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>You hit a mine. Try again or skip the level.</p>
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <button class="modal-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="skipWithAd()">Skip with Ad</button>
+                <button class="modal-button" style="background: linear-gradient(to right, #00b09b, #96c93d);" onclick="skipWithCoins()">Skip with Coins</button>
+                <button class="modal-button" style="background: linear-gradient(to right, #1d976c, #93f9b9);" onclick="restartLevel()">Restart Level</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="dailyBonusModal">
+        <div class="modal-content">
+            <h2>Daily Bonus!</h2>
+            <p>You received 50 coins!</p>
+            <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="withdrawalSuccessModal">
+        <div class="withdrawal-success-modal">
+            <h2>Withdrawal Request Received!</h2>
+            <p>Your withdrawal request has been submitted successfully.</p>
+            <p>Please complete our verification form to process your payment.</p>
+            <button class="form-redirect-button" onclick="redirectToGoogleForm()">
+                Complete Verification Form
+            </button>
+        </div>
+    </div>
     
     <!-- NEW: Admin Access Modal -->
     <div class="modal" id="adminAccessModal">
@@ -637,9 +1281,84 @@
             });
         }
 
-        // ... (keep all existing functions) ...
+        // Check if user has completed verification
+        function hasCompletedVerification() {
+            // Check if we have user ID and channel joined status
+            if (!gameState.userId) return false;
+            
+            // Check if user has joined channel
+            const joined = localStorage.getItem(`channelJoined_${gameState.userId}`);
+            return joined === 'true';
+        }
 
-        // Update the showPage function to handle new pages
+        // Verify channel membership
+        function verifyChannelJoin() {
+            const checkBtn = document.querySelector('.check-button');
+            checkBtn.disabled = true;
+            checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
+            
+            // In a real app, you would use Telegram's API to verify channel membership
+            // For this demo, we'll simulate it with a delay
+            setTimeout(() => {
+                // Simulate verification - first attempt always fails to ensure user actually joins
+                if (gameState.verificationAttempts < 1) {
+                    gameState.verificationAttempts++;
+                    checkBtn.disabled = false;
+                    checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
+                    alert('Please actually join our Telegram channel before clicking verification.');
+                    return;
+                }
+                
+                // After first attempt, simulate successful verification
+                gameState.channelJoined = true;
+                localStorage.setItem(`channelJoined_${gameState.userId}`, 'true');
+                localStorage.setItem('lastChannelCheck', Date.now());
+                saveGameState();
+                
+                showPage('home');
+                alert('Verification successful! Welcome to Minezwall.');
+                
+                checkBtn.disabled = false;
+                checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
+            }, 2000);
+        }
+
+        function loadGameState() {
+            const savedState = localStorage.getItem(`minezwallGameState_${gameState.userId}`);
+            if (savedState) {
+                Object.assign(gameState, JSON.parse(savedState));
+            }
+            updateUI();
+        }
+
+        function saveGameState() {
+            localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
+        }
+
+        function setupEventListeners() {
+            document.querySelector('.menu-button').addEventListener('click', function() {
+                document.getElementById('dropdownMenu').classList.toggle('show');
+            });
+
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.menu-button')) {
+                    const dropdowns = document.getElementsByClassName('dropdown-content');
+                    for (let i = 0; i < dropdowns.length; i++) {
+                        const openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('soundToggle').addEventListener('change', toggleSound);
+            document.getElementById('musicToggle').addEventListener('change', toggleMusic);
+            document.getElementById('difficultySelect').value = gameState.difficulty;
+            document.getElementById('themeSelect').value = localStorage.getItem('theme') || 'dark';
+            applyTheme();
+        }
+
         function showPage(pageId) {
             // Always allow restriction page
             if (pageId === 'restriction') {
@@ -680,7 +1399,348 @@
             }
         }
 
-        // ... (keep the rest of the existing code) ...
+        function startGame() {
+            if (!hasCompletedVerification()) {
+                showPage('restriction');
+                alert('Please join our Telegram channel and verify your membership to play.');
+                return;
+            }
+            showPage('game');
+        }
+
+        function initGame() {
+            gameState.diamondsFound = 0;
+            gameState.gameActive = true;
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            gameState.grid = [];
+            
+            // Create all cells
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => revealCell(i));
+                grid.appendChild(cell);
+                gameState.grid.push({ isMine: false, isRevealed: false, isDiamond: false });
+            }
+            
+            // Place mines first
+            placeMines();
+            
+            // Then make all non-mine cells diamonds
+            placeDiamonds();
+            
+            updateUI();
+            startTimer();
+        }
+
+        function placeMines() {
+            let minesPlaced = 0;
+            while (minesPlaced < gameState.minesCount) {
+                const randomIndex = Math.floor(Math.random() * 25);
+                if (!gameState.grid[randomIndex].isMine) {
+                    gameState.grid[randomIndex].isMine = true;
+                    minesPlaced++;
+                }
+            }
+        }
+
+        function placeDiamonds() {
+            // Make all non-mine cells diamonds
+            for (let i = 0; i < gameState.grid.length; i++) {
+                if (!gameState.grid[i].isMine) {
+                    gameState.grid[i].isDiamond = true;
+                }
+            }
+        }
+
+        function revealCell(index) {
+            if (!gameState.gameActive) return;
+            const cell = gameState.grid[index];
+            const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
+            if (cell.isRevealed) return;
+            cell.isRevealed = true;
+            cellElement.classList.add('revealed');
+            playSound('click');
+            if (cell.isMine) {
+                cellElement.classList.add('mine');
+                cellElement.innerHTML = '💣';
+                gameOver();
+                return;
+            }
+            if (cell.isDiamond) {
+                cellElement.classList.add('diamond');
+                cellElement.innerHTML = '💎';
+                gameState.diamondsFound++;
+                playSound('win');
+                cellElement.classList.add('diamond-glow');
+                if (gameState.diamondsFound === gameState.diamondsToFind) {
+                    levelComplete();
+                }
+            }
+            updateUI();
+        }
+
+        function gameOver() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            playSound('lose');
+            gameState.grid.forEach((cell, index) => {
+                if (cell.isMine) {
+                    const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
+                    cellElement.classList.add('mine', 'revealed');
+                    cellElement.innerHTML = '💣';
+                }
+            });
+            document.getElementById('loseModal').style.display = 'flex';
+        }
+
+        function levelComplete() {
+            if (gameState.coins <= 0) {
+                alert("You don't have enough coins to proceed to the next level!");
+                gameState.gameActive = false;
+                clearInterval(gameState.timerInterval);
+                return;
+            }
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            gameState.coins -= 8;
+            gameState.usd += 0.005;
+            gameState.level++;
+            saveGameState();
+            playSound('win');
+            document.getElementById('winModal').style.display = 'flex';
+            showRewardedAd();
+        }
+
+        function nextLevel() {
+            closeModal('winModal');
+            initGame();
+        }
+
+        function startTimer() {
+            gameState.timer = 0;
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer++;
+                updateTimer();
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
+            const seconds = (gameState.timer % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').textContent = `${minutes}:${seconds}`;
+        }
+
+        function updateUI() {
+            document.getElementById('currentLevel').textContent = gameState.level;
+            document.getElementById('coinDisplay').textContent = gameState.coins;
+            document.getElementById('usdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
+            document.getElementById('withdrawUsdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
+            document.getElementById('diamondsFound').textContent = `${gameState.diamondsFound}/${gameState.diamondsToFind}`;
+        }
+
+        function skipWithAd() {
+            closeModal('loseModal');
+            showRewardedAd(() => {
+                skipLevelActions();
+            });
+        }
+
+        function skipWithCoins() {
+            if (gameState.coins >= 25) {
+                gameState.coins -= 25;
+                skipLevelActions();
+                closeModal('loseModal');
+                saveGameState();
+                updateUI();
+            } else {
+                alert('Not enough coins!');
+            }
+        }
+
+        function skipLevelActions() {
+            gameState.usd += 0.005;
+            gameState.level++;
+            saveGameState();
+            updateUI();
+            initGame();
+        }
+
+        function restartLevel() {
+            if (gameState.coins >= 5) {
+                gameState.coins -= 5;
+                saveGameState();
+                updateUI();
+                closeModal('loseModal');
+                initGame();
+            } else {
+                alert('Not enough coins to restart!');
+            }
+        }
+
+        function claimDailyBonus() {
+            const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
+            const today = new Date().toDateString();
+            if (lastClaimed !== today) {
+                gameState.coins += 50;
+                saveGameState();
+                updateUI();
+                localStorage.setItem('dailyBonusLastClaimed', today);
+                document.getElementById('dailyBonusModal').style.display = 'flex';
+            } else {
+                alert('You already claimed your daily bonus today!');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            localStorage.setItem('theme', theme);
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            if (theme === 'light') {
+                document.body.style.background = 'linear-gradient(135deg, #64b3f4, #c2e59c)';
+                document.body.style.color = '#333';
+            } else {
+                document.body.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c)';
+                document.body.style.color = 'white';
+            }
+        }
+
+        function changeDifficulty() {
+            gameState.difficulty = document.getElementById('difficultySelect').value;
+            saveGameState();
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = document.getElementById('soundToggle').checked;
+            saveGameState();
+        }
+
+        function toggleMusic() {
+            gameState.musicEnabled = document.getElementById('musicToggle').checked;
+            if (gameState.musicEnabled) {
+                startBackgroundMusic();
+            } else {
+                stopBackgroundMusic();
+            }
+            saveGameState();
+        }
+
+        function startBackgroundMusic() {
+            if (gameState.musicEnabled) {
+                const bgMusic = document.getElementById('backgroundMusic');
+                bgMusic.volume = 0.3;
+                bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
+            }
+        }
+
+        function stopBackgroundMusic() {
+            document.getElementById('backgroundMusic').pause();
+        }
+
+        function playSound(sound) {
+            if (!gameState.soundEnabled) return;
+            const soundElement = document.getElementById(sound + 'Sound');
+            soundElement.currentTime = 0;
+            soundElement.play().catch(e => console.log('Sound play prevented:', e));
+        }
+
+        function showInAppAd() {
+            try {
+                show_9662480({
+                    type: 'inApp',
+                    inAppSettings: {
+                        frequency: 3,
+                        capping: 0.3,
+                        interval: 60,
+                        timeout: 10,
+                        everyPage: true
+                    }
+                });
+            } catch (e) {
+                console.log('Ad error:', e);
+            }
+        }
+
+        function showRewardedAd(callback) {
+            try {
+                show_9662480('pop').then(() => {
+                    if (callback) callback();
+                }).catch(e => {
+                    console.log('Ad error:', e);
+                });
+            } catch (e) {
+                console.log('Ad error:', e);
+            }
+        }
+
+        function showPeriodicAd() {
+            try {
+                show_9662480();
+            } catch (e) {
+                console.log('Ad error:', e);
+            }
+        }
+
+        function processWithdrawal() {
+            const name = document.getElementById('withdrawName').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
+            const walletAddress = document.getElementById('walletAddress').value;
+            
+            if (!name) {
+                alert('Please enter your full name');
+                return;
+            }
+            if (isNaN(amount)) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            if (amount < 5) {
+                alert('Minimum withdrawal amount is $5.00');
+                return;
+            }
+            if (amount > gameState.usd) {
+                alert('Insufficient balance');
+                return;
+            }
+            if (!walletAddress) {
+                alert('Please enter your wallet address');
+                return;
+            }
+            
+            gameState.usd -= amount;
+            saveGameState();
+            updateUI();
+            
+            // Store withdrawal details (you might want to send these to your backend)
+            const withdrawalDetails = {
+                name: name,
+                amount: amount,
+                method: method,
+                walletAddress: walletAddress,
+                userId: gameState.userId,
+                date: new Date().toISOString()
+            };
+            localStorage.setItem(`withdrawal_${Date.now()}`, JSON.stringify(withdrawalDetails));
+            
+            document.getElementById('withdrawalSuccessModal').style.display = 'flex';
+        }
+
+        function redirectToGoogleForm() {
+            window.open('https://forms.gle/dcV7SNonaC1BVvNdA', '_blank');
+            closeModal('withdrawalSuccessModal');
+        }
 
         window.onload = init;
     </script>
