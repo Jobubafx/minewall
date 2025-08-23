@@ -275,25 +275,35 @@
         }
 
         async function verifyChannelJoin() {
-            const checkBtn = document.querySelector(".check-button");
-            checkBtn.disabled = true;
-            checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "verifyChannel", userId: gameState.userId }),
-                headers: { "Content-Type": "application/json" },
-            });
-            const { isMember } = await response.json();
-            checkBtn.disabled = false;
-            checkBtn.innerHTML = "I've Joined";
-            if (isMember) {
-                gameState.channelJoined = true;
-                showPage("home");
-                alert("Welcome to Minezwall!");
-            } else {
-                alert("Please join the Telegram channel.");
-            }
+    const checkBtn = document.querySelector(".check-button");
+    checkBtn.disabled = true;
+    checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    try {
+        const response = await fetch(APPS_SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "verifyChannel", userId: gameState.userId }),
+            headers: { "Content-Type": "application/json" },
+            timeout: 5000 // 5-second timeout
+        });
+        const { isMember } = await response.json();
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = "I've Joined";
+        if (isMember) {
+            gameState.channelJoined = true;
+            showPage("home");
+            alert("Welcome to Minezwall!");
+        } else {
+            alert("Please join the Telegram channel.");
         }
+    } catch (error) {
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = "I've Joined";
+        alert("Verification failed. Check your connection or try again.");
+        console.error("Verification error:", error);
+    }
+}
+
+
 
         async function loadUsers() {
             const response = await fetch(APPS_SCRIPT_URL, {
