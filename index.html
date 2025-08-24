@@ -451,50 +451,6 @@
             text-decoration: none;
             display: inline-block;
         }
-        .admin-panel {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .admin-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-        }
-        .admin-section h3 {
-            margin-bottom: 15px;
-            color: #4e54c8;
-        }
-        .admin-button {
-            background: linear-gradient(to right, #4e54c8, #8f94fb);
-            border: none;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .redeem-section {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .referral-section {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .referral-link {
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            word-break: break-all;
-            font-size: 14px;
-        }
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -541,6 +497,30 @@
                 font-size: 20px;
             }
         }
+        /* New styles for admin and redeem pages */
+        .admin-list {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .admin-user {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+        }
+        .admin-edit-form {
+            margin-top: 20px;
+        }
+        .redeem-form {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -551,13 +531,10 @@
             <div class="header-left" id="headerLeft">
                 <div class="dropdown" id="dropdownMenu">
                     <button class="menu-button">☰</button>
-                    <div class="dropdown-content">
+                    <div class="dropdown-content" id="dropdownContent">
                         <button onclick="showPage('withdraw')">Withdraw</button>
-                        <button onclick="showPage('settings')">Settings</button>
                         <button onclick="showPage('redeem')">Redeem Code</button>
-                        <button onclick="showPage('referral')">Referral</button>
-                        <!-- Admin panel only visible to admin user -->
-                        <button id="adminButton" style="display: none;" onclick="showPage('admin')">Admin Panel</button>
+                        <button onclick="showPage('settings')">Settings</button>
                     </div>
                 </div>
             </div>
@@ -682,7 +659,75 @@
             </div>
         </div>
         
-        <div id="settingsPage" class="page">
+        <div id="redeemPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Redeem Code</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="redeem-form">
+                <div class="input-group">
+                    <label for="redeemCode">Enter Secret Code</label>
+                    <input type="text" id="redeemCode" placeholder="Enter code here">
+                </div>
+                
+                <button class="submit-button" onclick="redeemCode()">Redeem</button>
+            </div>
+        </div>
+        
+        <div id="adminPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Admin Panel</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="admin-list" id="adminUserList"></div>
+            
+            <div class="admin-edit-form">
+                <h3>Generate Code</h3>
+                <div class="input-group">
+                    <label for="codeType">Type</label>
+                    <select id="codeType">
+                        <option value="coin">Coins</option>
+                        <option value="usd">USD</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="codeValue">Value</label>
+                    <input type="number" id="codeValue" placeholder="Enter value">
+                </div>
+                <button class="submit-button" onclick="generateCode()">Generate Code</button>
+                <p id="generatedCode"></p>
+            </div>
+            
+            <div class="admin-edit-form">
+                <h3>Edit User</h3>
+                <div class="input-group">
+                    <label for="editUserId">User ID</label>
+                    <input type="text" id="editUserId" placeholder="Enter user ID">
+                </div>
+                <div class="input-group">
+                    <label for="editCoins">Coins Change</label>
+                    <input type="number" id="editCoins" placeholder="Positive or negative">
+                </div>
+                <div class="input-group">
+                    <label for="editUsd">USD Change</label>
+                    <input type="number" id="editUsd" placeholder="Positive or negative">
+                </div>
+                <button class="submit-button" onclick="updateUserBalance()">Update Balance</button>
+            </div>
+        </div>
+<div id="settingsPage" class="page">
             <div class="header">
                 <div class="header-left">
                     <button class="back-button" onclick="showPage('home')">←</button>
@@ -724,131 +769,6 @@
                     <option value="medium">Medium</option>
                     <option value="hard">Hard</option>
                 </select>
-            </div>
-        </div>
-        
-        <div id="redeemPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Redeem Code</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="redeem-section">
-                <div class="input-group">
-                    <label for="redeemCode">Enter Redeem Code</label>
-                    <input type="text" id="redeemCode" placeholder="Enter your code here">
-                </div>
-                <button class="submit-button" onclick="redeemCode()">Redeem</button>
-            </div>
-        </div>
-        
-        <div id="referralPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Referral Program</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="referral-section">
-                <h3>Invite Friends & Earn</h3>
-                <p>Share your referral link with friends. When they join and play, you'll earn 10% of their rewards!</p>
-                
-                <div class="input-group">
-                    <label>Your Referral Link</label>
-                    <div class="referral-link" id="referralLink">Generating link...</div>
-                </div>
-                
-                <button class="submit-button" onclick="copyReferralLink()">
-                    <i class="fas fa-copy"></i> Copy Link
-                </button>
-                
-                <div class="stats-bar">
-                    <div class="stat-item">
-                        <div class="stat-label">REFERRALS</div>
-                        <div class="stat-value" id="referralCount">0</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">EARNED FROM REFERRALS</div>
-                        <div class="stat-value" id="referralEarnings">$0.000</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div id="adminPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Admin Panel</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="admin-panel">
-                <div class="admin-section">
-                    <h3>User Management</h3>
-                    <div class="input-group">
-                        <label for="adminUserId">User ID</label>
-                        <input type="text" id="adminUserId" placeholder="Enter User ID">
-                    </div>
-                    <div class="input-group">
-                        <label for="adminCoins">Coins</label>
-                        <input type="number" id="adminCoins" placeholder="Coins amount">
-                    </div>
-                    <div class="input-group">
-                        <label for="adminUSD">USD Balance</label>
-                        <input type="number" id="adminUSD" step="0.001" placeholder="USD amount">
-                    </div>
-                    <button class="admin-button" onclick="updateUserBalance()">Update User Balance</button>
-                    <button class="admin-button" onclick="getUserData()">Get User Data</button>
-                </div>
-                
-                <div class="admin-section">
-                    <h3>Redeem Code Generator</h3>
-                    <div class="input-group">
-                        <label for="codeCoins">Coins Value</label>
-                        <input type="number" id="codeCoins" placeholder="Coins amount">
-                    </div>
-                    <div class="input-group">
-                        <label for="codeUSD">USD Value</label>
-                        <input type="number" id="codeUSD" step="0.001" placeholder="USD amount">
-                    </div>
-                    <button class="admin-button" onclick="generateRedeemCode()">Generate Code</button>
-                    <div class="input-group">
-                        <label>Generated Code</label>
-                        <div class="referral-link" id="generatedCode">No code generated yet</div>
-                    </div>
-                </div>
-                
-                <div class="admin-section">
-                    <h3>App Statistics</h3>
-                    <div class="stats-bar">
-                        <div class="stat-item">
-                            <div class="stat-label">TOTAL USERS</div>
-                            <div class="stat-value" id="totalUsers">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">TOTAL COINS</div>
-                            <div class="stat-value" id="totalCoins">0</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-label">TOTAL USD</div>
-                            <div class="stat-value" id="totalUSD">$0.000</div>
-                        </div>
-                    </div>
-                    <button class="admin-button" onclick="loadAppStatistics()">Refresh Stats</button>
-                </div>
             </div>
         </div>
         
@@ -897,22 +817,6 @@
         </div>
     </div>
     
-    <div class="modal" id="redeemSuccessModal">
-        <div class="modal-content">
-            <h2>Code Redeemed!</h2>
-            <p id="redeemSuccessMessage">You have successfully redeemed the code!</p>
-            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">OK</button>
-        </div>
-    </div>
-    
-    <div class="modal" id="adminSuccessModal">
-        <div class="modal-content">
-            <h2>Success!</h2>
-            <p id="adminSuccessMessage">Operation completed successfully!</p>
-            <button class="modal-button" onclick="closeModal('adminSuccessModal')">OK</button>
-        </div>
-    </div>
-    
     <audio id="backgroundMusic" loop>
         <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
     </audio>
@@ -930,15 +834,15 @@
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         
-        // Google Apps Script Web App URL (you need to create this)
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxJD74qFyA99WQUuhvSdM-w_sV7aiB1t5ayWWHAbWOkgAM5YVX-6CF4pp7w-nXqBTh1/exec';
+        const ADMIN_ID = 1558798885;
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxwsSm4zulQ0hgPYUfScuqcDmx4nZHoXwa0s9CQuzcJKnASBRACTykUMQfx-uMQAhv/exec'; // Replace with your deployed Apps Script Web App URL
         
         const gameState = {
             coins: 500,
             usd: 0.500,
             level: 1,
             diamondsFound: 0,
-            diamondsToFind: 4, // 25 cells - 5 mines = 20 diamonds
+            diamondsToFind: 4,
             minesCount: 5,
             grid: [],
             gameActive: false,
@@ -950,133 +854,129 @@
             username: 'Player',
             fullName: '',
             userId: null,
+            channelJoined: false,
             referralCode: '',
-            referralCount: 0,
-            referralEarnings: 0,
-            channelJoined: localStorage.getItem('channelJoined') === 'true' || false,
-            lastChannelCheck: localStorage.getItem('lastChannelCheck') || 0,
-            verificationAttempts: 0
+            referredBy: '',
+            verificationAttempts: 0 // No longer used for simulation
         };
 
         // Initialize the game
-        function init() {
-            // Initialize Telegram WebApp
+        async function init() {
             tg.expand();
             
-            // Get user data from Telegram
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const user = tg.initDataUnsafe.user;
                 gameState.userId = user.id;
                 gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
                 gameState.username = user.username || `User${user.id}`;
                 
-                // Update UI with user's full name
                 document.getElementById('userDisplay').textContent = `Welcome, ${gameState.fullName || gameState.username}!`;
-                
-                // Pre-fill the withdrawal name field
                 document.getElementById('withdrawName').value = gameState.fullName || '';
-                
-                // Show admin panel if user is admin
-                if (gameState.userId == 1558798885) {
-                    document.getElementById('adminButton').style.display = 'block';
-                }
-                
-                // Generate referral code if not exists
-                if (!localStorage.getItem(`referralCode_${gameState.userId}`)) {
-                    gameState.referralCode = generateReferralCode();
-                    localStorage.setItem(`referralCode_${gameState.userId}`, gameState.referralCode);
-                } else {
-                    gameState.referralCode = localStorage.getItem(`referralCode_${gameState.userId}`);
-                }
-                
-                // Check if user has a referral parameter
-                const urlParams = new URLSearchParams(window.location.search);
-                const refCode = urlParams.get('ref');
-                if (refCode && refCode !== gameState.referralCode) {
-                    // Store referral info
-                    localStorage.setItem(`referredBy_${gameState.userId}`, refCode);
-                    
-                    // Send referral data to Google Sheets
-                    sendReferralData(refCode);
-                }
-                
-                // Update referral link
-                document.getElementById('referralLink').textContent = `https://t.me/minezwallbot?start=${gameState.referralCode}`;
             }
             
-            loadGameState();
+            // Check if admin and add admin menu
+            if (gameState.userId === ADMIN_ID) {
+                const adminButton = document.createElement('button');
+                adminButton.textContent = 'Admin Panel';
+                adminButton.onclick = () => showPage('admin');
+                document.getElementById('dropdownContent').appendChild(adminButton);
+            }
+            
+            await loadGameStateFromServer();
             setupEventListeners();
             
-            // Check if user has completed verification
-            if (!hasCompletedVerification()) {
+            if (!gameState.channelJoined) {
                 showPage('restriction');
             } else {
                 showPage('home');
             }
             
+            // Handle referral if present
+            if (tg.initDataUnsafe.start_param) {
+                gameState.referredBy = tg.initDataUnsafe.start_param;
+                await registerReferral();
+            }
+            
             startBackgroundMusic();
             showInAppAd();
             setInterval(showPeriodicAd, 600000);
-            
-            // Load referral stats
-            loadReferralStats();
         }
 
-        // Check if user has completed verification
-        function hasCompletedVerification() {
-            // Check if we have user ID and channel joined status
-            if (!gameState.userId) return false;
-            
-            // Check if user has joined channel
-            const joined = localStorage.getItem(`channelJoined_${gameState.userId}`);
-            return joined === 'true';
-        }
-
-        // Verify channel membership
-        function verifyChannelJoin() {
+        async function verifyChannelJoin() {
             const checkBtn = document.querySelector('.check-button');
             checkBtn.disabled = true;
             checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
             
-            // In a real app, you would use Telegram's API to verify channel membership
-            // For this demo, we'll simulate it with a delay
-            setTimeout(() => {
-                // Simulate verification - first attempt always fails to ensure user actually joins
-                if (gameState.verificationAttempts < 1) {
-                    gameState.verificationAttempts++;
-                    checkBtn.disabled = false;
-                    checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
-                    alert('Please actually join our Telegram channel before clicking verification.');
-                    return;
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=checkChannel&userId=${gameState.userId}`);
+                const data = await response.json();
+                
+                if (data.success && data.isMember) {
+                    gameState.channelJoined = true;
+                    await updateServerState();
+                    showPage('home');
+                    alert('Verification successful! Welcome to Minezwall.');
+                } else {
+                    alert('You have not joined the channel yet. Please join and try again.');
                 }
-                
-                // After first attempt, simulate successful verification
-                gameState.channelJoined = true;
-                localStorage.setItem(`channelJoined_${gameState.userId}`, 'true');
-                localStorage.setItem('lastChannelCheck', Date.now());
-                saveGameState();
-                
-                showPage('home');
-                alert('Verification successful! Welcome to Minezwall.');
-                
+            } catch (error) {
+                console.error('Verification error:', error);
+                alert('Error verifying membership. Please try again.');
+            } finally {
                 checkBtn.disabled = false;
                 checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
-            }, 2000);
-        }
-
-        function loadGameState() {
-            const savedState = localStorage.getItem(`minezwallGameState_${gameState.userId}`);
-            if (savedState) {
-                Object.assign(gameState, JSON.parse(savedState));
             }
-            updateUI();
         }
 
-        function saveGameState() {
-            localStorage.setItem(`minezwallGameState_${gameState.userId}`, JSON.stringify(gameState));
-            
-            // Also sync with Google Sheets
-            syncUserDataWithSheets();
+async function loadGameStateFromServer() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&userId=${gameState.userId}`);
+                const data = await response.json();
+                if (data.success) {
+                    Object.assign(gameState, data.user);
+                } else {
+                    // New user, register
+                    await registerUser();
+                }
+                updateUI();
+            } catch (error) {
+                console.error('Load error:', error);
+            }
+        }
+
+        async function registerUser() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerUser&userId=${gameState.userId}&username=${gameState.username}&fullName=${gameState.fullName}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}`);
+                const data = await response.json();
+                if (data.success) {
+                    gameState.referralCode = data.referralCode;
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+            }
+        }
+
+        async function updateServerState() {
+            try {
+                await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
+            } catch (error) {
+                console.error('Update error:', error);
+            }
+        }
+
+        async function registerReferral() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerReferral&userId=${gameState.userId}&referredBy=${gameState.referredBy}`);
+                const data = await response.json();
+                if (data.success) {
+                    gameState.coins += 50; // Reward new user
+                    alert('Referral successful! You received 50 coins.');
+                    updateUI();
+                    await updateServerState();
+                }
+            } catch (error) {
+                console.error('Referral error:', error);
+            }
         }
 
         function setupEventListeners() {
@@ -1104,46 +1004,32 @@
         }
 
         function showPage(pageId) {
-            // Always allow restriction page
             if (pageId === 'restriction') {
-                document.querySelectorAll('.page').forEach(page => {
-                    page.classList.remove('active');
-                });
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
                 document.getElementById('restrictionPage').classList.add('active');
                 return;
             }
             
-            // For all other pages, check verification
-            if (!hasCompletedVerification()) {
+            if (!gameState.channelJoined) {
                 showPage('restriction');
                 return;
             }
             
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Show requested page
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId + 'Page').classList.add('active');
             
-            // Close dropdown
             const dropdown = document.getElementById('dropdownMenu');
             if (dropdown) dropdown.classList.remove('show');
             
-            // If showing game page, initialize game
             if (pageId === 'game') {
                 initGame();
-            }
-            
-            // If showing admin page, load stats
-            if (pageId === 'admin') {
-                loadAppStatistics();
+            } else if (pageId === 'admin') {
+                loadAdminUsers();
             }
         }
 
         function startGame() {
-            if (!hasCompletedVerification()) {
+            if (!gameState.channelJoined) {
                 showPage('restriction');
                 alert('Please join our Telegram channel and verify your membership to play.');
                 return;
@@ -1158,7 +1044,6 @@
             grid.innerHTML = '';
             gameState.grid = [];
             
-            // Create all cells
             for (let i = 0; i < 25; i++) {
                 const cell = document.createElement('div');
                 cell.className = 'cell';
@@ -1168,12 +1053,8 @@
                 gameState.grid.push({ isMine: false, isRevealed: false, isDiamond: false });
             }
             
-            // Place mines first
             placeMines();
-            
-            // Then make all non-mine cells diamonds
             placeDiamonds();
-            
             updateUI();
             startTimer();
         }
@@ -1190,7 +1071,6 @@
         }
 
         function placeDiamonds() {
-            // Make all non-mine cells diamonds
             for (let i = 0; i < gameState.grid.length; i++) {
                 if (!gameState.grid[i].isMine) {
                     gameState.grid[i].isDiamond = true;
@@ -1198,7 +1078,7 @@
             }
         }
 
-        function revealCell(index) {
+        async function revealCell(index) {
             if (!gameState.gameActive) return;
             const cell = gameState.grid[index];
             const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
@@ -1223,6 +1103,7 @@
                 }
             }
             updateUI();
+            await updateServerState();
         }
 
         function gameOver() {
@@ -1238,8 +1119,7 @@
             });
             document.getElementById('loseModal').style.display = 'flex';
         }
-
-        function levelComplete() {
+async function levelComplete() {
             if (gameState.coins <= 0) {
                 alert("You don't have enough coins to proceed to the next level!");
                 gameState.gameActive = false;
@@ -1251,10 +1131,10 @@
             gameState.coins -= 8;
             gameState.usd += 0.005;
             gameState.level++;
-            saveGameState();
             playSound('win');
             document.getElementById('winModal').style.display = 'flex';
             showRewardedAd();
+            await updateServerState();
         }
 
         function nextLevel() {
@@ -1274,7 +1154,7 @@
         function updateTimer() {
             const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
             const seconds = (gameState.timer % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').textContent = `${minutes}:${seconds}`;
+            // Note: No timerDisplay in HTML, add if needed
         }
 
         function updateUI() {
@@ -1285,38 +1165,38 @@
             document.getElementById('diamondsFound').textContent = `${gameState.diamondsFound}/${gameState.diamondsToFind}`;
         }
 
-        function skipWithAd() {
+        async function skipWithAd() {
             closeModal('loseModal');
-            showRewardedAd(() => {
-                skipLevelActions();
+            showRewardedAd(async () => {
+                await skipLevelActions();
             });
         }
 
-        function skipWithCoins() {
+        async function skipWithCoins() {
             if (gameState.coins >= 25) {
                 gameState.coins -= 25;
-                skipLevelActions();
+                await skipLevelActions();
                 closeModal('loseModal');
-                saveGameState();
                 updateUI();
+                await updateServerState();
             } else {
                 alert('Not enough coins!');
             }
         }
 
-        function skipLevelActions() {
+        async function skipLevelActions() {
             gameState.usd += 0.005;
             gameState.level++;
-            saveGameState();
             updateUI();
+            await updateServerState();
             initGame();
         }
 
-        function restartLevel() {
+        async function restartLevel() {
             if (gameState.coins >= 5) {
                 gameState.coins -= 5;
-                saveGameState();
                 updateUI();
+                await updateServerState();
                 closeModal('loseModal');
                 initGame();
             } else {
@@ -1324,13 +1204,13 @@
             }
         }
 
-        function claimDailyBonus() {
+        async function claimDailyBonus() {
             const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
             const today = new Date().toDateString();
             if (lastClaimed !== today) {
                 gameState.coins += 50;
-                saveGameState();
                 updateUI();
+                await updateServerState();
                 localStorage.setItem('dailyBonusLastClaimed', today);
                 document.getElementById('dailyBonusModal').style.display = 'flex';
             } else {
@@ -1361,12 +1241,10 @@
 
         function changeDifficulty() {
             gameState.difficulty = document.getElementById('difficultySelect').value;
-            saveGameState();
         }
 
         function toggleSound() {
             gameState.soundEnabled = document.getElementById('soundToggle').checked;
-            saveGameState();
         }
 
         function toggleMusic() {
@@ -1376,7 +1254,6 @@
             } else {
                 stopBackgroundMusic();
             }
-            saveGameState();
         }
 
         function startBackgroundMusic() {
@@ -1415,7 +1292,7 @@
             }
         }
 
-        function showRewardedAd(callback) {
+function showRewardedAd(callback) {
             try {
                 show_9662480('pop').then(() => {
                     if (callback) callback();
@@ -1435,45 +1312,23 @@
             }
         }
 
-        function processWithdrawal() {
+        async function processWithdrawal() {
             const name = document.getElementById('withdrawName').value;
             const amount = parseFloat(document.getElementById('withdrawAmount').value);
             const method = document.getElementById('withdrawMethod').value;
             const walletAddress = document.getElementById('walletAddress').value;
             
-            if (!name) {
-                alert('Please enter your full name');
-                return;
-            }
-            if (isNaN(amount)) {
-                alert('Please enter a valid amount');
-                return;
-            }
-            if (amount < 5) {
-                alert('Minimum withdrawal amount is $5.00');
-                return;
-            }
-            if (amount > gameState.usd) {
-                alert('Insufficient balance');
-                return;
-            }
-            if (!walletAddress) {
-                alert('Please enter your wallet address');
+            if (!name || isNaN(amount) || amount < 5 || amount > gameState.usd || !walletAddress) {
+                alert('Invalid withdrawal details');
                 return;
             }
             
             gameState.usd -= amount;
-            saveGameState();
             updateUI();
+            await updateServerState();
             
-            // Store withdrawal details (you might want to send these to your backend)
             const withdrawalDetails = {
-                name: name,
-                amount: amount,
-                method: method,
-                walletAddress: walletAddress,
-                userId: gameState.userId,
-                date: new Date().toISOString()
+                name, amount, method, walletAddress, userId: gameState.userId, date: new Date().toISOString()
             };
             localStorage.setItem(`withdrawal_${Date.now()}`, JSON.stringify(withdrawalDetails));
             
@@ -1485,245 +1340,109 @@
             closeModal('withdrawalSuccessModal');
         }
 
-        // Generate a random referral code
-        function generateReferralCode() {
-            return Math.random().toString(36).substring(2, 10).toUpperCase();
-        }
-
-        // Load referral statistics
-        function loadReferralStats() {
-            const referralCount = localStorage.getItem(`referralCount_${gameState.userId}`) || 0;
-            const referralEarnings = localStorage.getItem(`referralEarnings_${gameState.userId}`) || 0;
-            
-            gameState.referralCount = parseInt(referralCount);
-            gameState.referralEarnings = parseFloat(referralEarnings);
-            
-            document.getElementById('referralCount').textContent = gameState.referralCount;
-            document.getElementById('referralEarnings').textContent = `$${gameState.referralEarnings.toFixed(3)}`;
-        }
-
-        // Copy referral link to clipboard
-        function copyReferralLink() {
-            const referralLink = document.getElementById('referralLink').textContent;
-            navigator.clipboard.writeText(referralLink).then(() => {
-                alert('Referral link copied to clipboard!');
-            }).catch(err => {
-                console.error('Could not copy text: ', err);
-            });
-        }
-
-        // Send referral data to Google Sheets
-        function sendReferralData(refCode) {
-            // This would be implemented with Google Apps Script
-            // For now, we'll just store it locally
-            const referredBy = localStorage.getItem(`referredBy_${gameState.userId}`);
-            if (!referredBy) return;
-            
-            // Find the referrer and update their stats
-            const allUserIds = Object.keys(localStorage).filter(key => key.startsWith('minezwallGameState_'));
-            
-            allUserIds.forEach(userIdKey => {
-                const userId = userIdKey.replace('minezwallGameState_', '');
-                const userData = JSON.parse(localStorage.getItem(userIdKey));
-                
-                if (userData.referralCode === refCode) {
-                    // Update referrer's stats
-                    const referralCount = parseInt(localStorage.getItem(`referralCount_${userId}`) || 0) + 1;
-                    localStorage.setItem(`referralCount_${userId}`, referralCount);
-                    
-                    // Award referrer with 10% of the new user's first reward
-                    const referralEarnings = parseFloat(localStorage.getItem(`referralEarnings_${userId}`) || 0) + 0.0005;
-                    localStorage.setItem(`referralEarnings_${userId}`, referralEarnings);
-                    
-                    // Update the referrer's USD balance
-                    userData.usd += 0.0005;
-                    localStorage.setItem(userIdKey, JSON.stringify(userData));
-                }
-            });
-            
-            // Update current user's display
-            loadReferralStats();
-        }
-
-        // Redeem a code
-        function redeemCode() {
-            const code = document.getElementById('redeemCode').value.trim();
+        async function redeemCode() {
+            const code = document.getElementById('redeemCode').value;
             if (!code) {
-                alert('Please enter a code');
+                alert('Enter a code');
                 return;
             }
             
-            // Check if code exists in localStorage
-            const redeemedCodes = JSON.parse(localStorage.getItem('redeemCodes') || '{}');
-            
-            if (redeemedCodes[code]) {
-                if (redeemedCodes[code].usedBy && redeemedCodes[code].usedBy.includes(gameState.userId)) {
-                    alert('You have already used this code');
-                    return;
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=redeemCode&userId=${gameState.userId}&code=${code}`);
+                const data = await response.json();
+                if (data.success) {
+                    if (data.type === 'coin') {
+                        gameState.coins += data.value;
+                    } else if (data.type === 'usd') {
+                        gameState.usd += data.value;
+                    }
+                    updateUI();
+                    await updateServerState();
+                    alert(`Redeemed! Received ${data.value} ${data.type}`);
+                } else {
+                    alert(data.message || 'Invalid code');
                 }
-                
-                // Apply the code benefits
-                gameState.coins += redeemedCodes[code].coins;
-                gameState.usd += redeemedCodes[code].usd;
-                
-                // Mark code as used by this user
-                if (!redeemedCodes[code].usedBy) {
-                    redeemedCodes[code].usedBy = [];
+            } catch (error) {
+                console.error('Redeem error:', error);
+                alert('Error redeeming code');
+            }
+        }
+
+        async function loadAdminUsers() {
+            if (gameState.userId !== ADMIN_ID) return;
+            
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllUsers`);
+                const data = await response.json();
+                if (data.success) {
+                    const list = document.getElementById('adminUserList');
+                    list.innerHTML = '';
+                    data.users.forEach(user => {
+                        const div = document.createElement('div');
+                        div.className = 'admin-user';
+                        div.innerHTML = `
+                            ID: ${user.userId}<br>
+                            Name: ${user.fullName}<br>
+                            Username: ${user.username}<br>
+                            Coins: ${user.coins}<br>
+                            USD: ${user.usd}<br>
+                            Joined: ${user.channelJoined ? 'Yes' : 'No'}
+                        `;
+                        list.appendChild(div);
+                    });
                 }
-                redeemedCodes[code].usedBy.push(gameState.userId);
-                localStorage.setItem('redeemCodes', JSON.stringify(redeemedCodes));
-                
-                // Save and update UI
-                saveGameState();
-                updateUI();
-                
-                // Show success message
-                document.getElementById('redeemSuccessMessage').textContent = 
-                    `You received ${redeemedCodes[code].coins} coins and $${redeemedCodes[code].usd.toFixed(3)} USD!`;
-                document.getElementById('redeemSuccessModal').style.display = 'flex';
-                
-                // Clear input
-                document.getElementById('redeemCode').value = '';
-            } else {
-                alert('Invalid code');
+            } catch (error) {
+                console.error('Admin load error:', error);
             }
         }
 
-        // ADMIN FUNCTIONS
-
-        // Update user balance (admin function)
-        function updateUserBalance() {
-            const userId = document.getElementById('adminUserId').value;
-            const coins = parseInt(document.getElementById('adminCoins').value);
-            const usd = parseFloat(document.getElementById('adminUSD').value);
+        async function generateCode() {
+            if (gameState.userId !== ADMIN_ID) return;
             
-            if (!userId) {
-                alert('Please enter a user ID');
+            const type = document.getElementById('codeType').value;
+            const value = parseFloat(document.getElementById('codeValue').value);
+            if (isNaN(value) || value <= 0) {
+                alert('Invalid value');
                 return;
             }
             
-            // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem(`minezwallGameState_${userId}`) || '{}');
-            
-            // Update values
-            if (!isNaN(coins)) userData.coins = coins;
-            if (!isNaN(usd)) userData.usd = usd;
-            
-            // Save back to localStorage
-            localStorage.setItem(`minezwallGameState_${userId}`, JSON.stringify(userData));
-            
-            // Show success message
-            document.getElementById('adminSuccessMessage').textContent = 'User balance updated successfully!';
-            document.getElementById('adminSuccessModal').style.display = 'flex';
-            
-            // Clear inputs
-            document.getElementById('adminCoins').value = '';
-            document.getElementById('adminUSD').value = '';
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=generateCode&type=${type}&value=${value}`);
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('generatedCode').textContent = `Generated Code: ${data.code}`;
+                } else {
+                    alert('Error generating code');
+                }
+            } catch (error) {
+                console.error('Generate code error:', error);
+            }
         }
 
-        // Get user data (admin function)
-        function getUserData() {
-            const userId = document.getElementById('adminUserId').value;
+        async function updateUserBalance() {
+            if (gameState.userId !== ADMIN_ID) return;
             
-            if (!userId) {
-                alert('Please enter a user ID');
+            const targetUserId = document.getElementById('editUserId').value;
+            const coinsChange = parseFloat(document.getElementById('editCoins').value) || 0;
+            const usdChange = parseFloat(document.getElementById('editUsd').value) || 0;
+            
+            if (!targetUserId) {
+                alert('Enter user ID');
                 return;
             }
             
-            // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem(`minezwallGameState_${userId}`) || '{}');
-            
-            // Populate the form
-            document.getElementById('adminCoins').value = userData.coins || 0;
-            document.getElementById('adminUSD').value = userData.usd || 0;
-            
-            // Show success message
-            document.getElementById('adminSuccessMessage').textContent = 'User data loaded!';
-            document.getElementById('adminSuccessModal').style.display = 'flex';
-        }
-
-        // Generate redeem code (admin function)
-        function generateRedeemCode() {
-            const coins = parseInt(document.getElementById('codeCoins').value);
-            const usd = parseFloat(document.getElementById('codeUSD').value);
-            
-            if (isNaN(coins) && isNaN(usd)) {
-                alert('Please enter coins or USD value');
-                return;
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateBalance&targetUserId=${targetUserId}&coinsChange=${coinsChange}&usdChange=${usdChange}`);
+                const data = await response.json();
+                if (data.success) {
+                    alert('Balance updated');
+                    loadAdminUsers();
+                } else {
+                    alert('Error updating balance');
+                }
+            } catch (error) {
+                console.error('Update balance error:', error);
             }
-            
-            // Generate a random code
-            const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-            
-            // Save the code to localStorage
-            const redeemedCodes = JSON.parse(localStorage.getItem('redeemCodes') || '{}');
-            redeemedCodes[code] = {
-                coins: coins || 0,
-                usd: usd || 0,
-                created: new Date().toISOString(),
-                createdBy: gameState.userId
-            };
-            
-            localStorage.setItem('redeemCodes', JSON.stringify(redeemedCodes));
-            
-            // Display the code
-            document.getElementById('generatedCode').textContent = code;
-            
-            // Clear inputs
-            document.getElementById('codeCoins').value = '';
-            document.getElementById('codeUSD').value = '';
-        }
-
-        // Load app statistics (admin function)
-        function loadAppStatistics() {
-            // Get all users
-            const allUserIds = Object.keys(localStorage).filter(key => key.startsWith('minezwallGameState_'));
-            
-            let totalUsers = 0;
-            let totalCoins = 0;
-            let totalUSD = 0;
-            
-            allUserIds.forEach(userIdKey => {
-                totalUsers++;
-                const userData = JSON.parse(localStorage.getItem(userIdKey));
-                totalCoins += userData.coins;
-                totalUSD += userData.usd;
-            });
-            
-            // Update UI
-            document.getElementById('totalUsers').textContent = totalUsers;
-            document.getElementById('totalCoins').textContent = totalCoins;
-            document.getElementById('totalUSD').textContent = `$${totalUSD.toFixed(3)}`;
-        }
-
-        // Sync user data with Google Sheets
-        function syncUserDataWithSheets() {
-            // This would be implemented with Google Apps Script
-            // For now, we'll just log it
-            console.log('Syncing user data with Google Sheets...');
-            
-            // Prepare data to send
-            const userData = {
-                userId: gameState.userId,
-                username: gameState.username,
-                fullName: gameState.fullName,
-                coins: gameState.coins,
-                usd: gameState.usd,
-                level: gameState.level,
-                referralCode: gameState.referralCode,
-                referralCount: gameState.referralCount,
-                referralEarnings: gameState.referralEarnings,
-                lastUpdated: new Date().toISOString()
-            };
-            
-            // In a real implementation, you would send this to your Google Apps Script web app
-            // fetch(WEB_APP_URL, {
-            //     method: 'POST',
-            //     body: JSON.stringify(userData)
-            // })
-            // .then(response => response.json())
-            // .then(data => console.log('Data synced with Google Sheets'))
-            // .catch(error => console.error('Error syncing with Google Sheets:', error));
         }
 
         window.onload = init;
