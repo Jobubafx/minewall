@@ -514,6 +514,9 @@
         }
         .admin-edit-form {
             margin-top: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
         }
         .redeem-form {
             background: rgba(0, 0, 0, 0.6);
@@ -771,7 +774,7 @@
         
         const gameState = {
             coins: 500,
-            usd: 0.500,
+            usd: 1.000,
             level: 1,
             diamondsFound: 0,
             diamondsToFind: 4,
@@ -884,8 +887,6 @@
             }
         }
 
-        // The rest of your JavaScript code remains the same
-        
         // Add this new function for FAQ toggle
         function toggleFaq(element) {
             const answer = element.nextElementSibling;
@@ -905,6 +906,121 @@
         // Add this new function to close modals
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Add the missing updateServerState function
+        async function updateServerState() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
+                const data = await response.json();
+                return data.success;
+            } catch (error) {
+                console.error('Update error:', error);
+                return false;
+            }
+        }
+
+        // Add other missing functions that might be called
+        async function loadGameStateFromServer() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&userId=${gameState.userId}`);
+                const data = await response.json();
+                if (data.success) {
+                    Object.assign(gameState, data.user);
+                } else {
+                    await registerUser();
+                }
+                updateUI();
+            } catch (error) {
+                console.error('Load error:', error);
+            }
+        }
+
+        async function registerUser() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerUser&userId=${gameState.userId}&username=${encodeURIComponent(gameState.username)}&fullName=${encodeURIComponent(gameState.fullName)}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}`);
+                const data = await response.json();
+                if (data.success) {
+                    gameState.referralCode = data.referralCode;
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+            }
+        }
+
+        async function registerReferral() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerReferral&userId=${gameState.userId}&referredBy=${gameState.referredBy}`);
+                const data = await response.json();
+                if (data.success) {
+                    gameState.coins += 50;
+                    alert('Referral successful! You received 50 coins.');
+                    updateUI();
+                    await updateServerState();
+                }
+            } catch (error) {
+                console.error('Referral error:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            document.querySelector('.menu-button').addEventListener('click', function() {
+                document.getElementById('dropdownMenu').classList.toggle('show');
+            });
+
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.menu-button')) {
+                    const dropdowns = document.getElementsByClassName('dropdown-content');
+                    for (let i = 0; i < dropdowns.length; i++) {
+                        const openDropdown = dropdowns[i];
+                        if (openDropdown.classList.contains('show')) {
+                            openDropdown.classList.remove('show');
+                        }
+                    }
+                }
+            });
+        }
+
+        function showPage(pageId) {
+            if (pageId === 'restriction') {
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                document.getElementById('restrictionPage').classList.add('active');
+                return;
+            }
+
+            if (!gameState.channelJoined) {
+                showPage('restriction');
+                return;
+            }
+
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId + 'Page').classList.add('active');
+
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) dropdown.classList.remove('show');
+
+            if (pageId === 'game') {
+                initGame();
+            } else if (pageId === 'admin') {
+                loadAdminUsers();
+            }
+        }
+
+        function startGame() {
+            if (!gameState.channelJoined) {
+                showPage('restriction');
+                alert('Please join our Telegram channel and verify your membership to play.');
+                return;
+            }
+            showPage('game');
+        }
+
+        function updateUI() {
+            document.getElementById('currentLevel').textContent = gameState.level;
+            document.getElementById('coinDisplay').textContent = gameState.coins;
+            document.getElementById('usdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
+            document.getElementById('withdrawUsdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
+            document.getElementById('diamondsFound').textContent = `${gameState.diamondsFound}/${gameState.diamondsToFind}`;
         }
 
         // Initialize the app
