@@ -606,17 +606,6 @@
         .faq-answer.show {
             display: block;
         }
-        .timer-display {
-            text-align: center;
-            font-size: 16px;
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-left: auto;
-            margin-right: auto;
-        }
     </style>
 </head>
 <body>
@@ -697,8 +686,6 @@
                 </div>
                 <div class="header-right"></div>
             </div>
-
-            <div class="timer-display" id="timerDisplay">Time: 00:00</div>
             
             <div class="stats-bar">
                 <div class="stat-item">
@@ -711,7 +698,7 @@
                 </div>
                 <div class="stat-item">
                     <div class="stat-label">DIAMONDS FOUND</div>
-                    <div class="stat-value" id="diamondsFound">0/4</div>
+                    <div class="stat-value" id="diamondsFound">0/20</div>
                 </div>
             </div>
 
@@ -1130,7 +1117,7 @@
             usd: 0.500,
             level: 1,
             diamondsFound: 0,
-            diamondsToFind: 4,
+            diamondsToFind: 20, // Changed to 20 diamonds
             minesCount: 5,
             grid: [],
             gameActive: false,
@@ -1275,7 +1262,7 @@
 
         async function updateServerState() {
             try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
+                const response = await fetch(`${APPS_SCRIPT_URL?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
                 const data = await response.json();
                 return data.success;
             } catch (error) {
@@ -1376,7 +1363,6 @@
             placeMines();
             placeDiamonds();
             updateUI();
-            startTimer();
         }
 
         function placeMines() {
@@ -1392,10 +1378,10 @@
 
         function placeDiamonds() {
             let diamondsPlaced = 0;
-            while (diamondsPlaced < gameState.diamondsToFind) {
-                const randomIndex = Math.floor(Math.random() * 25);
-                if (!gameState.grid[randomIndex].isMine && !gameState.grid[randomIndex].isDiamond) {
-                    gameState.grid[randomIndex].isDiamond = true;
+            // First place diamonds in non-mine cells
+            for (let i = 0; i < 25 && diamondsPlaced < gameState.diamondsToFind; i++) {
+                if (!gameState.grid[i].isMine) {
+                    gameState.grid[i].isDiamond = true;
                     diamondsPlaced++;
                 }
             }
@@ -1438,7 +1424,6 @@
 
         function gameOver() {
             gameState.gameActive = false;
-            clearInterval(gameState.timerInterval);
             playSound('lose');
 
             gameState.grid.forEach((cell, index) => {
@@ -1456,12 +1441,10 @@
             if (gameState.coins <= 0) {
                 alert("You don't have enough coins to proceed to the next level!");
                 gameState.gameActive = false;
-                clearInterval(gameState.timerInterval);
                 return;
             }
 
             gameState.gameActive = false;
-            clearInterval(gameState.timerInterval);
             gameState.coins -= 8;
             gameState.usd += 0.005;
             gameState.level++;
@@ -1477,21 +1460,6 @@
         function nextLevel() {
             closeModal('winModal');
             initGame();
-        }
-
-        function startTimer() {
-            gameState.timer = 0;
-            clearInterval(gameState.timerInterval);
-            gameState.timerInterval = setInterval(() => {
-                gameState.timer++;
-                updateTimer();
-            }, 1000);
-        }
-
-        function updateTimer() {
-            const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
-            const seconds = (gameState.timer % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').textContent = `Time: ${minutes}:${seconds}`;
         }
 
         function updateUI() {
@@ -1596,15 +1564,15 @@
             // Adjust game parameters based on difficulty
             switch (gameState.difficulty) {
                 case 'easy':
-                    gameState.diamondsToFind = 4;
+                    gameState.diamondsToFind = 20;
                     gameState.minesCount = 5;
                     break;
                 case 'medium':
-                    gameState.diamondsToFind = 5;
+                    gameState.diamondsToFind = 18;
                     gameState.minesCount = 7;
                     break;
                 case 'hard':
-                    gameState.diamondsToFind = 6;
+                    gameState.diamondsToFind = 16;
                     gameState.minesCount = 9;
                     break;
             }
@@ -1892,6 +1860,7 @@
         }
 
         function generateReferralLink() {
+            // Fixed referral link generation
             return `https://t.me/minezwall_bot?start=${gameState.referralCode}`;
         }
 
