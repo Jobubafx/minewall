@@ -179,6 +179,10 @@
             display: inline-block;
             margin-left: auto;
             margin-right: auto;
+            max-width: 80%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
         .game-grid {
             display: grid;
@@ -231,6 +235,7 @@
         }
         .stat-item {
             text-align: center;
+            flex: 1;
         }
         .stat-label {
             font-size: 12px;
@@ -497,6 +502,10 @@
                 padding: 15px 30px;
                 font-size: 20px;
             }
+            .username-display {
+                font-size: 16px;
+                padding: 6px 12px;
+            }
         }
         .admin-list {
             background: rgba(0, 0, 0, 0.6);
@@ -597,6 +606,17 @@
         .faq-answer.show {
             display: block;
         }
+        .timer-display {
+            text-align: center;
+            font-size: 16px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
 <body>
@@ -650,11 +670,160 @@
             <h1 class="game-title">MINEZWALL</h1>
             <div class="username-display" id="userDisplay">Welcome, Player!</div>
             <button class="start-button pulse" onclick="startGame()">START GAME</button>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">COINS</div>
+                    <div class="stat-value" id="homeCoinDisplay">500</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="homeUsdDisplay">$0.500</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">LEVEL</div>
+                    <div class="stat-value" id="homeLevelDisplay">1</div>
+                </div>
+            </div>
         </div>
 
-        <!-- Other page content remains the same as in your original code -->
-        
-        <!-- FAQ Page -->
+        <div id="gamePage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Level: <span id="currentLevel">1</span></div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+
+            <div class="timer-display" id="timerDisplay">Time: 00:00</div>
+            
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">COINS</div>
+                    <div class="stat-value" id="coinDisplay">500</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="usdDisplay">$0.500</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">DIAMONDS FOUND</div>
+                    <div class="stat-value" id="diamondsFound">0/4</div>
+                </div>
+            </div>
+
+            <div class="game-grid" id="gameGrid"></div>
+
+            <div class="game-controls">
+                <button class="control-button skip-ad" onclick="skipWithAd()">
+                    <i class="fas fa-ad"></i> Skip with Ad
+                </button>
+                <button class="control-button skip-coin" onclick="skipWithCoins()">
+                    <i class="fas fa-coins"></i> Skip with Coins
+                </button>
+                <button class="control-button restart" onclick="restartLevel()">
+                    <i class="fas fa-redo"></i> Restart
+                </button>
+            </div>
+        </div>
+
+        <div id="withdrawPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Withdraw</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-label">USD BALANCE</div>
+                    <div class="stat-value" id="withdrawUsdDisplay">$0.500</div>
+                </div>
+            </div>
+
+            <div class="withdraw-form">
+                <div class="input-group">
+                    <label for="withdrawName">Full Name</label>
+                    <input type="text" id="withdrawName" placeholder="Enter your full name">
+                </div>
+                <div class="input-group">
+                    <label for="withdrawAmount">Amount to Withdraw (USD)</label>
+                    <input type="number" id="withdrawAmount" placeholder="Minimum $5.00" min="5" step="0.001">
+                </div>
+                <div class="input-group">
+                    <label for="withdrawMethod">Withdrawal Method</label>
+                    <select id="withdrawMethod">
+                        <option value="usdt">USDT (Polygon Network)</option>
+                        <option value="btc">Bitcoin</option>
+                        <option value="eth">Ethereum</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="walletAddress">Wallet Address</label>
+                    <input type="text" id="walletAddress" placeholder="Enter your wallet address">
+                </div>
+                <button class="submit-button" onclick="processWithdrawal()">Withdraw Funds</button>
+            </div>
+        </div>
+
+        <div id="redeemPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Redeem Code</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+
+            <div class="redeem-form">
+                <div class="input-group">
+                    <label for="redeemCode">Enter Secret Code</label>
+                    <input type="text" id="redeemCode" placeholder="Enter code here">
+                </div>
+                <button class="submit-button" onclick="redeemCode()">Redeem</button>
+            </div>
+        </div>
+
+        <div id="referralPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Referral Program</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+
+            <div class="referral-link-container">
+                <h3>Your Referral Link</h3>
+                <p>Share this link with friends to earn rewards when they join!</p>
+                <div class="referral-link" id="referralLink">Loading...</div>
+                <button class="copy-button" onclick="copyReferralLink()">
+                    <i class="fas fa-copy"></i> Copy Link
+                </button>
+            </div>
+
+            <div class="help-section">
+                <h3>How It Works</h3>
+                <div class="help-content">
+                    <p>1. Share your referral link with friends</p>
+                    <p>2. When they join using your link, they'll be registered as your referral</p>
+                    <p>3. Contact admin to get your referral reward code after your friend completes verification</p>
+                    <p>4. Redeem your reward code in the "Redeem Code" section</p>
+                </div>
+            </div>
+        </div>
+
         <div id="helpPage" class="page">
             <div class="header">
                 <div class="header-left">
@@ -665,7 +834,7 @@
                 </div>
                 <div class="header-right"></div>
             </div>
-            
+
             <div class="help-section">
                 <h3>How to Play</h3>
                 <div class="help-content">
@@ -676,10 +845,10 @@
                     <p>5. Use coins to skip levels or restart when needed</p>
                 </div>
             </div>
-            
+
             <div class="faq-container">
                 <h3>Frequently Asked Questions</h3>
-                
+
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         How do I earn money? <i class="fas fa-chevron-down"></i>
@@ -689,7 +858,7 @@
                         You can also earn through the referral program and daily bonuses.
                     </div>
                 </div>
-                
+
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         How do I withdraw my earnings? <i class="fas fa-chevron-down"></i>
@@ -699,7 +868,7 @@
                         The minimum withdrawal amount is $5.00. Withdrawals are processed within 24-48 hours.
                     </div>
                 </div>
-                
+
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         What is the referral program? <i class="fas fa-chevron-down"></i>
@@ -709,7 +878,7 @@
                         contact admin to receive a reward code that you can redeem for coins or USD.
                     </div>
                 </div>
-                
+
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         Why do I need to join the Telegram channel? <i class="fas fa-chevron-down"></i>
@@ -719,7 +888,7 @@
                         updates, and special promotions related to Minezwall.
                     </div>
                 </div>
-                
+
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
                         What happens if I hit a mine? <i class="fas fa-chevron-down"></i>
@@ -729,6 +898,120 @@
                         use coins to skip the level, or restart the level (which costs coins).
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="settingsPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Settings</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+
+            <div class="settings-item">
+                <div><i class="fas fa-volume-up"></i> Sound Effects</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-item">
+                <div><i class="fas fa-music"></i> Background Music</div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="musicToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="settings-item">
+                <div><i class="fas fa-palette"></i> Theme</div>
+                <select id="themeSelect" onchange="changeTheme()">
+                    <option value="dark">Dark Mode</option>
+                    <option value="light">Light Mode</option>
+                </select>
+            </div>
+
+            <div class="settings-item">
+                <div><i class="fas fa-cog"></i> Difficulty</div>
+                <select id="difficultySelect" onchange="changeDifficulty()">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="adminPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Admin Panel</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+
+            <div class="admin-list" id="adminUserList"></div>
+
+            <div class="admin-edit-form">
+                <h3>Generate Code</h3>
+                <div class="input-group">
+                    <label for="codeType">Type</label>
+                    <select id="codeType">
+                        <option value="coin">Coins</option>
+                        <option value="usd">USD</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="codeValue">Value</label>
+                    <input type="number" id="codeValue" placeholder="Enter value">
+                </div>
+                <button class="submit-button" onclick="generateCode()">Generate Code</button>
+                <p id="generatedCode"></p>
+            </div>
+
+            <div class="admin-edit-form">
+                <h3>Edit User</h3>
+                <div class="input-group">
+                    <label for="editUserId">User ID</label>
+                    <input type="text" id="editUserId" placeholder="Enter user ID">
+                </div>
+                <div class="input-group">
+                    <label for="editCoins">Coins Change</label>
+                    <input type="number" id="editCoins" placeholder="Positive or negative" step="any">
+                </div>
+                <div class="input-group">
+                    <label for="editUsd">USD Change</label>
+                    <input type="number" id="editUsd" placeholder="Positive or negative" step="any">
+                </div>
+                <button class="submit-button" onclick="updateUserBalance()">Update Balance</button>
+            </div>
+
+            <div class="admin-edit-form">
+                <h3>Generate Referral Reward</h3>
+                <div class="input-group">
+                    <label for="rewardUserId">Referrer User ID</label>
+                    <input type="text" id="rewardUserId" placeholder="Enter referrer's user ID">
+                </div>
+                <div class="input-group">
+                    <label for="rewardType">Reward Type</label>
+                    <select id="rewardType">
+                        <option value="coin">Coins</option>
+                        <option value="usd">USD</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="rewardValue">Reward Value</label>
+                    <input type="number" id="rewardValue" placeholder="Enter reward value">
+                </div>
+                <button class="submit-button" onclick="generateReferralReward()">Generate Reward Code</button>
+                <p id="rewardCodeOutput"></p>
             </div>
         </div>
 
@@ -764,6 +1047,76 @@
         </div>
     </div>
 
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <h2>Congratulations!</h2>
+            <p>You found all diamonds and completed the level!</p>
+            <p>Reward: +$0.005 USD</p>
+            <button class="modal-button" onclick="nextLevel()">Next Level</button>
+        </div>
+    </div>
+
+    <div class="modal" id="loseModal">
+        <div class="modal-content">
+            <h2>Game Over!</h2>
+            <p>You hit a mine. Try again or skip the level.</p>
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <button class="modal-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="skipWithAd()">Skip with Ad</button>
+                <button class="modal-button" style="background: linear-gradient(to right, #00b09b, #96c93d);" onclick="skipWithCoins()">Skip with Coins</button>
+                <button class="modal-button" style="background: linear-gradient(to right, #1d976c, #93f9b9);" onclick="restartLevel()">Restart Level</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="dailyBonusModal">
+        <div class="modal-content">
+            <h2>Daily Bonus!</h2>
+            <p>You received 50 coins!</p>
+            <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
+        </div>
+    </div>
+
+    <div class="modal" id="withdrawalSuccessModal">
+        <div class="withdrawal-success-modal">
+            <h2>Withdrawal Request Received!</h2>
+            <p>Your withdrawal request has been submitted successfully.</p>
+            <p>Processing may take 24-48 hours.</p>
+            <button class="modal-button" onclick="closeModal('withdrawalSuccessModal')">OK</button>
+        </div>
+    </div>
+
+    <div class="modal" id="redeemSuccessModal">
+        <div class="modal-content">
+            <h2>Code Redeemed!</h2>
+            <p id="redeemSuccessMessage">Your reward has been added to your account.</p>
+            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">OK</button>
+        </div>
+    </div>
+
+    <div class="modal" id="redeemErrorModal">
+        <div class="modal-content">
+            <h2>Error</h2>
+            <p id="redeemErrorMessage">Invalid code. Please try again.</p>
+            <button class="modal-button" onclick="closeModal('redeemErrorModal')">OK</button>
+        </div>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="clickSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="winSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="loseSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-losing-drums-2023.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
         // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
@@ -774,7 +1127,7 @@
         
         const gameState = {
             coins: 500,
-            usd: 1.000,
+            usd: 0.500,
             level: 1,
             diamondsFound: 0,
             diamondsToFind: 4,
@@ -820,6 +1173,7 @@
                 gameState.channelJoined = true;
                 showPage('home');
                 document.getElementById('referralBtn').style.display = 'inline-block';
+                updateUI();
             } else {
                 // Try to load previous state
                 await loadGameStateFromServer();
@@ -827,6 +1181,7 @@
                 if (gameState.channelJoined) {
                     showPage('home');
                     document.getElementById('referralBtn').style.display = 'inline-block';
+                    updateUI();
                 } else {
                     showPage('restriction');
                 }
@@ -838,6 +1193,7 @@
             }
 
             setupEventListeners();
+            displayReferralLink();
         }
 
         async function verifyChannelJoin() {
@@ -872,6 +1228,9 @@
                     
                     // Show referral button
                     document.getElementById('referralBtn').style.display = 'inline-block';
+                    
+                    // Update UI
+                    updateUI();
                 } else {
                     // Failed
                     throw new Error('Could not verify channel membership. Please make sure you have joined the channel.');
@@ -887,40 +1246,6 @@
             }
         }
 
-        // Add this new function for FAQ toggle
-        function toggleFaq(element) {
-            const answer = element.nextElementSibling;
-            const icon = element.querySelector('i');
-            
-            if (answer.classList.contains('show')) {
-                answer.classList.remove('show');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            } else {
-                answer.classList.add('show');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            }
-        }
-        
-        // Add this new function to close modals
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Add the missing updateServerState function
-        async function updateServerState() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
-                const data = await response.json();
-                return data.success;
-            } catch (error) {
-                console.error('Update error:', error);
-                return false;
-            }
-        }
-
-        // Add other missing functions that might be called
         async function loadGameStateFromServer() {
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&userId=${gameState.userId}`);
@@ -945,6 +1270,17 @@
                 }
             } catch (error) {
                 console.error('Register error:', error);
+            }
+        }
+
+        async function updateServerState() {
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
+                const data = await response.json();
+                return data.success;
+            } catch (error) {
+                console.error('Update error:', error);
+                return false;
             }
         }
 
@@ -979,6 +1315,12 @@
                     }
                 }
             });
+
+            document.getElementById('soundToggle').addEventListener('change', toggleSound);
+            document.getElementById('musicToggle').addEventListener('change', toggleMusic);
+            document.getElementById('difficultySelect').value = gameState.difficulty;
+            document.getElementById('themeSelect').value = localStorage.getItem('theme') || 'dark';
+            applyTheme();
         }
 
         function showPage(pageId) {
@@ -1015,12 +1357,573 @@
             showPage('game');
         }
 
+        function initGame() {
+            gameState.diamondsFound = 0;
+            gameState.gameActive = true;
+            const grid = document.getElementById('gameGrid');
+            grid.innerHTML = '';
+            gameState.grid = [];
+
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.index = i;
+                cell.addEventListener('click', () => revealCell(i));
+                grid.appendChild(cell);
+                gameState.grid.push({ isMine: false, isRevealed: false, isDiamond: false });
+            }
+
+            placeMines();
+            placeDiamonds();
+            updateUI();
+            startTimer();
+        }
+
+        function placeMines() {
+            let minesPlaced = 0;
+            while (minesPlaced < gameState.minesCount) {
+                const randomIndex = Math.floor(Math.random() * 25);
+                if (!gameState.grid[randomIndex].isMine) {
+                    gameState.grid[randomIndex].isMine = true;
+                    minesPlaced++;
+                }
+            }
+        }
+
+        function placeDiamonds() {
+            let diamondsPlaced = 0;
+            while (diamondsPlaced < gameState.diamondsToFind) {
+                const randomIndex = Math.floor(Math.random() * 25);
+                if (!gameState.grid[randomIndex].isMine && !gameState.grid[randomIndex].isDiamond) {
+                    gameState.grid[randomIndex].isDiamond = true;
+                    diamondsPlaced++;
+                }
+            }
+        }
+
+        function revealCell(index) {
+            if (!gameState.gameActive) return;
+
+            const cell = gameState.grid[index];
+            const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
+
+            if (cell.isRevealed) return;
+
+            cell.isRevealed = true;
+            cellElement.classList.add('revealed');
+            playSound('click');
+
+            if (cell.isMine) {
+                cellElement.classList.add('mine');
+                cellElement.innerHTML = '💣';
+                gameOver();
+                return;
+            }
+
+            if (cell.isDiamond) {
+                cellElement.classList.add('diamond');
+                cellElement.innerHTML = '💎';
+                gameState.diamondsFound++;
+                playSound('win');
+                cellElement.classList.add('diamond-glow');
+
+                if (gameState.diamondsFound === gameState.diamondsToFind) {
+                    levelComplete();
+                }
+            }
+
+            updateUI();
+            updateServerState();
+        }
+
+        function gameOver() {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            playSound('lose');
+
+            gameState.grid.forEach((cell, index) => {
+                if (cell.isMine) {
+                    const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
+                    cellElement.classList.add('mine', 'revealed');
+                    cellElement.innerHTML = '💣';
+                }
+            });
+
+            document.getElementById('loseModal').style.display = 'flex';
+        }
+
+        async function levelComplete() {
+            if (gameState.coins <= 0) {
+                alert("You don't have enough coins to proceed to the next level!");
+                gameState.gameActive = false;
+                clearInterval(gameState.timerInterval);
+                return;
+            }
+
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+            gameState.coins -= 8;
+            gameState.usd += 0.005;
+            gameState.level++;
+
+            playSound('win');
+            document.getElementById('winModal').style.display = 'flex';
+
+            showRewardedAd();
+            await updateServerState();
+            updateUI();
+        }
+
+        function nextLevel() {
+            closeModal('winModal');
+            initGame();
+        }
+
+        function startTimer() {
+            gameState.timer = 0;
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer++;
+                updateTimer();
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(gameState.timer / 60).toString().padStart(2, '0');
+            const seconds = (gameState.timer % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').textContent = `Time: ${minutes}:${seconds}`;
+        }
+
         function updateUI() {
             document.getElementById('currentLevel').textContent = gameState.level;
             document.getElementById('coinDisplay').textContent = gameState.coins;
             document.getElementById('usdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
             document.getElementById('withdrawUsdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
             document.getElementById('diamondsFound').textContent = `${gameState.diamondsFound}/${gameState.diamondsToFind}`;
+            
+            // Update home page stats
+            document.getElementById('homeCoinDisplay').textContent = gameState.coins;
+            document.getElementById('homeUsdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
+            document.getElementById('homeLevelDisplay').textContent = gameState.level;
+        }
+
+        async function skipWithAd() {
+            closeModal('loseModal');
+            showRewardedAd(async () => {
+                await skipLevelActions();
+            });
+        }
+
+        async function skipWithCoins() {
+            if (gameState.coins >= 25) {
+                gameState.coins -= 25;
+                await skipLevelActions();
+                closeModal('loseModal');
+                updateUI();
+                await updateServerState();
+            } else {
+                alert('Not enough coins!');
+            }
+        }
+
+        async function skipLevelActions() {
+            gameState.usd += 0.005;
+            gameState.level++;
+            updateUI();
+            await updateServerState();
+            initGame();
+        }
+
+        async function restartLevel() {
+            if (gameState.coins >= 5) {
+                gameState.coins -= 5;
+                try {
+                    await updateServerState();
+                    updateUI();
+                    closeModal('loseModal');
+                    initGame();
+                } catch (error) {
+                    console.error('Restart level error:', error);
+                    alert('Error restarting level. Please try again.');
+                }
+            } else {
+                alert('Not enough coins to restart!');
+            }
+        }
+
+        async function claimDailyBonus() {
+            const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
+            const today = new Date().toDateString();
+
+            if (lastClaimed !== today) {
+                gameState.coins += 50;
+                updateUI();
+                await updateServerState();
+                localStorage.setItem('dailyBonusLastClaimed', today);
+                document.getElementById('dailyBonusModal').style.display = 'flex';
+            } else {
+                alert('You already claimed your daily bonus today!');
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            localStorage.setItem('theme', theme);
+            applyTheme();
+        }
+
+        function applyTheme() {
+            const theme = localStorage.getItem('theme') || 'dark';
+            if (theme === 'light') {
+                document.body.style.background = 'linear-gradient(135deg, #64b3f4, #c2e59c)';
+                document.body.style.color = '#333';
+            } else {
+                document.body.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c)';
+                document.body.style.color = 'white';
+            }
+        }
+
+        function changeDifficulty() {
+            gameState.difficulty = document.getElementById('difficultySelect').value;
+            
+            // Adjust game parameters based on difficulty
+            switch (gameState.difficulty) {
+                case 'easy':
+                    gameState.diamondsToFind = 4;
+                    gameState.minesCount = 5;
+                    break;
+                case 'medium':
+                    gameState.diamondsToFind = 5;
+                    gameState.minesCount = 7;
+                    break;
+                case 'hard':
+                    gameState.diamondsToFind = 6;
+                    gameState.minesCount = 9;
+                    break;
+            }
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = document.getElementById('soundToggle').checked;
+        }
+
+        function toggleMusic() {
+            gameState.musicEnabled = document.getElementById('musicToggle').checked;
+            if (gameState.musicEnabled) {
+                startBackgroundMusic();
+            } else {
+                stopBackgroundMusic();
+            }
+        }
+
+        function startBackgroundMusic() {
+            if (gameState.musicEnabled) {
+                const bgMusic = document.getElementById('backgroundMusic');
+                bgMusic.volume = 0.3;
+                bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
+            }
+        }
+
+        function stopBackgroundMusic() {
+            document.getElementById('backgroundMusic').pause();
+        }
+
+        function playSound(sound) {
+            if (!gameState.soundEnabled) return;
+            const soundElement = document.getElementById(sound + 'Sound');
+            soundElement.currentTime = 0;
+            soundElement.play().catch(e => console.log('Sound play prevented:', e));
+        }
+
+        function showInAppAd() {
+            try {
+                if (typeof show_9662480 !== 'undefined') {
+                    show_9662480({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 3,
+                            capping: 0.3,
+                            interval: 60,
+                            timeout: 10,
+                            everyPage: true
+                        }
+                    });
+                }
+            } catch (e) {
+                console.log('Ad error:', e);
+            }
+        }
+
+        function showRewardedAd(callback) {
+            try {
+                if (typeof show_9662480 !== 'undefined') {
+                    show_9662480('pop').then(() => {
+                        if (callback) callback();
+                    }).catch(e => {
+                        console.log('Ad error:', e);
+                        if (callback) callback(); // Continue even if ad fails
+                    });
+                } else if (callback) {
+                    callback(); // Continue if ad SDK is not available
+                }
+            } catch (e) {
+                console.log('Ad error:', e);
+                if (callback) callback(); // Continue even if ad fails
+            }
+        }
+
+        function showPeriodicAd() {
+            try {
+                if (typeof show_9662480 !== 'undefined') {
+                    show_9662480();
+                }
+            } catch (e) {
+                console.log('Ad error:', e);
+            }
+        }
+
+        async function processWithdrawal() {
+            const name = document.getElementById('withdrawName').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const method = document.getElementById('withdrawMethod').value;
+            const walletAddress = document.getElementById('walletAddress').value;
+
+            if (!name || isNaN(amount) || amount < 5 || amount > gameState.usd || !walletAddress) {
+                alert('Invalid withdrawal details');
+                return;
+            }
+
+            gameState.usd -= amount;
+            updateUI();
+            await updateServerState();
+
+            const withdrawalDetails = {
+                name, amount, method, walletAddress, userId: gameState.userId, date: new Date().toISOString()
+            };
+
+            localStorage.setItem(`withdrawal_${Date.now()}`, JSON.stringify(withdrawalDetails));
+            document.getElementById('withdrawalSuccessModal').style.display = 'flex';
+        }
+
+        async function redeemCode() {
+            const code = document.getElementById('redeemCode').value;
+            if (!code) {
+                alert('Enter a code');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=redeemCode&userId=${gameState.userId}&code=${encodeURIComponent(code)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.type === 'coin') {
+                        gameState.coins += data.value;
+                    } else if (data.type === 'usd') {
+                        gameState.usd += data.value;
+                    }
+
+                    updateUI();
+                    await updateServerState();
+
+                    document.getElementById('redeemSuccessMessage').textContent = `Redeemed! Received ${data.value} ${data.type.toUpperCase()}`;
+                    document.getElementById('redeemSuccessModal').style.display = 'flex';
+                } else {
+                    document.getElementById('redeemErrorMessage').textContent = data.message || 'Invalid code';
+                    document.getElementById('redeemErrorModal').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error('Redeem error:', error);
+                document.getElementById('redeemErrorMessage').textContent = 'Error redeeming code';
+                document.getElementById('redeemErrorModal').style.display = 'flex';
+            }
+        }
+
+        async function loadAdminUsers() {
+            if (gameState.userId !== ADMIN_ID) {
+                console.log('Access denied: Not admin');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllUsers`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const list = document.getElementById('adminUserList');
+                    list.innerHTML = '';
+
+                    data.users.forEach(user => {
+                        const div = document.createElement('div');
+                        div.className = 'admin-user';
+                        div.innerHTML = `
+                            ID: ${user.userId}<br>
+                            Name: ${user.fullName}<br>
+                            Username: ${user.username}<br>
+                            Coins: ${user.coins}<br>
+                            USD: ${user.usd}<br>
+                            Joined: ${user.channelJoined ? 'Yes' : 'No'}
+                        `;
+                        list.appendChild(div);
+                    });
+                } else {
+                    console.error('Failed to load users:', data.message);
+                    alert('Failed to load users');
+                }
+            } catch (error) {
+                console.error('Admin load error:', error);
+                alert('Error loading admin users');
+            }
+        }
+
+        async function generateCode() {
+            if (gameState.userId !== ADMIN_ID) {
+                console.log('Access denied: Not admin');
+                return;
+            }
+
+            const type = document.getElementById('codeType').value;
+            const value = parseFloat(document.getElementById('codeValue').value);
+
+            if (isNaN(value) || value <= 0) {
+                alert('Invalid value');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=generateCode&type=${type}&value=${value}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('generatedCode').textContent = `Generated Code: ${data.code}`;
+                } else {
+                    console.error('Code generation failed:', data.message);
+                    alert('Error generating code');
+                }
+            } catch (error) {
+                console.error('Generate code error:', error);
+                alert('Error generating code');
+            }
+        }
+
+        async function updateUserBalance() {
+            if (gameState.userId !== ADMIN_ID) {
+                console.log('Access denied: Not admin');
+                alert('Access denied: Admin only');
+                return;
+            }
+
+            const targetUserId = document.getElementById('editUserId').value.trim();
+            const coinsChange = parseFloat(document.getElementById('editCoins').value) || 0;
+            const usdChange = parseFloat(document.getElementById('editUsd').value) || 0;
+
+            if (!targetUserId) {
+                alert('Enter a valid user ID');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateBalance&targetUserId=${targetUserId}&coinsChange=${coinsChange}&usdChange=${usdChange}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Balance updated successfully');
+                    await loadAdminUsers();
+                    document.getElementById('editUserId').value = '';
+                    document.getElementById('editCoins').value = '';
+                    document.getElementById('editUsd').value = '';
+                } else {
+                    console.error('Balance update failed:', data.message);
+                    alert(data.message || 'Error updating balance');
+                }
+            } catch (error) {
+                console.error('Update balance error:', error);
+                alert('Error updating balance');
+            }
+        }
+
+        async function generateReferralReward() {
+            if (gameState.userId !== ADMIN_ID) {
+                console.log('Access denied: Not admin');
+                alert('Access denied: Admin only');
+                return;
+            }
+
+            const referrerId = document.getElementById('rewardUserId').value.trim();
+            const type = document.getElementById('rewardType').value;
+            const value = parseFloat(document.getElementById('rewardValue').value);
+
+            if (!referrerId || isNaN(value) || value <= 0) {
+                alert('Invalid values');
+                return;
+            }
+
+            try {
+                // This would call your backend to generate a referral reward code
+                // For now, we'll simulate it
+                const code = generateRandomCode(10).toUpperCase();
+                document.getElementById('rewardCodeOutput').textContent = `Reward Code: ${code} (${value} ${type.toUpperCase()})`;
+                
+                // Clear the form
+                document.getElementById('rewardUserId').value = '';
+                document.getElementById('rewardValue').value = '';
+            } catch (error) {
+                console.error('Generate referral reward error:', error);
+                alert('Error generating referral reward');
+            }
+        }
+
+        function generateRandomCode(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            return result;
+        }
+
+        function generateReferralLink() {
+            return `https://t.me/minezwall_bot?start=${gameState.referralCode}`;
+        }
+
+        function displayReferralLink() {
+            const referralLinkElement = document.getElementById('referralLink');
+            if (referralLinkElement) {
+                referralLinkElement.textContent = generateReferralLink();
+            }
+        }
+
+        function copyReferralLink() {
+            const link = generateReferralLink();
+            navigator.clipboard.writeText(link).then(() => {
+                alert("Referral link copied to clipboard!");
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            
+            if (answer.classList.contains('show')) {
+                answer.classList.remove('show');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                answer.classList.add('show');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
         }
 
         // Initialize the app
