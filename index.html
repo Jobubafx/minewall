@@ -1,1902 +1,1654 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minezwall - Telegram Mini App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow-x: hidden;
-        }
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 10px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 10px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            margin-bottom: 10px;
-            position: relative;
-        }
-        .menu-button, .back-button {
-            background: #4e54c8;
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .daily-bonus {
-            background: linear-gradient(to right, #ff8a00, #da1b60);
-            border: none;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-        .game-title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            margin: 10px 0;
-            letter-spacing: 1px;
-        }
-        .page {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-        }
-        .page.active {
-            display: flex;
-        }
-        .restriction-page {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            margin: 20px;
-        }
-        .restriction-icon {
-            font-size: 60px;
-            color: #ff4d4d;
-            margin-bottom: 20px;
-        }
-        .restriction-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .restriction-message {
-            font-size: 16px;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        .telegram-button {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-top: 20px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-        }
-        .telegram-button:hover {
-            background: #0077b3;
-        }
-        .check-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 12px 25px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s;
-        }
-        .check-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .ad-container {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px 0;
-            text-align: center;
-            min-height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .start-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 20px 40px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 50px;
-            margin: 20px auto;
-            cursor: pointer;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-        .start-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-        }
-        .username-display {
-            text-align: center;
-            font-size: 18px;
-            margin-top: 15px;
-            background: rgba(255,255,255,0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-left: auto;
-            margin-right: auto;
-            max-width: 80%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin: 20px auto;
-            width: 100%;
-            max-width: 350px;
-        }
-        .cell {
-            aspect-ratio: 1/1;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        .cell::before {
-            content: "?";
-            position: absolute;
-            font-size: 24px;
-            color: rgba(255,255,255,0.7);
-        }
-        .cell.revealed {
-            background: rgba(255, 255, 255, 0.4);
-        }
-        .cell.revealed::before {
-            display: none;
-        }
-        .cell.mine {
-            background: #ff4d4d;
-        }
-        .cell.diamond {
-            background: #4dffb8;
-        }
-        .stats-bar {
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 12px;
-            border-radius: 15px;
-            margin: 10px 0;
-        }
-        .stat-item {
-            text-align: center;
-            flex: 1;
-        }
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .game-controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            gap: 10px;
-        }
-        .control-button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        .skip-ad {
-            background: linear-gradient(to right, #ff8a00, #e52e71);
-        }
-        .skip-coin {
-            background: linear-gradient(to right, #00b09b, #96c93d);
-        }
-        .restart {
-            background: linear-gradient(to right, #1d976c, #93f9b9);
-        }
-        .withdraw-form {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        .submit-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 10px;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .settings-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            height: 24px;
-        }
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 24px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-        .dropdown {
-            position: relative;
-            display: inline-block;
-            z-index: 1000;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background: rgba(0, 0, 0, 0.9);
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1000;
-            border-radius: 10px;
-            overflow: hidden;
-            top: 50px;
-            left: 0;
-        }
-        .dropdown-content button {
-            color: white;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            width: 100%;
-            text-align: left;
-            background: none;
-            border: none;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .dropdown-content button:hover {
-            background: rgba(78, 84, 200, 0.7);
-        }
-        .dropdown.show .dropdown-content {
-            display: block;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 90%;
-            width: 350px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .modal h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-        .modal p {
-            font-size: 18px;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        .modal-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 12px 25px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            margin: 0 5px;
-            transition: all 0.3s;
-        }
-        .modal-button:hover {
-            transform: scale(1.05);
-        }
-        .withdrawal-success-modal {
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 90%;
-            width: 350px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .form-redirect-button {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-top: 20px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-20px);}
-            60% {transform: translateY(-10px);}
-        }
-        .bounce {
-            animation: bounce 1s;
-        }
-        @keyframes diamondGlow {
-            0% { box-shadow: 0 0 5px #4dffb8; }
-            50% { box-shadow: 0 0 20px #4dffb8; }
-            100% { box-shadow: 0 0 5px #4dffb8; }
-        }
-        .diamond-glow {
-            animation: diamondGlow 1.5s infinite;
-        }
-        .footer {
-            text-align: center;
-            padding: 15px;
-            font-size: 12px;
-            opacity: 0.7;
-        }
-        @media (max-width: 480px) {
-            .game-grid {
-                gap: 6px;
-            }
-            .control-button {
-                font-size: 14px;
-                padding: 10px;
-            }
-            .game-title {
-                font-size: 24px;
-            }
-            .start-button {
-                padding: 15px 30px;
-                font-size: 20px;
-            }
-            .username-display {
-                font-size: 16px;
-                padding: 6px 12px;
-            }
-        }
-        .admin-list {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .admin-user {
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-        }
-        .admin-edit-form {
-            margin-top: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-        }
-        .redeem-form {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .help-section {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .help-item {
-            margin-bottom: 20px;
-        }
-        .help-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #4e54c8;
-        }
-        .help-content {
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .referral-link-container {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .referral-link {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 12px;
-            border-radius: 10px;
-            margin: 15px 0;
-            word-break: break-all;
-            font-size: 14px;
-        }
-        .copy-button {
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            border: none;
-            color: #1a2a6c;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .faq-container {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .faq-item {
-            margin-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 15px;
-        }
-        .faq-question {
-            font-weight: bold;
-            margin-bottom: 8px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .faq-answer {
-            display: none;
-            padding-top: 10px;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        .faq-answer.show {
-            display: block;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minezwall - Telegram Mini App</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 10px;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 15px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.menu-button, .back-button {
+  background: #4e54c8;
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.daily-bonus {
+  background: linear-gradient(to right, #ff8a00, #da1b60);
+  border: none;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.game-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  margin: 10px 0;
+  letter-spacing: 1px;
+}
+
+.page {
+  display: none;
+  flex: 1;
+  flex-direction: column;
+}
+
+.page.active {
+  display: flex;
+}
+
+.restriction-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  margin: 20px;
+}
+
+.restriction-icon {
+  font-size: 60px;
+  color: #ff4d4d;
+  margin-bottom: 20px;
+}
+
+.restriction-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.restriction-message {
+  font-size: 16px;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.telegram-button {
+  background: #0088cc;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.telegram-button:hover {
+  background: #0077b3;
+}
+
+.check-button {
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+  border: none;
+  color: #1a2a6c;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: all 0.3s;
+}
+
+.check-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ad-container {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+  text-align: center;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.start-button {
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+  border: none;
+  color: #1a2a6c;
+  padding: 20px 40px;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 50px;
+  margin: 20px auto;
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+
+.start-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+.username-display {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 15px;
+  background: rgba(255,255,255,0.1);
+  padding: 8px 15px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 350px;
+}
+
+.cell {
+  aspect-ratio: 1/1;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.cell::before {
+  content: "?";
+  position: absolute;
+  font-size: 24px;
+  color: rgba(255,255,255,0.7);
+}
+
+.cell.revealed {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.cell.revealed::before {
+  display: none;
+}
+
+.cell.mine {
+  background: #ff4d4d;
+}
+
+.cell.diamond {
+  background: #4dffb8;
+}
+
+.stats-bar {
+  display: flex;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 12px;
+  border-radius: 15px;
+  margin: 10px 0;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.game-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.control-button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.skip-ad {
+  background: linear-gradient(to right, #ff8a00, #e52e71);
+}
+
+.skip-coin {
+  background: linear-gradient(to right, #00b09b, #96c93d);
+}
+
+.restart {
+  background: linear-gradient(to right, #1d976c, #93f9b9);
+}
+
+.withdraw-form {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.input-group input, .input-group select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.submit-button {
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+  border: none;
+  color: #1a2a6c;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 10px;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.settings-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.9);
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  top: 50px;
+  left: 0;
+}
+
+.dropdown-content button {
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dropdown-content button:hover {
+  background: rgba(78, 84, 200, 0.7);
+}
+
+.dropdown.show .dropdown-content {
+  display: block;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 90%;
+  width: 350px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.modal h2 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.modal p {
+  font-size: 18px;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.modal-button {
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+  border: none;
+  color: #1a2a6c;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: all 0.3s;
+}
+
+.modal-button:hover {
+  transform: scale(1.05);
+}
+
+.withdrawal-success-modal {
+  background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+  padding: 30px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 90%;
+  width: 350px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.form-redirect-button {
+  background: #0088cc;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 20px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.faq-container {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.faq-item {
+  margin-bottom: 15px;
+}
+
+.faq-question {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #4e54c8;
+}
+
+.faq-answer {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.referral-section {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.referral-link {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 10px;
+  margin: 15px 0;
+  word-break: break-all;
+  font-size: 14px;
+}
+
+.copy-button {
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+  border: none;
+  color: #1a2a6c;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(-20px);}
+  60% {transform: translateY(-10px);}
+}
+
+.bounce {
+  animation: bounce 1s;
+}
+
+@keyframes diamondGlow {
+  0% { box-shadow: 0 0 5px #4dffb8; }
+  50% { box-shadow: 0 0 20px #4dffb8; }
+  100% { box-shadow: 0 0 5px #4dffb8; }
+}
+
+.diamond-glow {
+  animation: diamondGlow 1.5s infinite;
+}
+
+.footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+  .game-grid {
+    gap: 6px;
+  }
+  .control-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+  .game-title {
+    font-size: 24px;
+  }
+  .start-button {
+    padding: 15px 30px;
+    font-size: 20px;
+  }
+}
+
+/* New styles for admin and redeem pages */
+.admin-list {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.admin-user {
+  background: rgba(255,255,255,0.1);
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+
+.admin-edit-form {
+  margin-top: 20px;
+}
+
+.redeem-form {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+}
+</style>
 </head>
+
 <body>
-    <script src='//libtl.com/sdk.js' data-zone='9662480' data-sdk='show_9662480'></script>
+<script src='//libtl.com/sdk.js' data-zone='9662480' data-sdk='show_9662480'></script>
+
+<div class="container">
+  <div class="header">
+    <div class="header-left" id="headerLeft">
+      <div class="dropdown" id="dropdownMenu">
+        <button class="menu-button">☰</button>
+        <div class="dropdown-content" id="dropdownContent">
+          <button onclick="showPage('withdraw')">Withdraw</button>
+          <button onclick="showPage('redeem')">Redeem Code</button>
+          <button onclick="showPage('referral')">Referral</button>
+          <button onclick="showPage('faq')">FAQ & Help</button>
+          <button onclick="showPage('settings')">Settings</button>
+        </div>
+      </div>
+    </div>
+    <div class="header-center" id="headerCenter">
+      <div class="game-title">Minezwall</div>
+    </div>
+    <div class="header-right" id="headerRight">
+      <button class="daily-bonus" onclick="claimDailyBonus()">Daily Bonus</button>
+    </div>
+  </div>
+
+  <div id="restrictionPage" class="page active">
+    <div class="restriction-page">
+      <div class="restriction-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h2 class="restriction-title">Access Restricted</h2>
+      <p class="restriction-message">
+        To play Minezwall and start earning, you must join our official Telegram channel first.
+        After joining, please click the verification button below.
+      </p>
+      <a href="https://t.me/minezwallofficial" class="telegram-button" target="_blank">
+        <i class="fab fa-telegram"></i> Join Channel
+      </a>
+      <button class="check-button" onclick="verifyChannelJoin()">
+        <i class="fas fa-check-circle"></i> I've Joined
+      </button>
+    </div>
+  </div>
+
+  <div id="homePage" class="page">
+    <h1 class="game-title">MINEZWALL</h1>
+    <div class="username-display" id="userDisplay">Welcome, Player!</div>
+    <button class="start-button pulse" onclick="startGame()">START GAME</button>
+  </div>
+
+  <div id="gamePage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">Level: <span id="currentLevel">1</span></div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">COINS</div>
+        <div class="stat-value" id="coinDisplay">500</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">USD BALANCE</div>
+        <div class="stat-value" id="usdDisplay">$0.000</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">DIAMONDS FOUND</div>
+        <div class="stat-value" id="diamondsFound">0/4</div>
+      </div>
+    </div>
+
+    <div class="game-grid" id="gameGrid"></div>
+
+    <div class="game-controls">
+      <button class="control-button skip-ad" onclick="skipWithAd()">
+        <i class="fas fa-ad"></i> Skip with Ad
+      </button>
+      <button class="control-button skip-coin" onclick="skipWithCoins()">
+        <i class="fas fa-coins"></i> Skip with Coins
+      </button>
+      <button class="control-button restart" onclick="restartLevel()">
+        <i class="fas fa-redo"></i> Restart
+      </button>
+    </div>
+  </div>
+
+  <div id="withdrawPage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">Withdraw</div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-label">USD BALANCE</div>
+        <div class="stat-value" id="withdrawUsdDisplay">$0.000</div>
+      </div>
+    </div>
+
+    <div class="withdraw-form">
+      <div class="input-group">
+        <label for="withdrawName">Full Name</label>
+        <input type="text" id="withdrawName" placeholder="Enter your full name">
+      </div>
+      <div class="input-group">
+        <label for="withdrawAmount">Amount to Withdraw (USD)</label>
+        <input type="number" id="withdrawAmount" placeholder="Minimum $5.00" min="5" step="0.001">
+      </div>
+      <div class="input-group">
+        <label for="withdrawMethod">Withdrawal Method</label>
+        <select id="withdrawMethod">
+          <option value="usdt">USDT (Polygon Network)</option>
+          <option value="btc">Bitcoin</option>
+          <option value="eth">Ethereum</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="walletAddress">Wallet Address</label>
+        <input type="text" id="walletAddress" placeholder="Enter your wallet address">
+      </div>
+      <button class="submit-button" onclick="processWithdrawal()">Withdraw Funds</button>
+    </div>
+  </div>
+
+  <div id="redeemPage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">Redeem Code</div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="redeem-form">
+      <div class="input-group">
+        <label for="redeemCode">Enter Secret Code</label>
+        <input type="text" id="redeemCode" placeholder="Enter code here">
+      </div>
+      <button class="submit-button" onclick="redeemCode()">Redeem</button>
+    </div>
+  </div>
+
+  <div id="referralPage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">Referral Program</div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="referral-section">
+      <h3>Share Your Referral Link</h3>
+      <p>Invite friends to join Minezwall using your unique referral link below:</p>
+      <div class="referral-link" id="referralLink">Loading...</div>
+      <button class="copy-button" onclick="copyReferralLink()">
+        <i class="fas fa-copy"></i> Copy Link
+      </button>
+      <p style="margin-top: 20px; font-size: 14px;">
+        <strong>Note:</strong> Referral rewards are distributed manually by the admin. 
+        After your referrals meet the requirements, you'll receive a secret code to redeem your rewards.
+      </p>
+    </div>
+  </div>
+
+  <div id="faqPage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">FAQ & Help</div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="faq-container">
+      <h3>How to Play</h3>
+      <div class="faq-item">
+        <div class="faq-question">What is Minezwall?</div>
+        <div class="faq-answer">
+          Minezwall is a mining game where you search for diamonds while avoiding mines. 
+          Each level you complete earns you USD rewards that can be withdrawn.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">How do I play the game?</div>
+        <div class="faq-answer">
+          Click on tiles to reveal what's underneath. Find all diamonds without hitting any mines to complete the level.
+          Each level costs 8 coins to play and rewards $0.005 USD upon completion.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">What happens if I hit a mine?</div>
+        <div class="faq-answer">
+          If you hit a mine, the game ends. You can either restart the level (costs 5 coins), 
+          skip with an ad, or skip with coins (25 coins).
+        </div>
+      </div>
+
+      <h3>Earnings & Withdrawals</h3>
+      <div class="faq-item">
+        <div class="faq-question">How do I earn money?</div>
+        <div class="faq-answer">
+          You earn USD by completing levels. Each completed level gives you $0.005. 
+          You can also earn coins through daily bonuses and referral rewards.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">How do I withdraw my earnings?</div>
+        <div class="faq-answer">
+          Go to the Withdraw page, enter your details, and request a withdrawal. 
+          The minimum withdrawal amount is $5.00. After submitting, you'll need to complete a verification form.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">What payment methods are supported?</div>
+        <div class="faq-answer">
+          We support USDT (Polygon Network), Bitcoin, and Ethereum for withdrawals.
+        </div>
+      </div>
+
+      <h3>Referral Program</h3>
+      <div class="faq-item">
+        <div class="faq-question">How does the referral program work?</div>
+        <div class="faq-answer">
+          Share your unique referral link with friends. When they join using your link and meet certain requirements, 
+          you'll receive a secret code to redeem your referral rewards.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">How do I get my referral rewards?</div>
+        <div class="faq-answer">
+          The admin will manually review referrals and send you a secret code via Telegram when you qualify for rewards. 
+          Use the Redeem Code page to claim your rewards.
+        </div>
+      </div>
+
+      <h3>Other Features</h3>
+      <div class="faq-item">
+        <div class="faq-question">What is the Daily Bonus?</div>
+        <div class="faq-answer">
+          You can claim 50 coins once every 24 hours from the Daily Bonus button in the header.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">How do I change game settings?</div>
+        <div class="faq-answer">
+          Go to Settings from the menu to adjust sound effects, background music, theme, and difficulty level.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="adminPage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">Admin Panel</div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="admin-list" id="adminUserList"></div>
+
+    <div class="admin-edit-form">
+      <h3>Generate Code</h3>
+      <div class="input-group">
+        <label for="codeType">Type</label>
+        <select id="codeType">
+          <option value="coin">Coins</option>
+          <option value="usd">USD</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label for="codeValue">Value</label>
+        <input type="number" id="codeValue" placeholder="Enter value">
+      </div>
+      <button class="submit-button" onclick="generateCode()">Generate Code</button>
+      <p id="generatedCode"></p>
+    </div>
+
+    <div class="admin-edit-form">
+      <h3>Edit User</h3>
+      <div class="input-group">
+        <label for="editUserId">User ID</label>
+        <input type="text" id="editUserId" placeholder="Enter user ID">
+      </div>
+      <div class="input-group">
+        <label for="editCoins">Coins Change</label>
+        <input type="number" id="editCoins" placeholder="Positive or negative">
+      </div>
+      <div class="input-group">
+        <label for="editUsd">USD Change</label>
+        <input type="number" id="editUsd" placeholder="Positive or negative">
+      </div>
+      <button class="submit-button" onclick="updateUserBalance()">Update Balance</button>
+    </div>
+  </div>
+
+  <div id="settingsPage" class="page">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-button" onclick="showPage('home')">←</button>
+      </div>
+      <div class="header-center">
+        <div class="game-title">Settings</div>
+      </div>
+      <div class="header-right"></div>
+    </div>
+
+    <div class="settings-item">
+      <div><i class="fas fa-volume-up"></i> Sound Effects</div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="soundToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="settings-item">
+      <div><i class="fas fa-music"></i> Background Music</div>
+      <label class="toggle-switch">
+        <input type="checkbox" id="musicToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="settings-item">
+      <div><i class="fas fa-palette"></i> Theme</div>
+      <select id="themeSelect" onchange="changeTheme()">
+        <option value="dark">Dark Mode</option>
+        <option value="light">Light Mode</option>
+      </select>
+    </div>
+
+    <div class="settings-item">
+      <div><i class="fas fa-cog"></i> Difficulty</div>
+      <select id="difficultySelect" onchange="changeDifficulty()">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="footer">
+    Minezwall Mini App © 2025 | Play and Earn
+  </div>
+</div>
+
+<div class="modal" id="winModal">
+  <div class="modal-content">
+    <h2>Congratulations!</h2>
+    <p>You found all diamonds and completed the level!</p>
+    <p>Reward: +$0.005 USD</p>
+    <button class="modal-button" onclick="nextLevel()">Next Level</button>
+  </div>
+</div>
+
+<div class="modal" id="loseModal">
+  <div class="modal-content">
+    <h2>Game Over!</h2>
+    <p>You hit a mine. Try again or skip the level.</p>
+    <div style="display: flex; justify-content: center; margin-top: 20px;">
+      <button class="modal-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="skipWithAd()">Skip with Ad</button>
+      <button class="modal-button" style="background: linear-gradient(to right, #00b09b, #96c93d);" onclick="skipWithCoins()">Skip with Coins</button>
+      <button class="modal-button" style="background: linear-gradient(to right, #1d976c, #93f9b9);" onclick="restartLevel()">Restart Level</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="dailyBonusModal">
+  <div class="modal-content">
+    <h2>Daily Bonus!</h2>
+    <p>You received 50 coins!</p>
+    <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
+  </div>
+</div>
+
+<div class="modal" id="withdrawalSuccessModal">
+  <div class="withdrawal-success-modal">
+    <h2>Withdrawal Request Received!</h2>
+    <p>Your withdrawal request has been submitted successfully.</p>
+    <p>Please complete our verification form to process your payment.</p>
+    <button class="form-redirect-button" onclick="redirectToGoogleForm()">
+      Complete Verification Form
+    </button>
+  </div>
+</div>
+
+<audio id="backgroundMusic" loop>
+  <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="clickSound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="winSound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="loseSound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-game-over-213.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// Initialize Web App
+let tg = window.Telegram.WebApp;
+tg.expand();
+tg.enableClosingConfirmation();
+
+// Global variables
+let userData = {
+  id: '',
+  username: '',
+  firstName: '',
+  lastName: '',
+  coins: 500,
+  usd: 0,
+  level: 1,
+  diamondsFound: 0,
+  totalDiamonds: 4,
+  lastBonusClaim: 0,
+  referralCode: '',
+  referredBy: ''
+};
+
+let gameState = {
+  grid: [],
+  revealedCount: 0,
+  gameActive: false
+};
+
+// DOM elements
+const dropdownMenu = document.getElementById('dropdownMenu');
+const dropdownContent = document.getElementById('dropdownContent');
+
+// Initialize the app
+function initApp() {
+  // Get user data from Telegram
+  const user = tg.initDataUnsafe.user;
+  if (user) {
+    userData.id = user.id;
+    userData.username = user.username || `user_${user.id}`;
+    userData.firstName = user.first_name || '';
+    userData.lastName = user.last_name || '';
     
-    <div class="container">
-        <div class="header">
-            <div class="header-left" id="headerLeft">
-                <div class="dropdown" id="dropdownMenu">
-                    <button class="menu-button">☰</button>
-                    <div class="dropdown-content" id="dropdownContent">
-                        <button onclick="showPage('withdraw')">Withdraw</button>
-                        <button onclick="showPage('redeem')">Redeem Code</button>
-                        <button onclick="showPage('referral')">Referral</button>
-                        <button onclick="showPage('help')">Help & FAQ</button>
-                        <button onclick="showPage('settings')">Settings</button>
-                    </div>
-                </div>
-            </div>
-            <div class="header-center" id="headerCenter">
-                <div class="game-title">Minezwall</div>
-            </div>
-            <div class="header-right" id="headerRight">
-                <button class="daily-bonus" onclick="claimDailyBonus()">Daily Bonus</button>
-                <button class="daily-bonus" onclick="showPage('referral')" id="referralBtn" style="display: none; margin-left: 5px;">
-                    <i class="fas fa-share-alt"></i> Refer
-                </button>
-            </div>
-        </div>
-
-        <div id="restrictionPage" class="page active">
-            <div class="restriction-page">
-                <div class="restriction-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <h2 class="restriction-title">Access Restricted</h2>
-                <p class="restriction-message">
-                    To play Minezwall and start earning, you must join our official Telegram channel first.
-                    After joining, please click the verification button below.
-                </p>
-                <a href="https://t.me/minezwallofficial" class="telegram-button" target="_blank">
-                    <i class="fab fa-telegram"></i> Join Channel
-                </a>
-                <button class="check-button" onclick="verifyChannelJoin()" id="verifyButton">
-                    <i class="fas fa-check-circle"></i> I've Joined
-                </button>
-            </div>
-        </div>
-
-        <div id="homePage" class="page">
-            <h1 class="game-title">MINEZWALL</h1>
-            <div class="username-display" id="userDisplay">Welcome, Player!</div>
-            <button class="start-button pulse" onclick="startGame()">START GAME</button>
-            
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-label">COINS</div>
-                    <div class="stat-value" id="homeCoinDisplay">500</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="homeUsdDisplay">$0.500</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">LEVEL</div>
-                    <div class="stat-value" id="homeLevelDisplay">1</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="gamePage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Level: <span id="currentLevel">1</span></div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-label">COINS</div>
-                    <div class="stat-value" id="coinDisplay">500</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="usdDisplay">$0.500</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-label">DIAMONDS FOUND</div>
-                    <div class="stat-value" id="diamondsFound">0/20</div>
-                </div>
-            </div>
-
-            <div class="game-grid" id="gameGrid"></div>
-
-            <div class="game-controls">
-                <button class="control-button skip-ad" onclick="skipWithAd()">
-                    <i class="fas fa-ad"></i> Skip with Ad
-                </button>
-                <button class="control-button skip-coin" onclick="skipWithCoins()">
-                    <i class="fas fa-coins"></i> Skip with Coins
-                </button>
-                <button class="control-button restart" onclick="restartLevel()">
-                    <i class="fas fa-redo"></i> Restart
-                </button>
-            </div>
-        </div>
-
-        <div id="withdrawPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Withdraw</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="stat-label">USD BALANCE</div>
-                    <div class="stat-value" id="withdrawUsdDisplay">$0.500</div>
-                </div>
-            </div>
-
-            <div class="withdraw-form">
-                <div class="input-group">
-                    <label for="withdrawName">Full Name</label>
-                    <input type="text" id="withdrawName" placeholder="Enter your full name">
-                </div>
-                <div class="input-group">
-                    <label for="withdrawAmount">Amount to Withdraw (USD)</label>
-                    <input type="number" id="withdrawAmount" placeholder="Minimum $5.00" min="5" step="0.001">
-                </div>
-                <div class="input-group">
-                    <label for="withdrawMethod">Withdrawal Method</label>
-                    <select id="withdrawMethod">
-                        <option value="usdt">USDT (Polygon Network)</option>
-                        <option value="btc">Bitcoin</option>
-                        <option value="eth">Ethereum</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="walletAddress">Wallet Address</label>
-                    <input type="text" id="walletAddress" placeholder="Enter your wallet address">
-                </div>
-                <button class="submit-button" onclick="processWithdrawal()">Withdraw Funds</button>
-            </div>
-        </div>
-
-        <div id="redeemPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Redeem Code</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-
-            <div class="redeem-form">
-                <div class="input-group">
-                    <label for="redeemCode">Enter Secret Code</label>
-                    <input type="text" id="redeemCode" placeholder="Enter code here">
-                </div>
-                <button class="submit-button" onclick="redeemCode()">Redeem</button>
-            </div>
-        </div>
-
-        <div id="referralPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Referral Program</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-
-            <div class="referral-link-container">
-                <h3>Your Referral Link</h3>
-                <p>Share this link with friends to earn rewards when they join!</p>
-                <div class="referral-link" id="referralLink">Loading...</div>
-                <button class="copy-button" onclick="copyReferralLink()">
-                    <i class="fas fa-copy"></i> Copy Link
-                </button>
-            </div>
-
-            <div class="help-section">
-                <h3>How It Works</h3>
-                <div class="help-content">
-                    <p>1. Share your referral link with friends</p>
-                    <p>2. When they join using your link, they'll be registered as your referral</p>
-                    <p>3. Contact admin to get your referral reward code after your friend completes verification</p>
-                    <p>4. Redeem your reward code in the "Redeem Code" section</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="helpPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Help & FAQ</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-
-            <div class="help-section">
-                <h3>How to Play</h3>
-                <div class="help-content">
-                    <p>1. Click on cells to reveal what's underneath</p>
-                    <p>2. Find all diamonds to complete the level</p>
-                    <p>3. Avoid mines - they will end your game</p>
-                    <p>4. Complete levels to earn USD rewards</p>
-                    <p>5. Use coins to skip levels or restart when needed</p>
-                </div>
-            </div>
-
-            <div class="faq-container">
-                <h3>Frequently Asked Questions</h3>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        How do I earn money? <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        You earn money by completing levels. Each completed level gives you $0.005 USD. 
-                        You can also earn through the referral program and daily bonuses.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        How do I withdraw my earnings? <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Go to the Withdraw section, enter your details, and request a withdrawal. 
-                        The minimum withdrawal amount is $5.00. Withdrawals are processed within 24-48 hours.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        What is the referral program? <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Share your referral link with friends. When they join using your link and verify their account, 
-                        contact admin to receive a reward code that you can redeem for coins or USD.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        Why do I need to join the Telegram channel? <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        Joining our Telegram channel helps us build a community and keeps you updated with the latest news, 
-                        updates, and special promotions related to Minezwall.
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFaq(this)">
-                        What happens if I hit a mine? <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="faq-answer">
-                        If you hit a mine, the game ends. You can either watch an ad to continue, 
-                        use coins to skip the level, or restart the level (which costs coins).
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="settingsPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Settings</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-
-            <div class="settings-item">
-                <div><i class="fas fa-volume-up"></i> Sound Effects</div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="soundToggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="settings-item">
-                <div><i class="fas fa-music"></i> Background Music</div>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="musicToggle" checked>
-                    <span class="slider"></span>
-                </label>
-            </div>
-
-            <div class="settings-item">
-                <div><i class="fas fa-palette"></i> Theme</div>
-                <select id="themeSelect" onchange="changeTheme()">
-                    <option value="dark">Dark Mode</option>
-                    <option value="light">Light Mode</option>
-                </select>
-            </div>
-
-            <div class="settings-item">
-                <div><i class="fas fa-cog"></i> Difficulty</div>
-                <select id="difficultySelect" onchange="changeDifficulty()">
-                    <option value="easy">Easy</option>
-                    <option value="medium">Medium</option>
-                    <option value="hard">Hard</option>
-                </select>
-            </div>
-        </div>
-
-        <div id="adminPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">Admin Panel</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-
-            <div class="admin-list" id="adminUserList"></div>
-
-            <div class="admin-edit-form">
-                <h3>Generate Code</h3>
-                <div class="input-group">
-                    <label for="codeType">Type</label>
-                    <select id="codeType">
-                        <option value="coin">Coins</option>
-                        <option value="usd">USD</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="codeValue">Value</label>
-                    <input type="number" id="codeValue" placeholder="Enter value">
-                </div>
-                <button class="submit-button" onclick="generateCode()">Generate Code</button>
-                <p id="generatedCode"></p>
-            </div>
-
-            <div class="admin-edit-form">
-                <h3>Edit User</h3>
-                <div class="input-group">
-                    <label for="editUserId">User ID</label>
-                    <input type="text" id="editUserId" placeholder="Enter user ID">
-                </div>
-                <div class="input-group">
-                    <label for="editCoins">Coins Change</label>
-                    <input type="number" id="editCoins" placeholder="Positive or negative" step="any">
-                </div>
-                <div class="input-group">
-                    <label for="editUsd">USD Change</label>
-                    <input type="number" id="editUsd" placeholder="Positive or negative" step="any">
-                </div>
-                <button class="submit-button" onclick="updateUserBalance()">Update Balance</button>
-            </div>
-
-            <div class="admin-edit-form">
-                <h3>Generate Referral Reward</h3>
-                <div class="input-group">
-                    <label for="rewardUserId">Referrer User ID</label>
-                    <input type="text" id="rewardUserId" placeholder="Enter referrer's user ID">
-                </div>
-                <div class="input-group">
-                    <label for="rewardType">Reward Type</label>
-                    <select id="rewardType">
-                        <option value="coin">Coins</option>
-                        <option value="usd">USD</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="rewardValue">Reward Value</label>
-                    <input type="number" id="rewardValue" placeholder="Enter reward value">
-                </div>
-                <button class="submit-button" onclick="generateReferralReward()">Generate Reward Code</button>
-                <p id="rewardCodeOutput"></p>
-            </div>
-        </div>
-
-        <div class="footer">
-            Minezwall Mini App © 2025 | Play and Earn
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div class="modal" id="verificationModal">
-        <div class="modal-content">
-            <h2>Verifying...</h2>
-            <p>Please wait while we verify your channel membership.</p>
-            <div class="pulse">
-                <i class="fas fa-spinner fa-spin" style="font-size: 40px;"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="verificationSuccessModal">
-        <div class="modal-content">
-            <h2>Success!</h2>
-            <p>Your channel membership has been verified successfully.</p>
-            <button class="modal-button" onclick="closeModal('verificationSuccessModal'); showPage('home');">Start Playing</button>
-        </div>
-    </div>
-
-    <div class="modal" id="verificationErrorModal">
-        <div class="modal-content">
-            <h2>Verification Failed</h2>
-            <p id="verificationErrorMsg">We couldn't verify your channel membership. Please make sure you've joined the channel and try again.</p>
-            <button class="modal-button" onclick="closeModal('verificationErrorModal')">Try Again</button>
-        </div>
-    </div>
-
-    <div class="modal" id="winModal">
-        <div class="modal-content">
-            <h2>Congratulations!</h2>
-            <p>You found all diamonds and completed the level!</p>
-            <p>Reward: +$0.005 USD</p>
-            <button class="modal-button" onclick="nextLevel()">Next Level</button>
-        </div>
-    </div>
-
-    <div class="modal" id="loseModal">
-        <div class="modal-content">
-            <h2>Game Over!</h2>
-            <p>You hit a mine. Try again or skip the level.</p>
-            <div style="display: flex; justify-content: center; margin-top: 20px;">
-                <button class="modal-button" style="background: linear-gradient(to right, #ff8a00, #e52e71);" onclick="skipWithAd()">Skip with Ad</button>
-                <button class="modal-button" style="background: linear-gradient(to right, #00b09b, #96c93d);" onclick="skipWithCoins()">Skip with Coins</button>
-                <button class="modal-button" style="background: linear-gradient(to right, #1d976c, #93f9b9);" onclick="restartLevel()">Restart Level</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="dailyBonusModal">
-        <div class="modal-content">
-            <h2>Daily Bonus!</h2>
-            <p>You received 50 coins!</p>
-            <button class="modal-button" onclick="closeModal('dailyBonusModal')">Claim</button>
-        </div>
-    </div>
-
-    <div class="modal" id="withdrawalSuccessModal">
-        <div class="withdrawal-success-modal">
-            <h2>Withdrawal Request Received!</h2>
-            <p>Your withdrawal request has been submitted successfully.</p>
-            <p>Processing may take 24-48 hours.</p>
-            <button class="modal-button" onclick="closeModal('withdrawalSuccessModal')">OK</button>
-        </div>
-    </div>
-
-    <div class="modal" id="redeemSuccessModal">
-        <div class="modal-content">
-            <h2>Code Redeemed!</h2>
-            <p id="redeemSuccessMessage">Your reward has been added to your account.</p>
-            <button class="modal-button" onclick="closeModal('redeemSuccessModal')">OK</button>
-        </div>
-    </div>
-
-    <div class="modal" id="redeemErrorModal">
-        <div class="modal-content">
-            <h2>Error</h2>
-            <p id="redeemErrorMessage">Invalid code. Please try again.</p>
-            <button class="modal-button" onclick="closeModal('redeemErrorModal')">OK</button>
-        </div>
-    </div>
-
-    <audio id="backgroundMusic" loop>
-        <source src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
-    </audio>
-
-    <audio id="clickSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
-    </audio>
-
-    <audio id="winSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
-    </audio>
-
-    <audio id="loseSound">
-        <source src="https://assets.mixkit.co/sfx/preview/mixkit-losing-drums-2023.mp3" type="audio/mpeg">
-    </audio>
-
-    <script>
-        // Initialize Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        const ADMIN_ID = 1558798885;
-        
-        // Replace with your deployed Apps Script Web App URL
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3Koa8azZ7LTNdnQbpzHrAbnUJiUIsCQWBsC5tpcIq0XzwXQlre7v0E1gA9nlMVaDg/exec';
-        
-        const gameState = {
-            coins: 500,
-            usd: 0.500,
-            level: 1,
-            diamondsFound: 0,
-            diamondsToFind: 20, // Changed to 20 diamonds
-            minesCount: 5,
-            grid: [],
-            gameActive: false,
-            timer: 0,
-            timerInterval: null,
-            soundEnabled: true,
-            musicEnabled: true,
-            difficulty: 'easy',
-            username: 'Player',
-            fullName: '',
-            userId: null,
-            channelJoined: false,
-            referralCode: '',
-            referredBy: ''
-        };
-
-        async function init() {
-            tg.expand();
-            
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                gameState.userId = user.id;
-                gameState.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
-                gameState.username = user.username || `User${user.id}`;
-                document.getElementById('userDisplay').textContent = `Welcome, ${gameState.fullName || gameState.username}!`;
-                document.getElementById('withdrawName').value = gameState.fullName || '';
-            }
-
-            // Add admin menu for ADMIN_ID
-            if (gameState.userId === ADMIN_ID) {
-                const adminButton = document.createElement('button');
-                adminButton.textContent = 'Admin Panel';
-                adminButton.onclick = () => showPage('admin');
-                document.getElementById('dropdownContent').appendChild(adminButton);
-            }
-
-            // Check if user has already joined the channel
-            const hasJoined = localStorage.getItem(`channelJoined_${gameState.userId}`);
-            if (hasJoined === 'true') {
-                gameState.channelJoined = true;
-                showPage('home');
-                document.getElementById('referralBtn').style.display = 'inline-block';
-                updateUI();
-            } else {
-                // Try to load previous state
-                await loadGameStateFromServer();
-                
-                if (gameState.channelJoined) {
-                    showPage('home');
-                    document.getElementById('referralBtn').style.display = 'inline-block';
-                    updateUI();
-                } else {
-                    showPage('restriction');
-                }
-            }
-
-            if (tg.initDataUnsafe.start_param) {
-                gameState.referredBy = tg.initDataUnsafe.start_param;
-                await registerReferral();
-            }
-
-            setupEventListeners();
-            displayReferralLink();
-        }
-
-        async function verifyChannelJoin() {
-            const checkBtn = document.getElementById('verifyButton');
-            checkBtn.disabled = true;
-            checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying...';
-            
-            // Show verification modal
-            document.getElementById('verificationModal').style.display = 'flex';
-            
-            try {
-                // In a real implementation, this would call your Google Apps Script
-                // For demonstration, we'll simulate a successful verification after a delay
-                
-                // Simulate API call delay
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                // Simulate successful verification (replace with actual API call)
-                const simulatedSuccess = Math.random() > 0.2; // 80% success rate for demo
-                
-                if (simulatedSuccess) {
-                    // Success
-                    gameState.channelJoined = true;
-                    localStorage.setItem(`channelJoined_${gameState.userId}`, 'true');
-                    
-                    // Update server
-                    await updateServerState();
-                    
-                    // Show success message
-                    document.getElementById('verificationModal').style.display = 'none';
-                    document.getElementById('verificationSuccessModal').style.display = 'flex';
-                    
-                    // Show referral button
-                    document.getElementById('referralBtn').style.display = 'inline-block';
-                    
-                    // Update UI
-                    updateUI();
-                } else {
-                    // Failed
-                    throw new Error('Could not verify channel membership. Please make sure you have joined the channel.');
-                }
-            } catch (error) {
-                console.error('Verification error:', error);
-                document.getElementById('verificationModal').style.display = 'none';
-                document.getElementById('verificationErrorMsg').textContent = error.message;
-                document.getElementById('verificationErrorModal').style.display = 'flex';
-            } finally {
-                checkBtn.disabled = false;
-                checkBtn.innerHTML = '<i class="fas fa-check-circle"></i> I\'ve Joined';
-            }
-        }
-
-        async function loadGameStateFromServer() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&userId=${gameState.userId}`);
-                const data = await response.json();
-                if (data.success) {
-                    Object.assign(gameState, data.user);
-                } else {
-                    await registerUser();
-                }
-                updateUI();
-            } catch (error) {
-                console.error('Load error:', error);
-            }
-        }
-
-        async function registerUser() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerUser&userId=${gameState.userId}&username=${encodeURIComponent(gameState.username)}&fullName=${encodeURIComponent(gameState.fullName)}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}`);
-                const data = await response.json();
-                if (data.success) {
-                    gameState.referralCode = data.referralCode;
-                }
-            } catch (error) {
-                console.error('Register error:', error);
-            }
-        }
-
-        async function updateServerState() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
-                const data = await response.json();
-                return data.success;
-            } catch (error) {
-                console.error('Update error:', error);
-                return false;
-            }
-        }
-
-        async function registerReferral() {
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerReferral&userId=${gameState.userId}&referredBy=${gameState.referredBy}`);
-                const data = await response.json();
-                if (data.success) {
-                    gameState.coins += 50;
-                    alert('Referral successful! You received 50 coins.');
-                    updateUI();
-                    await updateServerState();
-                }
-            } catch (error) {
-                console.error('Referral error:', error);
-            }
-        }
-
-        function setupEventListeners() {
-            document.querySelector('.menu-button').addEventListener('click', function() {
-                document.getElementById('dropdownMenu').classList.toggle('show');
-            });
-
-            window.addEventListener('click', function(e) {
-                if (!e.target.matches('.menu-button')) {
-                    const dropdowns = document.getElementsByClassName('dropdown-content');
-                    for (let i = 0; i < dropdowns.length; i++) {
-                        const openDropdown = dropdowns[i];
-                        if (openDropdown.classList.contains('show')) {
-                            openDropdown.classList.remove('show');
-                        }
-                    }
-                }
-            });
-
-            document.getElementById('soundToggle').addEventListener('change', toggleSound);
-            document.getElementById('musicToggle').addEventListener('change', toggleMusic);
-            document.getElementById('difficultySelect').value = gameState.difficulty;
-            document.getElementById('themeSelect').value = localStorage.getItem('theme') || 'dark';
-            applyTheme();
-        }
-
-        function showPage(pageId) {
-            if (pageId === 'restriction') {
-                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-                document.getElementById('restrictionPage').classList.add('active');
-                return;
-            }
-
-            if (!gameState.channelJoined) {
-                showPage('restriction');
-                return;
-            }
-
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId + 'Page').classList.add('active');
-
-            const dropdown = document.getElementById('dropdownMenu');
-            if (dropdown) dropdown.classList.remove('show');
-
-            if (pageId === 'game') {
-                initGame();
-            } else if (pageId === 'admin') {
-                loadAdminUsers();
-            }
-        }
-
-        function startGame() {
-            if (!gameState.channelJoined) {
-                showPage('restriction');
-                alert('Please join our Telegram channel and verify your membership to play.');
-                return;
-            }
-            showPage('game');
-        }
-
-        function initGame() {
-            gameState.diamondsFound = 0;
-            gameState.gameActive = true;
-            const grid = document.getElementById('gameGrid');
-            grid.innerHTML = '';
-            gameState.grid = [];
-
-            for (let i = 0; i < 25; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell';
-                cell.dataset.index = i;
-                cell.addEventListener('click', () => revealCell(i));
-                grid.appendChild(cell);
-                gameState.grid.push({ isMine: false, isRevealed: false, isDiamond: false });
-            }
-
-            placeMines();
-            placeDiamonds();
-            updateUI();
-        }
-
-        function placeMines() {
-            let minesPlaced = 0;
-            while (minesPlaced < gameState.minesCount) {
-                const randomIndex = Math.floor(Math.random() * 25);
-                if (!gameState.grid[randomIndex].isMine) {
-                    gameState.grid[randomIndex].isMine = true;
-                    minesPlaced++;
-                }
-            }
-        }
-
-        function placeDiamonds() {
-            let diamondsPlaced = 0;
-            // First place diamonds in non-mine cells
-            for (let i = 0; i < 25 && diamondsPlaced < gameState.diamondsToFind; i++) {
-                if (!gameState.grid[i].isMine) {
-                    gameState.grid[i].isDiamond = true;
-                    diamondsPlaced++;
-                }
-            }
-        }
-
-        function revealCell(index) {
-            if (!gameState.gameActive) return;
-
-            const cell = gameState.grid[index];
-            const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
-
-            if (cell.isRevealed) return;
-
-            cell.isRevealed = true;
-            cellElement.classList.add('revealed');
-            playSound('click');
-
-            if (cell.isMine) {
-                cellElement.classList.add('mine');
-                cellElement.innerHTML = '💣';
-                gameOver();
-                return;
-            }
-
-            if (cell.isDiamond) {
-                cellElement.classList.add('diamond');
-                cellElement.innerHTML = '💎';
-                gameState.diamondsFound++;
-                playSound('win');
-                cellElement.classList.add('diamond-glow');
-
-                if (gameState.diamondsFound === gameState.diamondsToFind) {
-                    levelComplete();
-                }
-            }
-
-            updateUI();
-            updateServerState();
-        }
-
-        function gameOver() {
-            gameState.gameActive = false;
-            playSound('lose');
-
-            gameState.grid.forEach((cell, index) => {
-                if (cell.isMine) {
-                    const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
-                    cellElement.classList.add('mine', 'revealed');
-                    cellElement.innerHTML = '💣';
-                }
-            });
-
-            document.getElementById('loseModal').style.display = 'flex';
-        }
-
-        async function levelComplete() {
-            if (gameState.coins <= 0) {
-                alert("You don't have enough coins to proceed to the next level!");
-                gameState.gameActive = false;
-                return;
-            }
-
-            gameState.gameActive = false;
-            gameState.coins -= 8;
-            gameState.usd += 0.005;
-            gameState.level++;
-
-            playSound('win');
-            document.getElementById('winModal').style.display = 'flex';
-
-            showRewardedAd();
-            await updateServerState();
-            updateUI();
-        }
-
-        function nextLevel() {
-            closeModal('winModal');
-            initGame();
-        }
-
-        function updateUI() {
-            document.getElementById('currentLevel').textContent = gameState.level;
-            document.getElementById('coinDisplay').textContent = gameState.coins;
-            document.getElementById('usdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
-            document.getElementById('withdrawUsdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
-            document.getElementById('diamondsFound').textContent = `${gameState.diamondsFound}/${gameState.diamondsToFind}`;
-            
-            // Update home page stats
-            document.getElementById('homeCoinDisplay').textContent = gameState.coins;
-            document.getElementById('homeUsdDisplay').textContent = `$${gameState.usd.toFixed(3)}`;
-            document.getElementById('homeLevelDisplay').textContent = gameState.level;
-        }
-
-        async function skipWithAd() {
-            closeModal('loseModal');
-            showRewardedAd(async () => {
-                await skipLevelActions();
-            });
-        }
-
-        async function skipWithCoins() {
-            if (gameState.coins >= 25) {
-                gameState.coins -= 25;
-                await skipLevelActions();
-                closeModal('loseModal');
-                updateUI();
-                await updateServerState();
-            } else {
-                alert('Not enough coins!');
-            }
-        }
-
-        async function skipLevelActions() {
-            gameState.usd += 0.005;
-            gameState.level++;
-            updateUI();
-            await updateServerState();
-            initGame();
-        }
-
-        async function restartLevel() {
-            if (gameState.coins >= 5) {
-                gameState.coins -= 5;
-                try {
-                    await updateServerState();
-                    updateUI();
-                    closeModal('loseModal');
-                    initGame();
-                } catch (error) {
-                    console.error('Restart level error:', error);
-                    alert('Error restarting level. Please try again.');
-                }
-            } else {
-                alert('Not enough coins to restart!');
-            }
-        }
-
-        async function claimDailyBonus() {
-            const lastClaimed = localStorage.getItem('dailyBonusLastClaimed');
-            const today = new Date().toDateString();
-
-            if (lastClaimed !== today) {
-                gameState.coins += 50;
-                updateUI();
-                await updateServerState();
-                localStorage.setItem('dailyBonusLastClaimed', today);
-                document.getElementById('dailyBonusModal').style.display = 'flex';
-            } else {
-                alert('You already claimed your daily bonus today!');
-            }
-        }
-
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        function changeTheme() {
-            const theme = document.getElementById('themeSelect').value;
-            localStorage.setItem('theme', theme);
-            applyTheme();
-        }
-
-        function applyTheme() {
-            const theme = localStorage.getItem('theme') || 'dark';
-            if (theme === 'light') {
-                document.body.style.background = 'linear-gradient(135deg, #64b3f4, #c2e59c)';
-                document.body.style.color = '#333';
-            } else {
-                document.body.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c)';
-                document.body.style.color = 'white';
-            }
-        }
-
-        function changeDifficulty() {
-            gameState.difficulty = document.getElementById('difficultySelect').value;
-            
-            // Adjust game parameters based on difficulty
-            switch (gameState.difficulty) {
-                case 'easy':
-                    gameState.diamondsToFind = 20;
-                    gameState.minesCount = 5;
-                    break;
-                case 'medium':
-                    gameState.diamondsToFind = 18;
-                    gameState.minesCount = 7;
-                    break;
-                case 'hard':
-                    gameState.diamondsToFind = 16;
-                    gameState.minesCount = 9;
-                    break;
-            }
-        }
-
-        function toggleSound() {
-            gameState.soundEnabled = document.getElementById('soundToggle').checked;
-        }
-
-        function toggleMusic() {
-            gameState.musicEnabled = document.getElementById('musicToggle').checked;
-            if (gameState.musicEnabled) {
-                startBackgroundMusic();
-            } else {
-                stopBackgroundMusic();
-            }
-        }
-
-        function startBackgroundMusic() {
-            if (gameState.musicEnabled) {
-                const bgMusic = document.getElementById('backgroundMusic');
-                bgMusic.volume = 0.3;
-                bgMusic.play().catch(e => console.log('Autoplay prevented:', e));
-            }
-        }
-
-        function stopBackgroundMusic() {
-            document.getElementById('backgroundMusic').pause();
-        }
-
-        function playSound(sound) {
-            if (!gameState.soundEnabled) return;
-            const soundElement = document.getElementById(sound + 'Sound');
-            soundElement.currentTime = 0;
-            soundElement.play().catch(e => console.log('Sound play prevented:', e));
-        }
-
-        function showInAppAd() {
-            try {
-                if (typeof show_9662480 !== 'undefined') {
-                    show_9662480({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 3,
-                            capping: 0.3,
-                            interval: 60,
-                            timeout: 10,
-                            everyPage: true
-                        }
-                    });
-                }
-            } catch (e) {
-                console.log('Ad error:', e);
-            }
-        }
-
-        function showRewardedAd(callback) {
-            try {
-                if (typeof show_9662480 !== 'undefined') {
-                    show_9662480('pop').then(() => {
-                        if (callback) callback();
-                    }).catch(e => {
-                        console.log('Ad error:', e);
-                        if (callback) callback(); // Continue even if ad fails
-                    });
-                } else if (callback) {
-                    callback(); // Continue if ad SDK is not available
-                }
-            } catch (e) {
-                console.log('Ad error:', e);
-                if (callback) callback(); // Continue even if ad fails
-            }
-        }
-
-        function showPeriodicAd() {
-            try {
-                if (typeof show_9662480 !== 'undefined') {
-                    show_9662480();
-                }
-            } catch (e) {
-                console.log('Ad error:', e);
-            }
-        }
-
-        async function processWithdrawal() {
-            const name = document.getElementById('withdrawName').value;
-            const amount = parseFloat(document.getElementById('withdrawAmount').value);
-            const method = document.getElementById('withdrawMethod').value;
-            const walletAddress = document.getElementById('walletAddress').value;
-
-            if (!name || isNaN(amount) || amount < 5 || amount > gameState.usd || !walletAddress) {
-                alert('Invalid withdrawal details');
-                return;
-            }
-
-            gameState.usd -= amount;
-            updateUI();
-            await updateServerState();
-
-            const withdrawalDetails = {
-                name, amount, method, walletAddress, userId: gameState.userId, date: new Date().toISOString()
-            };
-
-            localStorage.setItem(`withdrawal_${Date.now()}`, JSON.stringify(withdrawalDetails));
-            document.getElementById('withdrawalSuccessModal').style.display = 'flex';
-        }
-
-        async function redeemCode() {
-            const code = document.getElementById('redeemCode').value;
-            if (!code) {
-                alert('Enter a code');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=redeemCode&userId=${gameState.userId}&code=${encodeURIComponent(code)}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    if (data.type === 'coin') {
-                        gameState.coins += data.value;
-                    } else if (data.type === 'usd') {
-                        gameState.usd += data.value;
-                    }
-
-                    updateUI();
-                    await updateServerState();
-
-                    document.getElementById('redeemSuccessMessage').textContent = `Redeemed! Received ${data.value} ${data.type.toUpperCase()}`;
-                    document.getElementById('redeemSuccessModal').style.display = 'flex';
-                } else {
-                    document.getElementById('redeemErrorMessage').textContent = data.message || 'Invalid code';
-                    document.getElementById('redeemErrorModal').style.display = 'flex';
-                }
-            } catch (error) {
-                console.error('Redeem error:', error);
-                document.getElementById('redeemErrorMessage').textContent = 'Error redeeming code';
-                document.getElementById('redeemErrorModal').style.display = 'flex';
-            }
-        }
-
-        async function loadAdminUsers() {
-            if (gameState.userId !== ADMIN_ID) {
-                console.log('Access denied: Not admin');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllUsers`);
-                const data = await response.json();
-
-                if (data.success) {
-                    const list = document.getElementById('adminUserList');
-                    list.innerHTML = '';
-
-                    data.users.forEach(user => {
-                        const div = document.createElement('div');
-                        div.className = 'admin-user';
-                        div.innerHTML = `
-                            ID: ${user.userId}<br>
-                            Name: ${user.fullName}<br>
-                            Username: ${user.username}<br>
-                            Coins: ${user.coins}<br>
-                            USD: ${user.usd}<br>
-                            Joined: ${user.channelJoined ? 'Yes' : 'No'}
-                        `;
-                        list.appendChild(div);
-                    });
-                } else {
-                    console.error('Failed to load users:', data.message);
-                    alert('Failed to load users');
-                }
-            } catch (error) {
-                console.error('Admin load error:', error);
-                alert('Error loading admin users');
-            }
-        }
-
-        async function generateCode() {
-            if (gameState.userId !== ADMIN_ID) {
-                console.log('Access denied: Not admin');
-                return;
-            }
-
-            const type = document.getElementById('codeType').value;
-            const value = parseFloat(document.getElementById('codeValue').value);
-
-            if (isNaN(value) || value <= 0) {
-                alert('Invalid value');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=generateCode&type=${type}&value=${value}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    document.getElementById('generatedCode').textContent = `Generated Code: ${data.code}`;
-                } else {
-                    console.error('Code generation failed:', data.message);
-                    alert('Error generating code');
-                }
-            } catch (error) {
-                console.error('Generate code error:', error);
-                alert('Error generating code');
-            }
-        }
-
-        async function updateUserBalance() {
-            if (gameState.userId !== ADMIN_ID) {
-                console.log('Access denied: Not admin');
-                alert('Access denied: Admin only');
-                return;
-            }
-
-            const targetUserId = document.getElementById('editUserId').value.trim();
-            const coinsChange = parseFloat(document.getElementById('editCoins').value) || 0;
-            const usdChange = parseFloat(document.getElementById('editUsd').value) || 0;
-
-            if (!targetUserId) {
-                alert('Enter a valid user ID');
-                return;
-            }
-
-            try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateBalance&targetUserId=${targetUserId}&coinsChange=${coinsChange}&usdChange=${usdChange}`);
-                const data = await response.json();
-
-                if (data.success) {
-                    alert('Balance updated successfully');
-                    await loadAdminUsers();
-                    document.getElementById('editUserId').value = '';
-                    document.getElementById('editCoins').value = '';
-                    document.getElementById('editUsd').value = '';
-                } else {
-                    console.error('Balance update failed:', data.message);
-                    alert(data.message || 'Error updating balance');
-                }
-            } catch (error) {
-                console.error('Update balance error:', error);
-                alert('Error updating balance');
-            }
-        }
-
-        async function generateReferralReward() {
-            if (gameState.userId !== ADMIN_ID) {
-                console.log('Access denied: Not admin');
-                alert('Access denied: Admin only');
-                return;
-            }
-
-            const referrerId = document.getElementById('rewardUserId').value.trim();
-            const type = document.getElementById('rewardType').value;
-            const value = parseFloat(document.getElementById('rewardValue').value);
-
-            if (!referrerId || isNaN(value) || value <= 0) {
-                alert('Invalid values');
-                return;
-            }
-
-            try {
-                // This would call your backend to generate a referral reward code
-                // For now, we'll simulate it
-                const code = generateRandomCode(10).toUpperCase();
-                document.getElementById('rewardCodeOutput').textContent = `Reward Code: ${code} (${value} ${type.toUpperCase()})`;
-                
-                // Clear the form
-                document.getElementById('rewardUserId').value = '';
-                document.getElementById('rewardValue').value = '';
-            } catch (error) {
-                console.error('Generate referral reward error:', error);
-                alert('Error generating referral reward');
-            }
-        }
-
-        function generateRandomCode(length) {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let result = '';
-            
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            
-            return result;
-        }
-
-        function generateReferralLink() {
-            // Fixed referral link generation
-            return `https://t.me/minezwall_bot?start=${gameState.referralCode}`;
-        }
-
-        function displayReferralLink() {
-            const referralLinkElement = document.getElementById('referralLink');
-            if (referralLinkElement) {
-                referralLinkElement.textContent = generateReferralLink();
-            }
-        }
-
-        function copyReferralLink() {
-            const link = generateReferralLink();
-            navigator.clipboard.writeText(link).then(() => {
-                alert("Referral link copied to clipboard!");
-            }).catch(err => {
-                console.error('Failed to copy: ', err);
-            });
-        }
-
-        function toggleFaq(element) {
-            const answer = element.nextElementSibling;
-            const icon = element.querySelector('i');
-            
-            if (answer.classList.contains('show')) {
-                answer.classList.remove('show');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            } else {
-                answer.classList.add('show');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            }
-        }
-
-        // Initialize the app
-        window.onload = init;
-    </script>
+    // Generate a referral code based on user ID
+    userData.referralCode = generateReferralCode(user.id);
+    
+    document.getElementById('userDisplay').textContent = `Welcome, ${userData.firstName || userData.username}!`;
+  }
+  
+  // Check if user has joined the channel
+  checkChannelJoin();
+  
+  // Load user data from storage
+  loadUserData();
+  
+  // Update referral link display
+  updateReferralLink();
+  
+  // Setup dropdown menu
+  setupDropdown();
+  
+  // Setup game grid
+  setupGameGrid();
+  
+  // Setup event listeners
+  setupEventListeners();
+}
+
+// Generate a referral code based on user ID
+function generateReferralCode(userId) {
+  // Simple hash function to create a code from user ID
+  let hash = 0;
+  for (let i = 0; i < userId.toString().length; i++) {
+    hash = ((hash << 5) - hash) + userId.toString().charCodeAt(i);
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return 'MZ' + Math.abs(hash).toString(36).substring(0, 8).toUpperCase();
+}
+
+// Update referral link display
+function updateReferralLink() {
+  const referralLink = `https://t.me/MinezwallBot?start=${userData.referralCode}`;
+  document.getElementById('referralLink').textContent = referralLink;
+}
+
+// Copy referral link to clipboard
+function copyReferralLink() {
+  const referralLink = `https://t.me/MinezwallBot?start=${userData.referralCode}`;
+  navigator.clipboard.writeText(referralLink)
+    .then(() => {
+      alert('Referral link copied to clipboard!');
+    })
+    .catch(err => {
+      console.error('Failed to copy: ', err);
+      // Fallback method
+      const textArea = document.createElement('textarea');
+      textArea.value = referralLink;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Referral link copied to clipboard!');
+    });
+}
+
+// Check if user has joined the channel
+function checkChannelJoin() {
+  // For demo purposes, we'll simulate checking channel membership
+  // In a real implementation, you would use the Telegram API to check
+  const hasJoined = localStorage.getItem('channel_joined');
+  if (hasJoined === 'true') {
+    showPage('home');
+  } else {
+    showPage('restrictionPage');
+  }
+}
+
+// Verify channel join
+function verifyChannelJoin() {
+  // In a real implementation, you would verify via Telegram API
+  // For demo, we'll just set a flag
+  localStorage.setItem('channel_joined', 'true');
+  showPage('home');
+  alert('Verification successful! You can now play the game.');
+}
+
+// Setup dropdown menu
+function setupDropdown() {
+  dropdownMenu.addEventListener('click', function() {
+    dropdownMenu.classList.toggle('show');
+  });
+  
+  // Close dropdown when clicking outside
+  window.addEventListener('click', function(e) {
+    if (!dropdownMenu.contains(e.target)) {
+      dropdownMenu.classList.remove('show');
+    }
+  });
+}
+
+// Setup event listeners
+function setupEventListeners() {
+  // Sound toggles
+  document.getElementById('soundToggle').addEventListener('change', function() {
+    userData.soundEnabled = this.checked;
+    saveUserData();
+  });
+  
+  document.getElementById('musicToggle').addEventListener('change', function() {
+    userData.musicEnabled = this.checked;
+    if (this.checked) {
+      document.getElementById('backgroundMusic').play();
+    } else {
+      document.getElementById('backgroundMusic').pause();
+    }
+    saveUserData();
+  });
+}
+
+// Show a specific page
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(page => {
+    page.classList.remove('active');
+  });
+  
+  // Show the requested page
+  document.getElementById(pageId).classList.add('active');
+  
+  // Update UI elements if needed
+  if (pageId === 'gamePage') {
+    updateGameUI();
+  } else if (pageId === 'withdrawPage') {
+    document.getElementById('withdrawUsdDisplay').textContent = `$${userData.usd.toFixed(3)}`;
+  }
+}
+
+// Close modal
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = 'none';
+}
+
+// Open modal
+function openModal(modalId) {
+  document.getElementById(modalId).style.display = 'flex';
+}
+
+// Load user data from localStorage
+function loadUserData() {
+  const savedData = localStorage.getItem('minezwall_userData');
+  if (savedData) {
+    const parsedData = JSON.parse(savedData);
+    Object.assign(userData, parsedData);
+  }
+  
+  // Update UI with loaded data
+  updateUI();
+}
+
+// Save user data to localStorage
+function saveUserData() {
+  localStorage.setItem('minezwall_userData', JSON.stringify(userData));
+}
+
+// Update UI with current user data
+function updateUI() {
+  document.getElementById('coinDisplay').textContent = userData.coins;
+  document.getElementById('usdDisplay').textContent = `$${userData.usd.toFixed(3)}`;
+  document.getElementById('currentLevel').textContent = userData.level;
+  document.getElementById('diamondsFound').textContent = `${userData.diamondsFound}/${userData.totalDiamonds}`;
+  
+  // Update settings toggles
+  if (userData.soundEnabled !== undefined) {
+    document.getElementById('soundToggle').checked = userData.soundEnabled;
+  }
+  
+  if (userData.musicEnabled !== undefined) {
+    document.getElementById('musicToggle').checked = userData.musicEnabled;
+    if (userData.musicEnabled) {
+      document.getElementById('backgroundMusic').play();
+    }
+  }
+  
+  if (userData.theme) {
+    document.getElementById('themeSelect').value = userData.theme;
+    changeTheme();
+  }
+  
+  if (userData.difficulty) {
+    document.getElementById('difficultySelect').value = userData.difficulty;
+  }
+}
+
+// Update game UI
+function updateGameUI() {
+  document.getElementById('coinDisplay').textContent = userData.coins;
+  document.getElementById('usdDisplay').textContent = `$${userData.usd.toFixed(3)}`;
+  document.getElementById('currentLevel').textContent = userData.level;
+  document.getElementById('diamondsFound').textContent = `${userData.diamondsFound}/${userData.totalDiamonds}`;
+}
+
+// Setup game grid
+function setupGameGrid() {
+  const grid = document.getElementById('gameGrid');
+  grid.innerHTML = '';
+  
+  // Create 5x5 grid
+  for (let i = 0; i < 25; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.index = i;
+    cell.addEventListener('click', () => revealCell(i));
+    grid.appendChild(cell);
+  }
+}
+
+// Start the game
+function startGame() {
+  if (userData.coins < 8) {
+    alert('Not enough coins to play! Claim your daily bonus or complete more levels.');
+    return;
+  }
+  
+  // Deduct coins for playing
+  userData.coins -= 8;
+  saveUserData();
+  updateUI();
+  
+  // Initialize game state
+  gameState.revealedCount = 0;
+  gameState.gameActive = true;
+  userData.diamondsFound = 0;
+  
+  // Generate game grid with mines and diamonds
+  generateGameGrid();
+  
+  // Show game page
+  showPage('gamePage');
+}
+
+// Generate game grid with mines and diamonds
+function generateGameGrid() {
+  const cells = document.querySelectorAll('.cell');
+  const minePositions = [];
+  const diamondPositions = [];
+  
+  // Reset all cells
+  cells.forEach(cell => {
+    cell.className = 'cell';
+    cell.innerHTML = '';
+  });
+  
+  // Place mines (based on difficulty)
+  const mineCount = userData.difficulty === 'hard' ? 7 : userData.difficulty === 'medium' ? 5 : 3;
+  
+  while (minePositions.length < mineCount) {
+    const pos = Math.floor(Math.random() * 25);
+    if (!minePositions.includes(pos)) {
+      minePositions.push(pos);
+    }
+  }
+  
+  // Place diamonds
+  while (diamondPositions.length < userData.totalDiamonds) {
+    const pos = Math.floor(Math.random() * 25);
+    if (!minePositions.includes(pos) && !diamondPositions.includes(pos)) {
+      diamondPositions.push(pos);
+    }
+  }
+  
+  // Save grid state
+  gameState.grid = Array(25).fill(null).map((_, index) => {
+    if (minePositions.includes(index)) return 'mine';
+    if (diamondPositions.includes(index)) return 'diamond';
+    return 'empty';
+  });
+}
+
+// Reveal a cell
+function revealCell(index) {
+  if (!gameState.gameActive) return;
+  
+  const cell = document.querySelector(`.cell[data-index="${index}"]`);
+  if (cell.classList.contains('revealed')) return;
+  
+  // Play click sound
+  if (userData.soundEnabled) {
+    document.getElementById('clickSound').currentTime = 0;
+    document.getElementById('clickSound').play();
+  }
+  
+  cell.classList.add('revealed');
+  gameState.revealedCount++;
+  
+  // Check what's in the cell
+  if (gameState.grid[index] === 'mine') {
+    // Hit a mine - game over
+    cell.classList.add('mine');
+    cell.innerHTML = '💣';
+    gameOver();
+  } else if (gameState.grid[index] === 'diamond') {
+    // Found a diamond
+    cell.classList.add('diamond', 'diamond-glow');
+    cell.innerHTML = '💎';
+    userData.diamondsFound++;
+    updateUI();
+    
+    // Check if all diamonds found
+    if (userData.diamondsFound === userData.totalDiamonds) {
+      levelComplete();
+    }
+  } else {
+    // Empty cell
+    cell.innerHTML = '';
+  }
+}
+
+// Game over
+function gameOver() {
+  gameState.gameActive = false;
+  
+  // Play lose sound
+  if (userData.soundEnabled) {
+    document.getElementById('loseSound').currentTime = 0;
+    document.getElementById('loseSound').play();
+  }
+  
+  // Show lose modal
+  openModal('loseModal');
+}
+
+// Level complete
+function levelComplete() {
+  gameState.gameActive = false;
+  
+  // Add USD reward
+  userData.usd += 0.005;
+  userData.level++;
+  saveUserData();
+  
+  // Play win sound
+  if (userData.soundEnabled) {
+    document.getElementById('winSound').currentTime = 0;
+    document.getElementById('winSound').play();
+  }
+  
+  // Show win modal
+  openModal('winModal');
+}
+
+// Next level
+function nextLevel() {
+  closeModal('winModal');
+  startGame();
+}
+
+// Restart level
+function restartLevel() {
+  if (userData.coins < 5) {
+    alert('Not enough coins to restart!');
+    return;
+  }
+  
+  userData.coins -= 5;
+  saveUserData();
+  updateUI();
+  
+  closeModal('loseModal');
+  startGame();
+}
+
+// Skip with ad
+function skipWithAd() {
+  // In a real implementation, you would show an ad here
+  // For demo, we'll just skip the level
+  alert('Ad would be shown here. Skipping level...');
+  userData.level++;
+  saveUserData();
+  closeModal('loseModal');
+  showPage('home');
+}
+
+// Skip with coins
+function skipWithCoins() {
+  if (userData.coins < 25) {
+    alert('Not enough coins to skip!');
+    return;
+  }
+  
+  userData.coins -= 25;
+  userData.level++;
+  saveUserData();
+  updateUI();
+  
+  closeModal('loseModal');
+  showPage('home');
+}
+
+// Claim daily bonus
+function claimDailyBonus() {
+  const now = Date.now();
+  const lastClaim = userData.lastBonusClaim || 0;
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+  
+  if (now - lastClaim < twentyFourHours) {
+    const nextClaim = new Date(lastClaim + twentyFourHours);
+    alert(`You can claim your next daily bonus at ${nextClaim.toLocaleTimeString()}`);
+    return;
+  }
+  
+  userData.coins += 50;
+  userData.lastBonusClaim = now;
+  saveUserData();
+  updateUI();
+  
+  openModal('dailyBonusModal');
+}
+
+// Process withdrawal
+function processWithdrawal() {
+  const amount = parseFloat(document.getElementById('withdrawAmount').value);
+  const walletAddress = document.getElementById('walletAddress').value;
+  const name = document.getElementById('withdrawName').value;
+  
+  if (!name || !amount || !walletAddress) {
+    alert('Please fill all fields');
+    return;
+  }
+  
+  if (amount < 5) {
+    alert('Minimum withdrawal amount is $5.00');
+    return;
+  }
+  
+  if (amount > userData.usd) {
+    alert('Insufficient USD balance');
+    return;
+  }
+  
+  // In a real implementation, you would process the withdrawal here
+  // For demo, we'll just show a success message
+  userData.usd -= amount;
+  saveUserData();
+  updateUI();
+  
+  openModal('withdrawalSuccessModal');
+}
+
+// Redirect to Google Form for verification
+function redirectToGoogleForm() {
+  window.open('https://forms.google.com', '_blank');
+  closeModal('withdrawalSuccessModal');
+  showPage('home');
+}
+
+// Redeem code
+function redeemCode() {
+  const code = document.getElementById('redeemCode').value.trim();
+  
+  if (!code) {
+    alert('Please enter a code');
+    return;
+  }
+  
+  // In a real implementation, you would validate the code with your backend
+  // For demo, we'll just show a message
+  alert(`Code "${code}" has been submitted for verification. If valid, rewards will be added to your account.`);
+  document.getElementById('redeemCode').value = '';
+}
+
+// Change theme
+function changeTheme() {
+  const theme = document.getElementById('themeSelect').value;
+  userData.theme = theme;
+  saveUserData();
+  
+  if (theme === 'light') {
+    document.body.style.background = 'linear-gradient(135deg, #f5f7fa, #c3cfe2)';
+    document.body.style.color = '#333';
+  } else {
+    document.body.style.background = 'linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c)';
+    document.body.style.color = 'white';
+  }
+}
+
+// Change difficulty
+function changeDifficulty() {
+  const difficulty = document.getElementById('difficultySelect').value;
+  userData.difficulty = difficulty;
+  saveUserData();
+}
+
+// Initialize the app when the page loads
+window.addEventListener('DOMContentLoaded', initApp);
+
+// Performance optimization: Debounce resize events
+let resizeTimeout;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(function() {
+    // Update any layout-dependent elements here
+  }, 250);
+});
+
+// Optimize game grid rendering
+function optimizeGridRendering() {
+  const grid = document.getElementById('gameGrid');
+  grid.style.display = 'none';
+  
+  // Force reflow
+  void grid.offsetWidth;
+  
+  grid.style.display = 'grid';
+}
+
+// Preload audio files for better performance
+function preloadAudio() {
+  const audioElements = [
+    document.getElementById('backgroundMusic'),
+    document.getElementById('clickSound'),
+    document.getElementById('winSound'),
+    document.getElementById('loseSound')
+  ];
+  
+  audioElements.forEach(audio => {
+    audio.preload = 'auto';
+  });
+}
+
+// Call preload function after page loads
+window.addEventListener('load', preloadAudio);
+</script>
 </body>
 </html>
