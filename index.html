@@ -521,141 +521,6 @@
             padding: 20px;
             margin: 20px 0;
         }
-        
-        /* Styles for HOW TO page */
-        .howto-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
-            flex: 1;
-        }
-        .howto-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .howto-header h1 {
-            font-size: 36px;
-            margin-bottom: 10px;
-            background: linear-gradient(to right, #4dffb8, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .howto-header p {
-            font-size: 18px;
-            opacity: 0.9;
-        }
-        .howto-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        .howto-section h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #4dffb8;
-            display: flex;
-            align-items: center;
-        }
-        .howto-section h2 i {
-            margin-right: 10px;
-        }
-        .howto-section p {
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-        .howto-feature-list {
-            list-style-type: none;
-        }
-        .howto-feature-list li {
-            margin-bottom: 15px;
-            padding-left: 30px;
-            position: relative;
-        }
-        .howto-feature-list li i {
-            position: absolute;
-            left: 0;
-            top: 2px;
-            color: #ffd700;
-            font-size: 18px;
-        }
-        .howto-step {
-            display: flex;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .howto-step-number {
-            background: #4e54c8;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-        .howto-step-content {
-            flex: 1;
-        }
-        .howto-highlight {
-            background: rgba(255, 215, 0, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #ffd700;
-        }
-        .howto-tip {
-            background: rgba(77, 255, 184, 0.2);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #4dffb8;
-        }
-        .howto-navigation {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .howto-nav-item {
-            background: rgba(78, 84, 200, 0.3);
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        .howto-nav-item:hover {
-            background: rgba(78, 84, 200, 0.5);
-            transform: translateY(-3px);
-        }
-        .howto-button {
-            display: inline-block;
-            background: linear-gradient(to right, #00c9ff, #92fe9d);
-            color: #1a2a6c;
-            padding: 12px 25px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-        .howto-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        @media (max-width: 600px) {
-            .howto-navigation {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
@@ -669,7 +534,6 @@
                     <div class="dropdown-content" id="dropdownContent">
                         <button onclick="showPage('withdraw')">Withdraw</button>
                         <button onclick="showPage('redeem')">Redeem Code</button>
-                        <button onclick="showPage('howto')">How To Play</button>
                         <button onclick="showPage('settings')">Settings</button>
                     </div>
                 </div>
@@ -816,177 +680,6 @@
             </div>
         </div>
         
-        <div id="howtoPage" class="page">
-            <div class="header">
-                <div class="header-left">
-                    <button class="back-button" onclick="showPage('home')">←</button>
-                </div>
-                <div class="header-center">
-                    <div class="game-title">How To Play</div>
-                </div>
-                <div class="header-right"></div>
-            </div>
-            
-            <div class="howto-container">
-                <div class="howto-header">
-                    <h1>Welcome to Minezwall!</h1>
-                    <p>Your adventure to dig for cryptocurrency rewards starts here</p>
-                </div>
-
-                <div class="howto-section">
-                    <h2><i class="fas fa-gem"></i> How to Play</h2>
-                    <p>Minezwall is a skill-based game where you uncover diamonds while avoiding mines to earn real cryptocurrency rewards.</p>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">1</div>
-                        <div class="howto-step-content">
-                            <h3>Start the Game</h3>
-                            <p>Click the "START GAME" button on the home page to begin your mining adventure.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">2</div>
-                        <div class="howto-step-content">
-                            <h3>Reveal Cells</h3>
-                            <p>Tap on cells to reveal what's hidden beneath. You'll either find diamonds 💎 or mines 💣.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">3</div>
-                        <div class="howto-step-content">
-                            <h3>Find Diamonds</h3>
-                            <p>Each diamond you find increases your count. Find all diamonds to complete the level and earn rewards!</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">4</div>
-                        <div class="howto-step-content">
-                            <h3>Avoid Mines</h3>
-                            <p>If you hit a mine, the game ends. Be careful and strategic with your choices!</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">5</div>
-                        <div class="howto-step-content">
-                            <h3>Earn Rewards</h3>
-                            <p>Successfully completing levels earns you coins and USD balance that can be withdrawn as real cryptocurrency.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-tip">
-                        <p><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> The game gets more challenging as you progress to higher levels with more mines!</p>
-                    </div>
-                </div>
-
-                <div class="howto-section">
-                    <h2><i class="fas fa-compass"></i> Navigation Guide</h2>
-                    <p>Minezwall has several sections that you can access through the menu button ☰ in the top left corner:</p>
-                    
-                    <div class="howto-navigation">
-                        <div class="howto-nav-item">
-                            <h3><i class="fas fa-home"></i> Home</h3>
-                            <p>Your starting point with the game launch button</p>
-                        </div>
-                        <div class="howto-nav-item">
-                            <h3><i class="fas fa-gamepad"></i> Game</h3>
-                            <p>Where the mining action happens</p>
-                        </div>
-                        <div class="howto-nav-item">
-                            <h3><i class="fas fa-wallet"></i> Withdraw</h3>
-                            <p>Cash out your earnings to your crypto wallet</p>
-                        </div>
-                        <div class="howto-nav-item">
-                            <h3><i class="fas fa-cog"></i> Settings</h3>
-                            <p>Customize sound, music, theme, and difficulty</p>
-                        </div>
-                        <div class="howto-nav-item">
-                            <h3><i class="fas fa-ticket-alt"></i> Redeem Code</h3>
-                            <p>Enter special codes for bonus rewards</p>
-                        </div>
-                        <div class="howto-nav-item">
-                            <h3><i class="fas fa-users"></i> Referral</h3>
-                            <p>Invite friends and earn from their gameplay</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="howto-section">
-                    <h2><i class="fas fa-star"></i> Key Features</h2>
-                    <ul class="howto-feature-list">
-                        <li><i class="fas fa-coins"></i> <strong>Daily Bonuses</strong> - Claim free coins every day</li>
-                        <li><i class="fas fa-ad"></i> <strong>Ad Skip</strong> - Watch ads to skip difficult levels</li>
-                        <li><i class="fas fa-money-bill-wave"></i> <strong>Coin Skip</strong> - Use coins to skip levels</li>
-                        <li><i class="fas fa-redo"></i> <strong>Restart Level</strong> - Try again if you hit a mine</li>
-                        <li><i class="fas fa-bolt"></i> <strong>Multiple Withdrawal Options</strong> - USDT, Bitcoin, or Ethereum</li>
-                        <li><i class="fas fa-user-friends"></i> <strong>Referral Program</strong> - Earn 10% of your friends' rewards</li>
-                        <li><i class="fas fa-trophy"></i> <strong>Progression System</strong> - Advance through increasingly challenging levels</li>
-                    </ul>
-                </div>
-
-                <div class="howto-section">
-                    <h2><i class="fas fa-money-check-alt"></i> Withdrawing Earnings</h2>
-                    <p>When you've accumulated at least $5 in your USD balance, you can withdraw your earnings:</p>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">1</div>
-                        <div class="howto-step-content">
-                            <p>Go to the <strong>Withdraw</strong> section from the menu</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">2</div>
-                        <div class="howto-step-content">
-                            <p>Enter your full name and wallet address</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">3</div>
-                        <div class="howto-step-content">
-                            <p>Select your preferred cryptocurrency (USDT, Bitcoin, or Ethereum)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">4</div>
-                        <div class="howto-step-content">
-                            <p>Enter the amount you wish to withdraw (minimum $5)</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-step">
-                        <div class="howto-step-number">5</div>
-                        <div class="howto-step-content">
-                            <p>Submit your request and complete the verification form</p>
-                        </div>
-                    </div>
-                    
-                    <div class="howto-highlight">
-                        <p><i class="fas fa-exclamation-circle"></i> <strong>Important:</strong> You must join our Telegram channel before you can play and withdraw earnings. This helps prevent fraud and ensures fair gameplay for everyone.</p>
-                    </div>
-                </div>
-
-                <div class="howto-section">
-                    <h2><i class="fas fa-question-circle"></i> Need Help?</h2>
-                    <p>If you have any questions or encounter issues:</p>
-                    <ul class="howto-feature-list">
-                        <li><i class="fas fa-envelope"></i> Contact support through our Telegram channel</li>
-                        <li><i class="fas fa-book"></i> Check for updates in the announcement channel</li>
-                        <li><i class="fas fa-comments"></i> Connect with other players in the community chat</li>
-                    </ul>
-                    
-                    <center>
-                        <button class="howto-button" onclick="showPage('home')">Start Playing Now!</button>
-                    </center>
-                </div>
-            </div>
-        </div>
-        
         <div id="adminPage" class="page">
             <div class="header">
                 <div class="header-left">
@@ -1034,8 +727,7 @@
                 <button class="submit-button" onclick="updateUserBalance()">Update Balance</button>
             </div>
         </div>
-        
-        <div id="settingsPage" class="page">
+<div id="settingsPage" class="page">
             <div class="header">
                 <div class="header-left">
                     <button class="back-button" onclick="showPage('home')">←</button>
@@ -1236,7 +928,7 @@
             }
         }
 
-        async function loadGameStateFromServer() {
+async function loadGameStateFromServer() {
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&userId=${gameState.userId}`);
                 const data = await response.json();
@@ -1418,7 +1110,7 @@
             gameState.gameActive = false;
             clearInterval(gameState.timerInterval);
             playSound('lose');
-            gameState.grid.forEach((cell, index) {
+            gameState.grid.forEach((cell, index) => {
                 if (cell.isMine) {
                     const cellElement = document.querySelector(`.cell[data-index="${index}"]`);
                     cellElement.classList.add('mine', 'revealed');
@@ -1427,8 +1119,7 @@
             });
             document.getElementById('loseModal').style.display = 'flex';
         }
-
-        async function levelComplete() {
+async function levelComplete() {
             if (gameState.coins <= 0) {
                 alert("You don't have enough coins to proceed to the next level!");
                 gameState.gameActive = false;
@@ -1601,7 +1292,7 @@
             }
         }
 
-        function showRewardedAd(callback) {
+function showRewardedAd(callback) {
             try {
                 show_9662480('pop').then(() => {
                     if (callback) callback();
@@ -1741,7 +1432,7 @@
             }
             
             try {
-                const response = await fetch(`${APPS_SCRIPT_URL?action=updateBalance&targetUserId=${targetUserId}&coinsChange=${coinsChange}&usdChange=${usdChange}`);
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=updateBalance&targetUserId=${targetUserId}&coinsChange=${coinsChange}&usdChange=${usdChange}`);
                 const data = await response.json();
                 if (data.success) {
                     alert('Balance updated');
@@ -1758,3 +1449,4 @@
     </script>
 </body>
 </html>
+
