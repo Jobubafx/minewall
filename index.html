@@ -521,6 +521,51 @@
             padding: 20px;
             margin: 20px 0;
         }
+        /* Referral section styles */
+        .referral-section {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .referral-link-container {
+            display: flex;
+            margin: 15px 0;
+        }
+        .referral-link {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px 0 0 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .copy-button {
+            background: #4e54c8;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+        }
+        .referral-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .referral-stat {
+            text-align: center;
+        }
+        .referral-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .referral-stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -533,6 +578,7 @@
                     <button class="menu-button">☰</button>
                     <div class="dropdown-content" id="dropdownContent">
                         <button onclick="showPage('withdraw')">Withdraw</button>
+                        <button onclick="showPage('referral')">Referral</button>
                         <button onclick="showPage('redeem')">Redeem Code</button>
                         <button onclick="showPage('settings')">Settings</button>
                     </div>
@@ -659,6 +705,41 @@
             </div>
         </div>
         
+        <div id="referralPage" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <button class="back-button" onclick="showPage('home')">←</button>
+                </div>
+                <div class="header-center">
+                    <div class="game-title">Referral Program</div>
+                </div>
+                <div class="header-right"></div>
+            </div>
+            
+            <div class="referral-section">
+                <h3>Invite Friends & Earn Rewards</h3>
+                <p>Share your referral link and earn 50 coins for each friend who joins!</p>
+                
+                <div class="referral-link-container">
+                    <input type="text" id="referralLink" class="referral-link" readonly>
+                    <button class="copy-button" onclick="copyReferralLink()">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                
+                <div class="referral-stats">
+                    <div class="referral-stat">
+                        <div class="referral-stat-value" id="referralCount">0</div>
+                        <div class="referral-stat-label">Referrals</div>
+                    </div>
+                    <div class="referral-stat">
+                        <div class="referral-stat-value" id="referralEarnings">0</div>
+                        <div class="referral-stat-label">Coins Earned</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div id="redeemPage" class="page">
             <div class="header">
                 <div class="header-left">
@@ -727,7 +808,8 @@
                 <button class="submit-button" onclick="updateUserBalance()">Update Balance</button>
             </div>
         </div>
-<div id="settingsPage" class="page">
+        
+        <div id="settingsPage" class="page">
             <div class="header">
                 <div class="header-left">
                     <button class="back-button" onclick="showPage('home')">←</button>
@@ -835,7 +917,7 @@
         const tg = window.Telegram.WebApp;
         
         const ADMIN_ID = 1558798885;
-        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxa7Z-lO_5tn08UbAnqxxruagVeGT8jgBNXgzr_Hof5IGjUwgLPISi1cU63ndIIZg_0/exec'; // Replace with your deployed Apps Script Web App URL
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxwsSm4zulQ0hgPYUfScuqcDmx4nZHoXwa0s9CQuzcJKnASBRACTykUMQfx-uMQAhv/exec'; // Replace with your deployed Apps Script Web App URL
         
         const gameState = {
             coins: 500,
@@ -857,7 +939,9 @@
             channelJoined: false,
             referralCode: '',
             referredBy: '',
-            verificationAttempts: 0 // No longer used for simulation
+            referralCount: 0,
+            referralEarnings: 0,
+            verificationAttempts: 0
         };
 
         // Initialize the game
@@ -928,12 +1012,13 @@
             }
         }
 
-async function loadGameStateFromServer() {
+        async function loadGameStateFromServer() {
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=getUserData&userId=${gameState.userId}`);
                 const data = await response.json();
                 if (data.success) {
                     Object.assign(gameState, data.user);
+                    updateReferralUI();
                 } else {
                     // New user, register
                     await registerUser();
@@ -946,19 +1031,52 @@ async function loadGameStateFromServer() {
 
         async function registerUser() {
             try {
-                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerUser&userId=${gameState.userId}&username=${gameState.username}&fullName=${gameState.fullName}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}`);
+                // Generate a referral code for the user
+                gameState.referralCode = generateReferralCode();
+                
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=registerUser&userId=${gameState.userId}&username=${gameState.username}&fullName=${gameState.fullName}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&referralCode=${gameState.referralCode}`);
                 const data = await response.json();
                 if (data.success) {
-                    gameState.referralCode = data.referralCode;
+                    updateReferralLink();
                 }
             } catch (error) {
                 console.error('Register error:', error);
             }
         }
 
+        function generateReferralCode() {
+            // Generate a random 8-character alphanumeric code
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function updateReferralLink() {
+            // Create a Telegram deep link with the referral code
+            const botUsername = 'minezwall_bot'; // Replace with your bot's username
+            const referralLink = `https://t.me/${botUsername}?start=${gameState.referralCode}`;
+            document.getElementById('referralLink').value = referralLink;
+        }
+
+        function updateReferralUI() {
+            document.getElementById('referralCount').textContent = gameState.referralCount;
+            document.getElementById('referralEarnings').textContent = gameState.referralEarnings;
+            updateReferralLink();
+        }
+
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.select();
+            document.execCommand('copy');
+            alert('Referral link copied to clipboard!');
+        }
+
         async function updateServerState() {
             try {
-                await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}`);
+                await fetch(`${APPS_SCRIPT_URL}?action=updateUser&userId=${gameState.userId}&coins=${gameState.coins}&usd=${gameState.usd}&channelJoined=${gameState.channelJoined}&level=${gameState.level}&referralCount=${gameState.referralCount}&referralEarnings=${gameState.referralEarnings}`);
             } catch (error) {
                 console.error('Update error:', error);
             }
@@ -973,6 +1091,9 @@ async function loadGameStateFromServer() {
                     alert('Referral successful! You received 50 coins.');
                     updateUI();
                     await updateServerState();
+                    
+                    // Also reward the referrer
+                    await fetch(`${APPS_SCRIPT_URL}?action=rewardReferrer&referrerId=${gameState.referredBy}`);
                 }
             } catch (error) {
                 console.error('Referral error:', error);
@@ -1025,6 +1146,8 @@ async function loadGameStateFromServer() {
                 initGame();
             } else if (pageId === 'admin') {
                 loadAdminUsers();
+            } else if (pageId === 'referral') {
+                updateReferralUI();
             }
         }
 
@@ -1119,7 +1242,8 @@ async function loadGameStateFromServer() {
             });
             document.getElementById('loseModal').style.display = 'flex';
         }
-async function levelComplete() {
+
+        async function levelComplete() {
             if (gameState.coins <= 0) {
                 alert("You don't have enough coins to proceed to the next level!");
                 gameState.gameActive = false;
@@ -1292,7 +1416,7 @@ async function levelComplete() {
             }
         }
 
-function showRewardedAd(callback) {
+        function showRewardedAd(callback) {
             try {
                 show_9662480('pop').then(() => {
                     if (callback) callback();
@@ -1386,7 +1510,8 @@ function showRewardedAd(callback) {
                             Username: ${user.username}<br>
                             Coins: ${user.coins}<br>
                             USD: ${user.usd}<br>
-                            Joined: ${user.channelJoined ? 'Yes' : 'No'}
+                            Joined: ${user.channelJoined ? 'Yes' : 'No'}<br>
+                            Referrals: ${user.referralCount || 0}
                         `;
                         list.appendChild(div);
                     });
@@ -1449,4 +1574,3 @@ function showRewardedAd(callback) {
     </script>
 </body>
 </html>
-
