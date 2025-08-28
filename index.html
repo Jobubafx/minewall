@@ -718,7 +718,7 @@
             
             <div class="referral-section">
                 <h3>Invite Friends & Earn Rewards</h3>
-                <p>Share your referral link and earn 50 coins for each friend who joins!</p>
+                <p>Share your referral link and earn 500 coins for each friend who joins!</p>
                 
                 <div class="referral-link-container">
                     <input type="text" id="referralLink" class="referral-link" readonly>
@@ -862,7 +862,7 @@
     <div class="modal" id="winModal">
         <div class="modal-content">
             <h2>Congratulations!</h2>
-            <p>You found all diamonds and completed the level!</p>
+            <p>You found all 4 diamonds and completed the level!</p>
             <p>Reward: +$0.005 USD</p>
             <button class="modal-button" onclick="nextLevel()">Next Level</button>
         </div>
@@ -921,11 +921,11 @@
         
         const gameState = {
             coins: 500,
-            usd: 0.500,
+            usd: 1.000,
             level: 1,
             diamondsFound: 0,
             diamondsToFind: 4,
-            minesCount: 5,
+            minesCount: 6,
             grid: [],
             gameActive: false,
             timer: 0,
@@ -1087,8 +1087,8 @@
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=registerReferral&userId=${gameState.userId}&referredBy=${gameState.referredBy}`);
                 const data = await response.json();
                 if (data.success) {
-                    gameState.coins += 50; // Reward new user
-                    alert('Referral successful! You received 50 coins.');
+                    gameState.coins += 0; // Reward new user
+                    alert('Referral successful! Send the user id, username, and fullname to the official channel chat for verification and your reward.');
                     updateUI();
                     await updateServerState();
                     
