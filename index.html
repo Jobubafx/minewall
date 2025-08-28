@@ -1056,8 +1056,8 @@
 
         function updateReferralLink() {
             // Create a Telegram deep link with the referral code
-            const botUsername = 'minezwall_bot'; // Replace with your bot's username
-            const referralLink = `t.me/${botUsername}?start=${gameState.referralCode}`;
+            const botUsername = 'minezwallbot'; // Replace with your bot's username
+            const referralLink = `https://t.me/${botUsername}?start=${gameState.referralCode}`;
             document.getElementById('referralLink').value = referralLink;
         }
 
